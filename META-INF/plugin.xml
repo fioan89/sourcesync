@@ -5,7 +5,7 @@
   <vendor email="fioan89@gmail.com" url=""></vendor>
 
   <description><![CDATA[
-      Source Synchronizer is a powerful plugin for performing one-way module or file synchronization for your project.
+      Source Synchronizer is a powerful plugin for performing one-way file synchronization for your project.
       <br>It synchronizes the remote target so that it will match your local project.
       ]]></description>
 
