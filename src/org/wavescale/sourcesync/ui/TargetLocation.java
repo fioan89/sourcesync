@@ -1,10 +1,9 @@
-package org.wavescale.sourcesync.config;
+package org.wavescale.sourcesync.ui;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.event.*;
-import java.beans.PropertyChangeListener;
 
 public class TargetLocation extends JDialog {
     private JPanel contentPane;

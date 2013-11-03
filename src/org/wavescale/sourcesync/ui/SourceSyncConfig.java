@@ -1,4 +1,4 @@
-package org.wavescale.sourcesync.config;
+package org.wavescale.sourcesync.ui;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -7,8 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
-
-import static javax.swing.ListSelectionModel.*;
 
 /**
  * ****************************************************************************
