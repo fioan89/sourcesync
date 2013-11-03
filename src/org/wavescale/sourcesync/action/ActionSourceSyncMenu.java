@@ -2,7 +2,7 @@ package org.wavescale.sourcesync.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import org.wavescale.sourcesync.config.SourceSyncConfig;
+import org.wavescale.sourcesync.ui.SourceSyncConfig;
 
 /*******************************************************************************
  * Copyright (c) 2005-2013 Faur Ioan-Aurel.                                     *
