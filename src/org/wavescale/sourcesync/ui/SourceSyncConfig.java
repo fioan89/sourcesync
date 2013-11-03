@@ -3,6 +3,7 @@ package org.wavescale.sourcesync.ui;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -27,13 +28,16 @@ public class SourceSyncConfig {
     private JToolBar pnTargetName;
     private JPanel pnConfig;
     private JLabel lbTarget;
+
     // connection name to the connection type
     private Map<String, String> connectionType;
+    private JFrame frame;
 
     public SourceSyncConfig() {
-        JFrame frame = new JFrame("SourceSyncConfig");
+        frame = new JFrame("SourceSyncConfig");
         frame.setLocationRelativeTo(null);
         lstTargets.setModel(new DefaultListModel());
+        pnConfig.setLayout(new FlowLayout());
         frame.setContentPane(configPanel);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         connectionType = new HashMap<String, String>();
@@ -47,6 +51,8 @@ public class SourceSyncConfig {
                 connectionType.put(name, type);
                 ((DefaultListModel)lstTargets.getModel()).addElement(name);
                 lstTargets.setSelectedIndex(((DefaultListModel) lstTargets.getModel()).lastIndexOf(name));
+                ConnectionConfigPanel connectionConfigPanel = ConfigPanelFactory.getInstance().getConnectionConfigPanel();
+                pnConfig.getLayout().addLayoutComponent("config", connectionConfigPanel.getConfigPanel());
             }
         });
 
