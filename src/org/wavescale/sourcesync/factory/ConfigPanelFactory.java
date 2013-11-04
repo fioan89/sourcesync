@@ -1,4 +1,6 @@
-package org.wavescale.sourcesync.ui;
+package org.wavescale.sourcesync.factory;
+
+import org.wavescale.sourcesync.ui.ConnectionConfigPanel;
 
 /**
  * ****************************************************************************
