@@ -90,6 +90,7 @@ public class SourceSyncConfig {
                 connectionConfiguration = new SFTPConfiguration();
             }
             downloadConfigurationToPersistence(connectionConfiguration);
+            connectionFactory.addConnectionConfiguration(connectionName, connectionConfiguration);
         }
     }
 
@@ -98,7 +99,17 @@ public class SourceSyncConfig {
      * @param connectionConfiguration the actual implementation of the <code>ConnectionConfiguration</code>.
      */
     private void downloadConfigurationToPersistence(ConnectionConfiguration connectionConfiguration) {
-        // TODO
+        connectionConfiguration.setHost(connectionPanel.getHost());
+        connectionConfiguration.setRootPath(connectionPanel.getRootPath());
+        connectionConfiguration.setPort(connectionPanel.getPort());
+        connectionConfiguration.setUserName(connectionPanel.getUserName());
+        connectionConfiguration.setUserPassword(connectionPanel.getUserPassword());
+        connectionConfiguration.setExcludedFiles(connectionPanel.getExludedFiles());
+        if (Constants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
+            boolean value = connectionPanel.isImplicit();
+            ((FTPSConfiguration)connectionConfiguration).setRequireImplicitTLS(value);
+            ((FTPSConfiguration)connectionConfiguration).setRequireExplicitTLS(!value);
+        }
     }
 
     /**
@@ -106,7 +117,18 @@ public class SourceSyncConfig {
      * @param connectionConfiguration the actual implementation if the <code>ConnectionConfiguration</code>.
      */
     private void uploadConfiguration(ConnectionConfiguration connectionConfiguration) {
-        // TODO
+        connectionPanel.setConnectionType(connectionConfiguration.getConnectionType());
+        connectionPanel.setHost(connectionConfiguration.getHost());
+        connectionPanel.setRootPath(connectionConfiguration.getRootPath());
+        connectionPanel.setPort(connectionConfiguration.getPort());
+        connectionPanel.setUserName(connectionConfiguration.getUserName());
+        connectionPanel.setUserPassword(connectionConfiguration.getUserPassword());
+        connectionPanel.setExcludedFiles(connectionConfiguration.getExcludedFiles());
+        if (Constants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
+            boolean value = ((FTPSConfiguration)connectionConfiguration).isRequireImplicitTLS();
+            connectionPanel.setImplicit(value);
+            connectionPanel.setExplicit(!value);
+        }
     }
 
     class TargetListListener implements ListSelectionListener {

@@ -27,6 +27,10 @@ public class ConnectionConfigPanel {
     private JTextField crtImlTextField;
 
     public ConnectionConfigPanel() {
+        // group radio buttons
+        ButtonGroup group = new ButtonGroup();
+        group.add(rbImplicit);
+        group.add(rbExplicit);
         tfPort.setMinimumSize(new Dimension(50, 20));
         tfPort.setMaximumSize(new Dimension(50, 20));
     }
