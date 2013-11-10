@@ -14,8 +14,10 @@ package org.wavescale.sourcesync.factory;
 
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Load connection settings from the persistence layout, instantiate them and keep them
@@ -43,8 +45,27 @@ public class ConfigConnectionFactory {
         return connectionConfigurationMap.get(connectionName);
     }
 
+    /**
+     * Gets a set of all living connection names from the factory.
+     * @return a set of strings representing connection names that live inside the factory.
+     */
+    public Set<String> getConnectionNames() {
+        return connectionConfigurationMap.keySet();
+    }
+
     public void addConnectionConfiguration(String connectionName, ConnectionConfiguration connectionConfiguration) {
         connectionConfigurationMap.put(connectionName, connectionConfiguration);
+    }
+
+    public void saveConnectionToPersistance(ConnectionConfiguration connectionConfiguration) {
+        // TODO implement the method.
+    }
+
+    public void saveConnectionsToPersistance() {
+        Collection<ConnectionConfiguration> connections = connectionConfigurationMap.values();
+        for (ConnectionConfiguration connectionConfiguration : connections) {
+            saveConnectionToPersistance(connectionConfiguration);
+        }
     }
 
 }
