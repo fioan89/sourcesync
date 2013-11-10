@@ -18,7 +18,6 @@ public class TargetLocation extends JDialog {
         setModal(true);
         setLocationRelativeTo(null);
         getRootPane().setDefaultButton(buttonOK);
-
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onOK();
@@ -85,8 +84,8 @@ public class TargetLocation extends JDialog {
 
     /**
      * Gets the connection type.
-     * @return a string that can have the following values: {@link org.wavescale.sourcesync.api.Constants#CONN_TYPE_FTP}
-     * , {@link org.wavescale.sourcesync.api.Constants#CONN_TYPE_FTPS}, {@link org.wavescale.sourcesync.api.Constants#CONN_TYPE_SFTP}
+     * @return a string that can have the following values: {@link org.wavescale.sourcesync.api.ConnectionConstants#CONN_TYPE_FTP}
+     * , {@link org.wavescale.sourcesync.api.ConnectionConstants#CONN_TYPE_FTPS}, {@link org.wavescale.sourcesync.api.ConnectionConstants#CONN_TYPE_SFTP}
      */
     public String getTargetType() {
         return (String)typeOption.getSelectedItem();

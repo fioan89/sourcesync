@@ -3,15 +3,18 @@
   <grid id="27dc6" binding="configPanel" layout-manager="FormLayout">
     <rowspec value="top:35px:noGrow"/>
     <rowspec value="center:max(d;4px):noGrow"/>
-    <rowspec value="center:419px:grow"/>
-    <colspec value="fill:d:grow"/>
+    <rowspec value="fill:d:grow"/>
+    <rowspec value="top:4dlu:noGrow"/>
+    <rowspec value="center:max(d;4px):noGrow"/>
+    <colspec value="fill:d:noGrow"/>
     <colspec value="left:4dlu:noGrow"/>
-    <colspec value="fill:387px:grow"/>
+    <colspec value="fill:d:grow"/>
+    <colspec value="fill:max(d;4px):noGrow"/>
     <constraints>
-      <xy x="20" y="20" width="767" height="490"/>
+      <xy x="20" y="22" width="506" height="220"/>
     </constraints>
     <properties>
-      <minimumSize width="600" height="470"/>
+      <minimumSize width="0" height="0"/>
     </properties>
     <border type="none"/>
     <children>
@@ -50,7 +53,7 @@
       </toolbar>
       <toolbar id="d08c0" binding="pnTargetName">
         <constraints>
-          <grid row="0" column="2" row-span="2" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+          <grid row="0" column="2" row-span="2" col-span="2" vsize-policy="0" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="-1" height="20"/>
           </grid>
           <forms defaultalign-horz="false" defaultalign-vert="false"/>
@@ -77,28 +80,17 @@
         </children>
       </toolbar>
       <grid id="9630" binding="pnConfig" layout-manager="FormLayout">
-        <rowspec value="center:d:grow"/>
-        <colspec value="fill:d:grow"/>
-        <colspec value="left:4dlu:noGrow"/>
-        <colspec value="fill:10px:noGrow"/>
         <constraints>
-          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="2" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <forms defaultalign-vert="false"/>
         </constraints>
         <properties/>
         <border type="none"/>
-        <children>
-          <hspacer id="a2838">
-            <constraints>
-              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <forms defaultalign-horz="false"/>
-            </constraints>
-          </hspacer>
-        </children>
+        <children/>
       </grid>
       <component id="bbffe" class="javax.swing.JList" binding="lstTargets">
         <constraints>
-          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
+          <grid row="2" column="0" row-span="3" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="50"/>
           </grid>
           <forms defaultalign-vert="false"/>
@@ -106,6 +98,26 @@
         <properties>
           <maximumSize width="150" height="0"/>
           <selectionMode value="0"/>
+        </properties>
+      </component>
+      <component id="cd68c" class="javax.swing.JButton" binding="okButton">
+        <constraints>
+          <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+          <forms defaultalign-horz="false"/>
+        </constraints>
+        <properties>
+          <text value="Ok"/>
+          <toolTipText value="Close the window"/>
+        </properties>
+      </component>
+      <component id="5ff74" class="javax.swing.JButton" binding="applyButton" default-binding="true">
+        <constraints>
+          <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <forms/>
+        </constraints>
+        <properties>
+          <text value="Apply"/>
+          <toolTipText value="Save the modifications"/>
         </properties>
       </component>
     </children>

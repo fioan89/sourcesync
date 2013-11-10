@@ -139,4 +139,15 @@ public class ConnectionConfigPanel {
     public void setExcludedFiles(String excludedFiles) {
         this.crtImlTextField.setText(excludedFiles);
     }
+
+    /**
+     * Shows or hides the group of implicit and explicit radio buttons.
+     * @param isVisible <code>true</code> for visible, <code>false</code> otherwise.
+     */
+    public void setConnectionMethodVisible(boolean isVisible) {
+        rbExplicit.setVisible(isVisible);
+        rbExplicit.setEnabled(isVisible);
+        rbImplicit.setVisible(isVisible);
+        rbImplicit.setEnabled(isVisible);
+    }
 }
