@@ -33,7 +33,6 @@ public class SourceSyncConfig {
     private JList<String> lstTargets;
     private JButton btnAdd;
     private JButton btnRemove;
-    private JToolBar pnTargetName;
     private JPanel pnConfig;
     private JLabel lbTarget;
     private JButton okButton;

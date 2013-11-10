@@ -1,84 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="org.wavescale.sourcesync.ui.SourceSyncConfig">
   <grid id="27dc6" binding="configPanel" layout-manager="FormLayout">
-    <rowspec value="top:35px:noGrow"/>
-    <rowspec value="center:max(d;4px):noGrow"/>
+    <rowspec value="top:d:noGrow"/>
+    <rowspec value="top:4dlu:noGrow"/>
     <rowspec value="fill:d:grow"/>
     <rowspec value="top:4dlu:noGrow"/>
     <rowspec value="center:max(d;4px):noGrow"/>
-    <colspec value="fill:d:noGrow"/>
-    <colspec value="left:4dlu:noGrow"/>
+    <colspec value="fill:50px:noGrow"/>
+    <colspec value="fill:max(d;4px):grow"/>
     <colspec value="fill:d:grow"/>
     <colspec value="fill:max(d;4px):noGrow"/>
     <constraints>
-      <xy x="20" y="22" width="506" height="220"/>
+      <xy x="20" y="22" width="647" height="314"/>
     </constraints>
     <properties>
       <minimumSize width="0" height="0"/>
     </properties>
     <border type="none"/>
     <children>
-      <toolbar id="7a22b">
-        <constraints>
-          <grid row="0" column="0" row-span="2" col-span="1" vsize-policy="0" hsize-policy="6" anchor="1" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="-1" height="20"/>
-          </grid>
-          <forms defaultalign-horz="false" defaultalign-vert="false"/>
-        </constraints>
-        <properties>
-          <maximumSize width="10000000" height="35"/>
-          <minimumSize width="150" height="35"/>
-          <preferredSize width="150" height="35"/>
-        </properties>
-        <border type="none"/>
-        <children>
-          <component id="8d713" class="javax.swing.JButton" binding="btnAdd">
-            <constraints/>
-            <properties>
-              <icon value="general/add.png"/>
-              <selected value="true"/>
-              <text value=""/>
-              <toolTipText value="Add target location"/>
-            </properties>
-          </component>
-          <component id="42fd5" class="javax.swing.JButton" binding="btnRemove">
-            <constraints/>
-            <properties>
-              <icon value="general/remove.png"/>
-              <text value=""/>
-              <toolTipText value="Remove target location"/>
-            </properties>
-          </component>
-        </children>
-      </toolbar>
-      <toolbar id="d08c0" binding="pnTargetName">
-        <constraints>
-          <grid row="0" column="2" row-span="2" col-span="2" vsize-policy="0" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <preferred-size width="-1" height="20"/>
-          </grid>
-          <forms defaultalign-horz="false" defaultalign-vert="false"/>
-        </constraints>
-        <properties>
-          <maximumSize width="0" height="35"/>
-          <minimumSize width="0" height="35"/>
-        </properties>
-        <border type="none"/>
-        <children>
-          <hspacer id="c8482">
-            <constraints/>
-          </hspacer>
-          <component id="e4988" class="javax.swing.JLabel" binding="lbTarget">
-            <constraints/>
-            <properties>
-              <font size="16" style="1"/>
-              <text value=""/>
-            </properties>
-          </component>
-          <hspacer id="199a5">
-            <constraints/>
-          </hspacer>
-        </children>
-      </toolbar>
       <grid id="9630" binding="pnConfig" layout-manager="FormLayout">
         <constraints>
           <grid row="2" column="2" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -90,10 +29,10 @@
       </grid>
       <component id="bbffe" class="javax.swing.JList" binding="lstTargets">
         <constraints>
-          <grid row="2" column="0" row-span="3" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
+          <grid row="2" column="0" row-span="3" col-span="2" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="50"/>
           </grid>
-          <forms defaultalign-vert="false"/>
+          <forms top="0" left="5" bottom="5" right="5" defaultalign-vert="false"/>
         </constraints>
         <properties>
           <maximumSize width="150" height="0"/>
@@ -118,6 +57,39 @@
         <properties>
           <text value="Apply"/>
           <toolTipText value="Save the modifications"/>
+        </properties>
+      </component>
+      <component id="8d713" class="javax.swing.JButton" binding="btnAdd">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <forms top="0" left="5" bottom="0" right="0" defaultalign-horz="false" defaultalign-vert="false"/>
+        </constraints>
+        <properties>
+          <icon value="general/add.png"/>
+          <selected value="true"/>
+          <text value=""/>
+          <toolTipText value="Add target location"/>
+        </properties>
+      </component>
+      <component id="42fd5" class="javax.swing.JButton" binding="btnRemove">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <forms top="0" left="5" bottom="0" right="0" defaultalign-horz="false" defaultalign-vert="false"/>
+        </constraints>
+        <properties>
+          <icon value="general/remove.png"/>
+          <text value=""/>
+          <toolTipText value="Remove target location"/>
+        </properties>
+      </component>
+      <component id="e4988" class="javax.swing.JLabel" binding="lbTarget">
+        <constraints>
+          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <forms defaultalign-horz="false" defaultalign-vert="false"/>
+        </constraints>
+        <properties>
+          <font size="16" style="1"/>
+          <text value=""/>
         </properties>
       </component>
     </children>
