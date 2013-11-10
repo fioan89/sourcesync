@@ -1,7 +1,7 @@
 package org.wavescale.sourcesync.config;
 
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
-import org.wavescale.sourcesync.api.Constants;
+import org.wavescale.sourcesync.api.ConnectionConstants;
 
 /**
  * ****************************************************************************
@@ -16,13 +16,13 @@ import org.wavescale.sourcesync.api.Constants;
  */
 public class FTPConfiguration extends ConnectionConfiguration {
 
-    public FTPConfiguration() {
-        this.connectionType = Constants.CONN_TYPE_FTP;
+    public FTPConfiguration(String connectionName) {
+        super(connectionName);
+        this.connectionType = ConnectionConstants.CONN_TYPE_FTP;
         this.port = 21;
         this.rootPath = "";
         this.host = "ftp://";
         this.userName = "";
         this.userPassword = "";
-        this.excludedFiles = "";
     }
 }

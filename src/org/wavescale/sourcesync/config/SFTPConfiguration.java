@@ -1,7 +1,7 @@
 package org.wavescale.sourcesync.config;
 
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
-import org.wavescale.sourcesync.api.Constants;
+import org.wavescale.sourcesync.api.ConnectionConstants;
 
 /**
  * ****************************************************************************
@@ -16,13 +16,13 @@ import org.wavescale.sourcesync.api.Constants;
  */
 public class SFTPConfiguration extends ConnectionConfiguration {
 
-    public SFTPConfiguration() {
-        this.connectionType = Constants.CONN_TYPE_SFTP;
+    public SFTPConfiguration(String connectionName) {
+        super(connectionName);
+        this.connectionType = ConnectionConstants.CONN_TYPE_SFTP;
         this.port = 22;
         this.rootPath = "";
         this.host = "sftp://";
         this.userName = "";
         this.userPassword = "";
-        this.excludedFiles = "";
     }
 }

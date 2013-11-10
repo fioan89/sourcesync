@@ -1,7 +1,7 @@
 package org.wavescale.sourcesync.config;
 
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
-import org.wavescale.sourcesync.api.Constants;
+import org.wavescale.sourcesync.api.ConnectionConstants;
 
 /**
  * ****************************************************************************
@@ -18,14 +18,14 @@ public class FTPSConfiguration extends ConnectionConfiguration {
     private boolean requireImplicitTLS;
     private boolean requireExplicitTLS;
 
-    public FTPSConfiguration() {
-        this.connectionType = Constants.CONN_TYPE_FTPS;
+    public FTPSConfiguration(String connectionName) {
+        super(connectionName);
+        this.connectionType = ConnectionConstants.CONN_TYPE_FTPS;
         this.port = 21;
         this.rootPath = "";
         this.host = "ftp://";
         this.userName = "";
         this.userPassword = "";
-        this.excludedFiles = "";
         this.requireImplicitTLS = false;
         this.requireExplicitTLS = true;
     }
@@ -36,7 +36,6 @@ public class FTPSConfiguration extends ConnectionConfiguration {
 
     public void setRequireImplicitTLS(boolean requireImplicitTLS) {
         this.requireImplicitTLS = requireImplicitTLS;
-        setRequireExplicitTLS(!requireImplicitTLS);
     }
 
     public boolean isRequireExplicitTLS() {
@@ -45,7 +44,6 @@ public class FTPSConfiguration extends ConnectionConfiguration {
 
     public void setRequireExplicitTLS(boolean requireExplicitTLS) {
         this.requireExplicitTLS = requireExplicitTLS;
-        setRequireImplicitTLS(!requireExplicitTLS);
     }
 
 }
