@@ -17,6 +17,7 @@ package org.wavescale.sourcesync.api;
  */
 
 public abstract class ConnectionConfiguration {
+    protected String connectionName;
     protected String connectionType;
     protected String host;
     protected int port;
@@ -28,6 +29,20 @@ public abstract class ConnectionConfiguration {
      * representing a list of file types to be excluded from the sync.
      */
     protected String excludedFiles;
+
+    public ConnectionConfiguration(String connectionName) {
+        this.connectionName = connectionName;
+        this.excludedFiles = ".crt;.iml";
+    }
+
+    public String getConnectionName() {
+        return connectionName;
+    }
+
+    public void setConnectionName(String connectionName) {
+        this.connectionName = connectionName;
+    }
+
 
     /**
      * Gets a list of file types to be excluded from the sync.
