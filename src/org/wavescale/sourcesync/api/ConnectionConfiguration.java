@@ -12,23 +12,25 @@ package org.wavescale.sourcesync.api;
  * *****************************************************************************
  */
 
+import java.io.Serializable;
+
 /**
  * Abstract class to hold config info about different type of connections.
  */
 
-public abstract class ConnectionConfiguration {
-    protected String connectionName;
-    protected String connectionType;
-    protected String host;
-    protected int port;
-    protected String rootPath;
-    protected String userName;
-    protected String userPassword;
+public abstract class ConnectionConfiguration implements Serializable {
+    public String connectionName;
+    public String connectionType;
+    public String host;
+    public int port;
+    public String rootPath;
+    public String userName;
+    public String userPassword;
     /**
      * A string containing the ".ext" separated by ";" character,
      * representing a list of file types to be excluded from the sync.
      */
-    protected String excludedFiles;
+    public String excludedFiles;
 
     public ConnectionConfiguration(String connectionName) {
         this.connectionName = connectionName;

@@ -11,10 +11,9 @@ package org.wavescale.sourcesync.factory;
  * For any issues or questions send an email at: fioan89@gmail.com              *
  * *****************************************************************************
  */
-
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 
-import java.util.Collection;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -25,10 +24,16 @@ import java.util.Set;
  */
 public class ConfigConnectionFactory {
     private static final ConfigConnectionFactory CONFIG_CONNECTION_FACTORY = new ConfigConnectionFactory();
+    private static final String CONNECTIONS_FILE = ".connectionconfig.ser";
+    private String userHome;
+    String fileSeparator;
     private Map<String, ConnectionConfiguration> connectionConfigurationMap;
 
     private ConfigConnectionFactory() {
         connectionConfigurationMap = new HashMap<String, ConnectionConfiguration>();
+        userHome = System.getProperty("user.home");
+        fileSeparator = System.getProperty("file.separator");
+        initComponent();
     }
 
     public static ConfigConnectionFactory getInstance() {
@@ -38,6 +43,7 @@ public class ConfigConnectionFactory {
     /**
      * Searches for the connection configuration that is assigned to the given name. If not found
      * null is returned.
+     *
      * @param connectionName a <code>String</code> representing the connection name.
      * @return an implementation of the <code>ConnectionConfiguration</code>
      */
@@ -47,6 +53,7 @@ public class ConfigConnectionFactory {
 
     /**
      * Gets a set of all living connection names from the factory.
+     *
      * @return a set of strings representing connection names that live inside the factory.
      */
     public Set<String> getConnectionNames() {
@@ -57,15 +64,37 @@ public class ConfigConnectionFactory {
         connectionConfigurationMap.put(connectionName, connectionConfiguration);
     }
 
-    public void saveConnectionToPersistance(ConnectionConfiguration connectionConfiguration) {
-        // TODO implement the method.
+    public void removeConnectionConfiguration(String connectionName) {
+        connectionConfigurationMap.remove(connectionName);
     }
 
-    public void saveConnectionsToPersistance() {
-        Collection<ConnectionConfiguration> connections = connectionConfigurationMap.values();
-        for (ConnectionConfiguration connectionConfiguration : connections) {
-            saveConnectionToPersistance(connectionConfiguration);
+    private void initComponent() {
+        // try to load the persistence data.
+        if (new File(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE)).exists()) {
+            try {
+                FileInputStream inputStream = new FileInputStream(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE));
+                ObjectInputStream in = new ObjectInputStream(inputStream);
+                connectionConfigurationMap = (Map<String, ConnectionConfiguration>) in.readObject();
+                in.close();
+                inputStream.close();
+            } catch (IOException i) {
+                i.printStackTrace();
+            } catch (ClassNotFoundException c) {
+                c.printStackTrace();
+            }
         }
     }
 
+    public void saveConnections() {
+        // try to write the persistence data
+        try {
+            FileOutputStream outputStream = new FileOutputStream(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE));
+            ObjectOutputStream out = new ObjectOutputStream(outputStream);
+            out.writeObject(connectionConfigurationMap);
+            out.close();
+            outputStream.close();
+        } catch (IOException i) {
+            i.printStackTrace();
+        }
+    }
 }

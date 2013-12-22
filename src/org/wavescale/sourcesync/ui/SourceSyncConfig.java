@@ -58,6 +58,7 @@ public class SourceSyncConfig {
         lstTargets.getSelectionModel().addListSelectionListener(new TargetListListener());
 
         btnAdd.addActionListener(new ActionButtonListener());
+        btnRemove.addActionListener(new ActionButtonListener());
         okButton.addActionListener(new ActionButtonListener());
         applyButton.addActionListener(new ActionButtonListener());
 
@@ -73,6 +74,7 @@ public class SourceSyncConfig {
      * @param connectionFactory a {@link ConfigConnectionFactory} instance that contains
      *                          connections stored in the persistence layer.
      */
+    @SuppressWarnings("unchecked")
     private void loadConnections(ConfigConnectionFactory connectionFactory) {
         Set<String> connectionNames = connectionFactory.getConnectionNames();
         for (String connectionName : connectionNames) {
@@ -109,16 +111,18 @@ public class SourceSyncConfig {
      * @param connectionConfiguration the actual implementation of the <code>ConnectionConfiguration</code>.
      */
     private void downloadConfigurationToPersistence(ConnectionConfiguration connectionConfiguration) {
-        connectionConfiguration.setHost(connectionPanel.getHost());
-        connectionConfiguration.setRootPath(connectionPanel.getRootPath());
-        connectionConfiguration.setPort(connectionPanel.getPort());
-        connectionConfiguration.setUserName(connectionPanel.getUserName());
-        connectionConfiguration.setUserPassword(connectionPanel.getUserPassword());
-        connectionConfiguration.setExcludedFiles(connectionPanel.getExludedFiles());
-        if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
-            boolean value = connectionPanel.isImplicit();
-            ((FTPSConfiguration)connectionConfiguration).setRequireImplicitTLS(value);
-            ((FTPSConfiguration)connectionConfiguration).setRequireExplicitTLS(!value);
+        if (connectionConfiguration != null) {
+            connectionConfiguration.setHost(connectionPanel.getHost());
+            connectionConfiguration.setRootPath(connectionPanel.getRootPath());
+            connectionConfiguration.setPort(connectionPanel.getPort());
+            connectionConfiguration.setUserName(connectionPanel.getUserName());
+            connectionConfiguration.setUserPassword(connectionPanel.getUserPassword());
+            connectionConfiguration.setExcludedFiles(connectionPanel.getExludedFiles());
+            if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
+                boolean value = connectionPanel.isImplicit();
+                ((FTPSConfiguration) connectionConfiguration).setRequireImplicitTLS(value);
+                ((FTPSConfiguration) connectionConfiguration).setRequireExplicitTLS(!value);
+            }
         }
     }
 
@@ -151,15 +155,18 @@ public class SourceSyncConfig {
         public void valueChanged(ListSelectionEvent listSelectionEvent) {
             DefaultListSelectionModel selectionModel = (DefaultListSelectionModel) listSelectionEvent.getSource();
             int index = selectionModel.getMinSelectionIndex();
-            String target = lstTargets.getModel().getElementAt(index);
-            lbTarget.setText(target);
-            ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().getConnectionConfiguration(target);
-            uploadConfigurationFromPersistance(connectionConfiguration);
+            if (lstTargets.getModel() != null && index >= 0) {
+                String target = lstTargets.getModel().getElementAt(index);
+                lbTarget.setText(target);
+                ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().getConnectionConfiguration(target);
+                uploadConfigurationFromPersistance(connectionConfiguration);
+            }
         }
     }
 
     class ActionButtonListener implements ActionListener {
 
+        @SuppressWarnings("unchecked")
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             JButton actionButton = (JButton) actionEvent.getSource();
@@ -170,8 +177,7 @@ public class SourceSyncConfig {
                 ConfigConnectionFactory connectionFactory = ConfigConnectionFactory.getInstance();
                 ConnectionConfiguration connectionConfiguration = connectionFactory.getConnectionConfiguration(target);
                 downloadConfigurationToPersistence(connectionConfiguration);
-                connectionFactory.saveConnectionToPersistance(connectionConfiguration);
-
+                connectionFactory.saveConnections();
             } else if (btnAdd.equals(actionButton)) {
                 TargetLocation targetConfig = new TargetLocation();
                 targetConfig.setModal(true);
@@ -181,6 +187,18 @@ public class SourceSyncConfig {
                 lstTargets.setSelectedIndex(((DefaultListModel) lstTargets.getModel()).lastIndexOf(name));
                 createConnection(name, type);
                 pnConfig.setVisible(true);
+            } else if (btnRemove.equals(actionButton)) {
+                if (lstTargets.getModel().getSize() > 0) {
+                    String target = lstTargets.getSelectedValue();
+                    DefaultListModel listModel = ((DefaultListModel) lstTargets.getModel());
+                    int index = listModel.indexOf(target);
+                    if (index >= 0) {
+                        listModel.removeElement(target);
+                        // remove from config
+                        ConfigConnectionFactory configConnectionFactory = ConfigConnectionFactory.getInstance();
+                        configConnectionFactory.removeConnectionConfiguration(target);
+                    }
+                }
             }
         }
     }
