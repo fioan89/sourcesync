@@ -38,6 +38,11 @@
               text="Source Sync" description="Display the Source Sync config dialog">
           <add-to-group group-id="ToolsMenu" anchor="last"/>
       </action>
+      <action id="actionModuleConnectionConfig" class="org.wavescale.sourcesync.action.ActionModuleConnectionConfig"
+              text="Module Connection Configuration"
+              description="Display a connection configuration window for the selected module">
+          <add-to-group group-id="ProjectViewPopupMenuSettingsGroup" anchor="first"/>
+      </action>
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
