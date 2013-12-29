@@ -83,6 +83,7 @@
                 <item value="FTP"/>
                 <item value="FTPS"/>
                 <item value="SFTP"/>
+                <item value="SCP"/>
               </model>
             </properties>
           </component>

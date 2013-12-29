@@ -6,6 +6,7 @@ import org.wavescale.sourcesync.api.ConnectionConfiguration;
 import org.wavescale.sourcesync.api.ConnectionConstants;
 import org.wavescale.sourcesync.config.FTPConfiguration;
 import org.wavescale.sourcesync.config.FTPSConfiguration;
+import org.wavescale.sourcesync.config.SCPConfiguration;
 import org.wavescale.sourcesync.config.SFTPConfiguration;
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory;
 import org.wavescale.sourcesync.factory.ConfigPanelFactory;
@@ -71,6 +72,7 @@ public class SourceSyncConfig {
 
     /**
      * Loads connection stored in the connection factory and add them in the viewer.
+     *
      * @param connectionFactory a {@link ConfigConnectionFactory} instance that contains
      *                          connections stored in the persistence layer.
      */
@@ -78,7 +80,7 @@ public class SourceSyncConfig {
     private void loadConnections(ConfigConnectionFactory connectionFactory) {
         Set<String> connectionNames = connectionFactory.getConnectionNames();
         for (String connectionName : connectionNames) {
-            ((DefaultListModel)lstTargets.getModel()).addElement(connectionName);
+            ((DefaultListModel) lstTargets.getModel()).addElement(connectionName);
         }
         // select the firs index and trigger an action event.
         lstTargets.setSelectedIndex(0);
@@ -87,6 +89,7 @@ public class SourceSyncConfig {
     /**
      * Creates a new connection with the given name and type. The newly created connection is automatically
      * registered to the connection factory.
+     *
      * @param connectionName a name for the connection.
      * @param connectionType a constant value from the {@link ConnectionConstants}
      */
@@ -98,8 +101,10 @@ public class SourceSyncConfig {
                 connectionConfiguration = new FTPConfiguration(connectionName);
             } else if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionType)) {
                 connectionConfiguration = new FTPSConfiguration(connectionName);
-            } else {
+            } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionType)) {
                 connectionConfiguration = new SFTPConfiguration(connectionName);
+            } else {
+                connectionConfiguration = new SCPConfiguration(connectionName);
             }
             uploadConfigurationFromPersistance(connectionConfiguration);
             connectionFactory.addConnectionConfiguration(connectionName, connectionConfiguration);
@@ -108,6 +113,7 @@ public class SourceSyncConfig {
 
     /**
      * Gets option stored in the configuration panel and stores them in the specified connection configuration instance.
+     *
      * @param connectionConfiguration the actual implementation of the <code>ConnectionConfiguration</code>.
      */
     private void downloadConfigurationToPersistence(ConnectionConfiguration connectionConfiguration) {
@@ -128,6 +134,7 @@ public class SourceSyncConfig {
 
     /**
      * Stores option in the configuration panel from the specified connection configuration instance.
+     *
      * @param connectionConfiguration the actual implementation if the <code>ConnectionConfiguration</code>.
      */
     private void uploadConfigurationFromPersistance(ConnectionConfiguration connectionConfiguration) {
@@ -141,7 +148,7 @@ public class SourceSyncConfig {
             connectionPanel.setExcludedFiles(connectionConfiguration.getExcludedFiles());
             connectionPanel.setConnectionMethodVisible(false);
             if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
-                boolean value = ((FTPSConfiguration)connectionConfiguration).isRequireImplicitTLS();
+                boolean value = ((FTPSConfiguration) connectionConfiguration).isRequireImplicitTLS();
                 connectionPanel.setImplicit(value);
                 connectionPanel.setExplicit(!value);
                 connectionPanel.setConnectionMethodVisible(true);
@@ -183,7 +190,7 @@ public class SourceSyncConfig {
                 targetConfig.setModal(true);
                 String name = targetConfig.getTargetName();
                 String type = targetConfig.getTargetType();
-                ((DefaultListModel)lstTargets.getModel()).addElement(name);
+                ((DefaultListModel) lstTargets.getModel()).addElement(name);
                 lstTargets.setSelectedIndex(((DefaultListModel) lstTargets.getModel()).lastIndexOf(name));
                 createConnection(name, type);
                 pnConfig.setVisible(true);

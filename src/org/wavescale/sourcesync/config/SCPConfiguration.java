@@ -1,4 +1,7 @@
-package org.wavescale.sourcesync.api;
+package org.wavescale.sourcesync.config;
+
+import org.wavescale.sourcesync.api.ConnectionConfiguration;
+import org.wavescale.sourcesync.api.ConnectionConstants;
 
 /**
  * ****************************************************************************
@@ -11,13 +14,15 @@ package org.wavescale.sourcesync.api;
  * For any issues or questions send an email at: fioan89@gmail.com              *
  * *****************************************************************************
  */
-public class ConnectionConstants {
-    // ftp connection
-    public static final String CONN_TYPE_FTP = "FTP";
-    // ftp secured connection
-    public static final String CONN_TYPE_FTPS = "FTPS";
-    // ssh ftp connection
-    public static final String CONN_TYPE_SFTP = "SFTP";
-    // ssh scp connection
-    public static final String CONN_TYPE_SCP = "SCP";
+public class SCPConfiguration extends ConnectionConfiguration {
+
+    public SCPConfiguration(String connectionName) {
+        super(connectionName);
+        this.connectionType = ConnectionConstants.CONN_TYPE_SCP;
+        this.port = 22;
+        this.rootPath = "";
+        this.host = "scp://";
+        this.userName = "";
+        this.userPassword = "";
+    }
 }

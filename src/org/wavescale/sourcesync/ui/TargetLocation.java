@@ -85,7 +85,8 @@ public class TargetLocation extends JDialog {
     /**
      * Gets the connection type.
      * @return a string that can have the following values: {@link org.wavescale.sourcesync.api.ConnectionConstants#CONN_TYPE_FTP}
-     * , {@link org.wavescale.sourcesync.api.ConnectionConstants#CONN_TYPE_FTPS}, {@link org.wavescale.sourcesync.api.ConnectionConstants#CONN_TYPE_SFTP}
+     * , {@link org.wavescale.sourcesync.api.ConnectionConstants#CONN_TYPE_FTPS},
+     *  {@link org.wavescale.sourcesync.api.ConnectionConstants#CONN_TYPE_SFTP}, {@link org.wavescale.sourcesync.api.ConnectionConstants#CONN_TYPE_SCP}
      */
     public String getTargetType() {
         return (String)typeOption.getSelectedItem();
