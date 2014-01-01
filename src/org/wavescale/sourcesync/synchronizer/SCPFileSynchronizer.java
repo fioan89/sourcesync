@@ -1,7 +1,9 @@
 package org.wavescale.sourcesync.synchronizer;
 
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.jcraft.jsch.*;
+import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.FileSynchronizer;
 import org.wavescale.sourcesync.config.SCPConfiguration;
 import org.wavescale.sourcesync.logger.BalloonLogger;
@@ -21,15 +23,14 @@ import java.io.*;
  * *****************************************************************************
  */
 public class SCPFileSynchronizer extends FileSynchronizer {
-    private final Project project;
     private JSch jsch;
     private Session session;
 
 
-    public SCPFileSynchronizer(SCPConfiguration connectionInfo, Project project) {
-        super(connectionInfo);
+    public SCPFileSynchronizer(@NotNull SCPConfiguration connectionInfo, @NotNull Project project, @NotNull ProgressIndicator indicator) {
+        super(connectionInfo, project, indicator);
         this.jsch = new JSch();
-        this.project = project;
+        this.indicator.setIndeterminate(true);
     }
 
     @Override
@@ -86,7 +87,8 @@ public class SCPFileSynchronizer extends FileSynchronizer {
             }
 
             File _lfile = new File(finalSourcePath);
-
+            this.indicator.setIndeterminate(false);
+            this.indicator.setText("Uploading...[" + _lfile.getName() + "]");
             if (preserveTimestamp) {
                 command = "T " + (_lfile.lastModified() / 1000) + " 0";
                 // The access time should be sent here,
@@ -115,11 +117,14 @@ public class SCPFileSynchronizer extends FileSynchronizer {
 
             // send content of finalSourcePath
             FileInputStream fis = new FileInputStream(finalSourcePath);
+            double totalUploaded = 0.0;
             byte[] buf = new byte[1024];
             while (true) {
                 int len = fis.read(buf, 0, buf.length);
                 if (len <= 0) break;
                 out.write(buf, 0, len); //out.flush();
+                totalUploaded += len;
+                this.indicator.setFraction(totalUploaded / filesize);
             }
             fis.close();
             // send '\0'
@@ -127,7 +132,7 @@ public class SCPFileSynchronizer extends FileSynchronizer {
             out.write(buf, 0, 1);
             out.flush();
             if (checkAck(in) != 0) {
-                System.exit(0);
+                return;
             }
             out.close();
             channel.disconnect();
@@ -149,7 +154,7 @@ public class SCPFileSynchronizer extends FileSynchronizer {
         if (b == -1) return b;
 
         if (b == 1 || b == 2) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             int c;
             do {
                 c = in.read();

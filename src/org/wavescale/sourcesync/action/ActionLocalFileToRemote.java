@@ -3,8 +3,14 @@ package org.wavescale.sourcesync.action;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
+import org.wavescale.sourcesync.api.ConnectionConfiguration;
+import org.wavescale.sourcesync.api.ConnectionConstants;
 import org.wavescale.sourcesync.config.SCPConfiguration;
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory;
 import org.wavescale.sourcesync.factory.ModuleConnectionConfig;
@@ -26,7 +32,7 @@ import java.io.File;
  * *****************************************************************************
  */
 public class ActionLocalFileToRemote extends AnAction {
-    public void actionPerformed(AnActionEvent e) {
+    public void actionPerformed(final AnActionEvent e) {
         // first check if there's a connection type associated to this module. If not alert the user
         // and get out
         Project currentProject = DataKeys.PROJECT.getData(e.getDataContext());
@@ -37,12 +43,24 @@ public class ActionLocalFileToRemote extends AnAction {
             return;
         }
         VirtualFile virtualFile = DataKeys.VIRTUAL_FILE.getData(e.getDataContext());
-        SCPConfiguration connectionConfiguration = (SCPConfiguration) ConfigConnectionFactory.getInstance().getConnectionConfiguration(associationName);
-        SCPFileSynchronizer scpFileSynchronizer = new SCPFileSynchronizer(connectionConfiguration, e.getProject());
-        scpFileSynchronizer.connect();
-        File relativeFile = new File(virtualFile.getPath().replaceFirst(currentProject.getBasePath(), ""));
-        scpFileSynchronizer.syncFile(relativeFile.getPath(), relativeFile.getParent());
-        scpFileSynchronizer.disconnect();
+        final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
+                getConnectionConfiguration(associationName);
+        final File relativeFile = new File(virtualFile.getPath().replaceFirst(currentProject.getBasePath(), ""));
+        ProgressManager.getInstance().run(new Task.Backgroundable(e.getProject(), "Uploading", false) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                if (ConnectionConstants.CONN_TYPE_SCP.equals(connectionConfiguration.getConnectionType())) {
+                    SCPFileSynchronizer scpFileSynchronizer = new SCPFileSynchronizer((SCPConfiguration) connectionConfiguration,
+                            e.getProject(), indicator);
+                    scpFileSynchronizer.connect();
+                    // so final destination will look like this:
+                    // root_home/ + project_name/ + project_relative_path_to_file/
+                    scpFileSynchronizer.syncFile(relativeFile.getPath(), e.getProject().getName() + File.separator + relativeFile.getParent());
+                    scpFileSynchronizer.disconnect();
+                }
+            }
+        });
+
     }
 
     private void showNoConnectionSpecifiedError(AnActionEvent e, String moduleName) {
