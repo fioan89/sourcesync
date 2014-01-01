@@ -8,6 +8,8 @@ import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.ui.awt.RelativePoint;
 
+import javax.swing.*;
+
 /**
  * ****************************************************************************
  * Copyright (c) 2005-2013 Faur Ioan-Aurel.                                     *
@@ -25,10 +27,15 @@ public class BalloonLogger {
         //
     }
 
-    public static void logBalloonError(String htmlMessage, Project project) {
-        StatusBar statusBar = WindowManager.getInstance().getStatusBar(project);
-        JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(htmlMessage, MessageType.ERROR, null).
-                setFadeoutTime(7500).createBalloon().show(RelativePoint.getCenterOf(statusBar.getComponent()),
-                Balloon.Position.atRight);
+    public static void logBalloonError(final String htmlMessage, final Project project) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                StatusBar statusBar = WindowManager.getInstance().getStatusBar(project);
+                JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(htmlMessage, MessageType.ERROR, null).
+                        setFadeoutTime(7500).createBalloon().show(RelativePoint.getCenterOf(statusBar.getComponent()),
+                        Balloon.Position.atRight);
+            }
+        });
     }
 }
