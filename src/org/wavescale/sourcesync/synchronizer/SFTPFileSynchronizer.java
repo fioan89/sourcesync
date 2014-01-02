@@ -120,7 +120,7 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
                 int lastAcc = sftpATTRS.getATime();
                 // this is a messed method: if lastModified is greater than Integer.MAX_VALUE
                 // then timestamp will not be ok.
-                sftpATTRS.setACMODTIME(lastAcc, new Long(toUpload.lastModified()).intValue());
+                sftpATTRS.setACMODTIME(lastAcc, new Long(toUpload.lastModified() / 1000).intValue());
                 channelSftp.setStat(toUpload.getName(), sftpATTRS);
             }
         } catch (SftpException e) {
