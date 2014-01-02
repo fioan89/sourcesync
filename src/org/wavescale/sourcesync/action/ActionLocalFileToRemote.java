@@ -11,6 +11,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 import org.wavescale.sourcesync.api.ConnectionConstants;
+import org.wavescale.sourcesync.api.FileSynchronizer;
 import org.wavescale.sourcesync.config.SCPConfiguration;
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory;
 import org.wavescale.sourcesync.factory.ModuleConnectionConfig;
@@ -49,14 +50,18 @@ public class ActionLocalFileToRemote extends AnAction {
         ProgressManager.getInstance().run(new Task.Backgroundable(e.getProject(), "Uploading", false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
+                FileSynchronizer fileSynchronizer = null;
                 if (ConnectionConstants.CONN_TYPE_SCP.equals(connectionConfiguration.getConnectionType())) {
-                    SCPFileSynchronizer scpFileSynchronizer = new SCPFileSynchronizer((SCPConfiguration) connectionConfiguration,
+                    fileSynchronizer = new SCPFileSynchronizer((SCPConfiguration) connectionConfiguration,
                             e.getProject(), indicator);
-                    scpFileSynchronizer.connect();
+                }
+
+                if (fileSynchronizer != null) {
+                    fileSynchronizer.connect();
                     // so final destination will look like this:
                     // root_home/ + project_name/ + project_relative_path_to_file/
-                    scpFileSynchronizer.syncFile(relativeFile.getPath(), e.getProject().getName() + File.separator + relativeFile.getParent());
-                    scpFileSynchronizer.disconnect();
+                    fileSynchronizer.syncFile(relativeFile.getPath(), e.getProject().getName() + File.separator + relativeFile.getParent());
+                    fileSynchronizer.disconnect();
                 }
             }
         });

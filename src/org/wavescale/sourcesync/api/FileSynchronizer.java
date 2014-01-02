@@ -16,7 +16,6 @@ package org.wavescale.sourcesync.api;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.wavescale.sourcesync.config.SCPConfiguration;
 
 /**
  * Abstract class for uploading a local file to a remote target.
@@ -29,18 +28,13 @@ public abstract class FileSynchronizer {
     /**
      * Build a file synchronizer from general info contained by <b>connectionInfo</b> param.
      *
-     *
-     */
-    /**
-     * Build a file synchronizer from general info contained by <b>connectionInfo</b> param.
-     *
      * @param connectionInfo a {@link org.wavescale.sourcesync.api.ConnectionConfiguration} instance
      *                       containing session info like hostname, user, password, etc...
      * @param project        a {@link com.intellij.openapi.project.Project} instance used to gather project relative
      *                       metadata like name, absoulte path, etc...
      * @param indicator      used to report progress on upload process.
      */
-    public FileSynchronizer(@NotNull SCPConfiguration connectionInfo, @NotNull Project project, @NotNull ProgressIndicator indicator) {
+    public FileSynchronizer(@NotNull ConnectionConfiguration connectionInfo, @NotNull Project project, @NotNull ProgressIndicator indicator) {
         this.connectionInfo = connectionInfo;
         this.project = project;
         this.indicator = indicator;
