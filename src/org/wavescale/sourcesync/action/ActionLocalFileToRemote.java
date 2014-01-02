@@ -13,11 +13,13 @@ import org.wavescale.sourcesync.api.ConnectionConfiguration;
 import org.wavescale.sourcesync.api.ConnectionConstants;
 import org.wavescale.sourcesync.api.FileSynchronizer;
 import org.wavescale.sourcesync.config.SCPConfiguration;
+import org.wavescale.sourcesync.config.SFTPConfiguration;
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory;
 import org.wavescale.sourcesync.factory.ModuleConnectionConfig;
 import org.wavescale.sourcesync.logger.BalloonLogger;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 import org.wavescale.sourcesync.synchronizer.SCPFileSynchronizer;
+import org.wavescale.sourcesync.synchronizer.SFTPFileSynchronizer;
 
 import java.io.File;
 
@@ -53,6 +55,9 @@ public class ActionLocalFileToRemote extends AnAction {
                 FileSynchronizer fileSynchronizer = null;
                 if (ConnectionConstants.CONN_TYPE_SCP.equals(connectionConfiguration.getConnectionType())) {
                     fileSynchronizer = new SCPFileSynchronizer((SCPConfiguration) connectionConfiguration,
+                            e.getProject(), indicator);
+                } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType())) {
+                    fileSynchronizer = new SFTPFileSynchronizer((SFTPConfiguration) connectionConfiguration,
                             e.getProject(), indicator);
                 }
 
