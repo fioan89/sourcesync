@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 import org.wavescale.sourcesync.api.ConnectionConstants;
 import org.wavescale.sourcesync.api.FileSynchronizer;
+import org.wavescale.sourcesync.api.Utils;
 import org.wavescale.sourcesync.config.FTPConfiguration;
 import org.wavescale.sourcesync.config.FTPSConfiguration;
 import org.wavescale.sourcesync.config.SCPConfiguration;
@@ -52,34 +53,38 @@ public class ActionLocalFileToRemote extends AnAction {
         VirtualFile virtualFile = DataKeys.VIRTUAL_FILE.getData(e.getDataContext());
         final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
                 getConnectionConfiguration(associationName);
-        final File relativeFile = new File(virtualFile.getPath().replaceFirst(currentProject.getBasePath(), ""));
-        ProgressManager.getInstance().run(new Task.Backgroundable(e.getProject(), "Uploading", false) {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                FileSynchronizer fileSynchronizer = null;
-                if (ConnectionConstants.CONN_TYPE_SCP.equals(connectionConfiguration.getConnectionType())) {
-                    fileSynchronizer = new SCPFileSynchronizer((SCPConfiguration) connectionConfiguration,
-                            e.getProject(), indicator);
-                } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType())) {
-                    fileSynchronizer = new SFTPFileSynchronizer((SFTPConfiguration) connectionConfiguration,
-                            e.getProject(), indicator);
-                } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {
-                    fileSynchronizer = new FTPFileSynchronizer((FTPConfiguration) connectionConfiguration,
-                            e.getProject(), indicator);
-                } else if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
-                    fileSynchronizer = new FTPSFileSynchronizer((FTPSConfiguration) connectionConfiguration,
-                            e.getProject(), indicator);
-                }
+        if (Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
+            final File relativeFile = new File(virtualFile.getPath().replaceFirst(currentProject.getBasePath(), ""));
+            ProgressManager.getInstance().run(new Task.Backgroundable(e.getProject(), "Uploading", false) {
+                @Override
+                public void run(@NotNull ProgressIndicator indicator) {
+                    FileSynchronizer fileSynchronizer = null;
+                    if (ConnectionConstants.CONN_TYPE_SCP.equals(connectionConfiguration.getConnectionType())) {
+                        fileSynchronizer = new SCPFileSynchronizer((SCPConfiguration) connectionConfiguration,
+                                e.getProject(), indicator);
+                    } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType())) {
+                        fileSynchronizer = new SFTPFileSynchronizer((SFTPConfiguration) connectionConfiguration,
+                                e.getProject(), indicator);
+                    } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {
+                        fileSynchronizer = new FTPFileSynchronizer((FTPConfiguration) connectionConfiguration,
+                                e.getProject(), indicator);
+                    } else if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
+                        fileSynchronizer = new FTPSFileSynchronizer((FTPSConfiguration) connectionConfiguration,
+                                e.getProject(), indicator);
+                    }
 
-                if (fileSynchronizer != null) {
-                    fileSynchronizer.connect();
-                    // so final destination will look like this:
-                    // root_home/ + project_name/ + project_relative_path_to_file/
-                    fileSynchronizer.syncFile(relativeFile.getPath(), e.getProject().getName() + File.separator + relativeFile.getParent());
-                    fileSynchronizer.disconnect();
+                    if (fileSynchronizer != null) {
+                        fileSynchronizer.connect();
+                        // so final destination will look like this:
+                        // root_home/ + project_name/ + project_relative_path_to_file/
+                        fileSynchronizer.syncFile(relativeFile.getPath(), e.getProject().getName() + File.separator + relativeFile.getParent());
+                        fileSynchronizer.disconnect();
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            EventDataLogger.logWarning("File <b>" + virtualFile.getName() + "</b> is filtered out!", e.getProject());
+        }
 
     }
 
@@ -89,7 +94,6 @@ public class ActionLocalFileToRemote extends AnAction {
                 .append("</b> module.\nPlease right click on module name and then select <b>Module Connection Configuration</b> to select connection type!");
         BalloonLogger.logBalloonError(message.toString(), e.getProject());
         EventDataLogger.logError(message.toString(), e.getProject());
-
-
     }
+
 }
