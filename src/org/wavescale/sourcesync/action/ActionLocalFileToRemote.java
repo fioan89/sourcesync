@@ -13,6 +13,7 @@ import org.wavescale.sourcesync.api.ConnectionConfiguration;
 import org.wavescale.sourcesync.api.ConnectionConstants;
 import org.wavescale.sourcesync.api.FileSynchronizer;
 import org.wavescale.sourcesync.config.FTPConfiguration;
+import org.wavescale.sourcesync.config.FTPSConfiguration;
 import org.wavescale.sourcesync.config.SCPConfiguration;
 import org.wavescale.sourcesync.config.SFTPConfiguration;
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory;
@@ -20,6 +21,7 @@ import org.wavescale.sourcesync.factory.ModuleConnectionConfig;
 import org.wavescale.sourcesync.logger.BalloonLogger;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 import org.wavescale.sourcesync.synchronizer.FTPFileSynchronizer;
+import org.wavescale.sourcesync.synchronizer.FTPSFileSynchronizer;
 import org.wavescale.sourcesync.synchronizer.SCPFileSynchronizer;
 import org.wavescale.sourcesync.synchronizer.SFTPFileSynchronizer;
 
@@ -63,6 +65,9 @@ public class ActionLocalFileToRemote extends AnAction {
                             e.getProject(), indicator);
                 } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {
                     fileSynchronizer = new FTPFileSynchronizer((FTPConfiguration) connectionConfiguration,
+                            e.getProject(), indicator);
+                } else if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
+                    fileSynchronizer = new FTPSFileSynchronizer((FTPSConfiguration) connectionConfiguration,
                             e.getProject(), indicator);
                 }
 
