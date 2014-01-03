@@ -27,7 +27,7 @@ public class EventDataLogger {
     }
 
     public static void logWarning(String htmlMessage, Project project) {
-        Notification notification = new Notification("SourceSync Notifications", "Sync error", htmlMessage, NotificationType.ERROR);
+        Notification notification = new Notification("SourceSync Notifications", "Sync warning", htmlMessage, NotificationType.WARNING);
         Notifications.Bus.notify(notification, project);
     }
 }
