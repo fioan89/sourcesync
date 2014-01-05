@@ -57,6 +57,15 @@
             <add-to-group group-id="EditorTabPopupMenu" anchor="after"
                           relative-to-action="org.wavescale.sourcesync.action.ActionLocalFileToRemote"/>
         </action>
+        <action id="actionSelectedFilesToRemote" class="org.wavescale.sourcesync.action.ActionSelectedFilesToRemote"
+                text="Sync selected files to remote target" description="Sync localy selected files to remote target">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="after"
+                          relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="after"
+                          relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote"/>
+            <add-to-group group-id="EditorTabPopupMenu" anchor="after"
+                          relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
