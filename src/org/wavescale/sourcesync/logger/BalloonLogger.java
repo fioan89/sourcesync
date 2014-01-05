@@ -38,4 +38,16 @@ public class BalloonLogger {
             }
         });
     }
+
+    public static void logBalloonInfo(final String htmlMessage, final Project project) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                StatusBar statusBar = WindowManager.getInstance().getStatusBar(project);
+                JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(htmlMessage, MessageType.INFO, null).
+                        setFadeoutTime(7500).createBalloon().show(RelativePoint.getCenterOf(statusBar.getComponent()),
+                        Balloon.Position.atRight);
+            }
+        });
+    }
 }

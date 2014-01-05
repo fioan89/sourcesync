@@ -30,4 +30,9 @@ public class EventDataLogger {
         Notification notification = new Notification("SourceSync Notifications", "Sync warning", htmlMessage, NotificationType.WARNING);
         Notifications.Bus.notify(notification, project);
     }
+
+    public static void logInfo(String htmlMessage, Project project) {
+        Notification notification = new Notification("SourceSync Notifications", "Sync info", htmlMessage, NotificationType.INFORMATION);
+        Notifications.Bus.notify(notification, project);
+    }
 }
