@@ -2,7 +2,7 @@ package org.wavescale.sourcesync.api;
 
 /**
  * ****************************************************************************
- * Copyright (c) 2005-2013 Faur Ioan-Aurel.                                     *
+ * Copyright (c) 2005-2014 Faur Ioan-Aurel.                                     *
  * All rights reserved. This program and the accompanying materials             *
  * are made available under the terms of the MIT License                        *
  * which accompanies this distribution, and is available at                     *
@@ -50,6 +50,7 @@ public abstract class ConnectionConfiguration implements Serializable {
 
     /**
      * Gets a list of file types to be excluded from the sync.
+     *
      * @return a string containing the ".ext" separated by ";" character,
      * representing a list of file types to be excluded from the sync.
      */
@@ -59,8 +60,9 @@ public abstract class ConnectionConfiguration implements Serializable {
 
     /**
      * Sets a list of file types to be excluded from the sync.
+     *
      * @param excludedFiles a string containing the ".ext" separated by ";" character,
-     * representing a list of file types to be excluded from the sync.
+     *                      representing a list of file types to be excluded from the sync.
      */
     public void setExcludedFiles(String excludedFiles) {
         this.excludedFiles = excludedFiles;
