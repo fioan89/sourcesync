@@ -25,6 +25,7 @@ public class ConnectionConfigPanel {
     private JRadioButton rbImplicit;
     private JRadioButton rbExplicit;
     private JTextField crtImlTextField;
+    private JCheckBox preserveTimestamp;
 
     public ConnectionConfigPanel() {
         // group radio buttons
@@ -136,6 +137,10 @@ public class ConnectionConfigPanel {
         return crtImlTextField.getText();
     }
 
+    public boolean isTimestampPreserved() {
+        return preserveTimestamp.isSelected();
+    }
+
     public void setExcludedFiles(String excludedFiles) {
         this.crtImlTextField.setText(excludedFiles);
     }
@@ -149,5 +154,15 @@ public class ConnectionConfigPanel {
         rbExplicit.setEnabled(isVisible);
         rbImplicit.setVisible(isVisible);
         rbImplicit.setEnabled(isVisible);
+    }
+
+    /**
+     * Shows or hides preserve timestamp checkbox.
+     *
+     * @param isVisible
+     */
+    public void setPreserveTimestampVisible(boolean isVisible) {
+        preserveTimestamp.setVisible(isVisible);
+        preserveTimestamp.setEnabled(isVisible);
     }
 }

@@ -65,8 +65,7 @@ public class SCPFileSynchronizer extends FileSynchronizer {
      */
     @Override
     public void syncFile(String sourcePath, String destinationPath) {
-        // preserve timestamp for now
-        boolean preserveTimestamp = true;
+        boolean preserveTimestamp = this.connectionInfo.isPreserveTime();
         // exec 'scp -t rfile' remotely
         String finalSourcePath = new File(project.getBasePath(), sourcePath).getAbsolutePath();
         String remotePath = new File(this.connectionInfo.getRootPath(), destinationPath).getPath();

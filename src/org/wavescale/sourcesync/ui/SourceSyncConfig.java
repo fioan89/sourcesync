@@ -124,10 +124,14 @@ public class SourceSyncConfig {
             connectionConfiguration.setUserName(connectionPanel.getUserName());
             connectionConfiguration.setUserPassword(connectionPanel.getUserPassword());
             connectionConfiguration.setExcludedFiles(connectionPanel.getExludedFiles());
+            connectionConfiguration.setPreserveTime(connectionPanel.isTimestampPreserved());
             if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
                 boolean value = connectionPanel.isImplicit();
                 ((FTPSConfiguration) connectionConfiguration).setRequireImplicitTLS(value);
                 ((FTPSConfiguration) connectionConfiguration).setRequireExplicitTLS(!value);
+                connectionConfiguration.setPreserveTime(false);
+            } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {
+                connectionConfiguration.setPreserveTime(false);
             }
         }
     }
@@ -147,11 +151,15 @@ public class SourceSyncConfig {
             connectionPanel.setUserPassword(connectionConfiguration.getUserPassword());
             connectionPanel.setExcludedFiles(connectionConfiguration.getExcludedFiles());
             connectionPanel.setConnectionMethodVisible(false);
+            connectionPanel.setPreserveTimestampVisible(true);
             if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
                 boolean value = ((FTPSConfiguration) connectionConfiguration).isRequireImplicitTLS();
                 connectionPanel.setImplicit(value);
                 connectionPanel.setExplicit(!value);
                 connectionPanel.setConnectionMethodVisible(true);
+                connectionPanel.setPreserveTimestampVisible(false);
+            } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {
+                connectionPanel.setPreserveTimestampVisible(false);
             }
             pnConfig.setVisible(true);
         }

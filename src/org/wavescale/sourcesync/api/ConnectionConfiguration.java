@@ -19,13 +19,14 @@ import java.io.Serializable;
  */
 
 public abstract class ConnectionConfiguration implements Serializable {
-    public String connectionName;
-    public String connectionType;
-    public String host;
-    public int port;
-    public String rootPath;
-    public String userName;
-    public String userPassword;
+    protected String connectionName;
+    protected String connectionType;
+    protected String host;
+    protected int port;
+    protected String rootPath;
+    protected String userName;
+    protected String userPassword;
+    protected boolean preserveTime;
     /**
      * A string containing the ".ext" separated by ";" character,
      * representing a list of file types to be excluded from the sync.
@@ -35,6 +36,7 @@ public abstract class ConnectionConfiguration implements Serializable {
     public ConnectionConfiguration(String connectionName) {
         this.connectionName = connectionName;
         this.excludedFiles = ".crt;.iml";
+        this.preserveTime = false;
     }
 
     public String getConnectionName() {
@@ -111,4 +113,14 @@ public abstract class ConnectionConfiguration implements Serializable {
     public void setUserPassword(String userPassword) {
         this.userPassword = userPassword;
     }
+
+    public void setPreserveTime(boolean shouldPreserveTimestamp) {
+        this.preserveTime = shouldPreserveTimestamp;
+    }
+
+    public boolean isPreserveTime() {
+        return this.preserveTime;
+    }
+
+
 }

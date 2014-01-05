@@ -75,8 +75,7 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
      */
     @Override
     public void syncFile(String sourcePath, String destinationPath) {
-        // for now preserve timestamp by default
-        boolean preserveTimestamp = true;
+        boolean preserveTimestamp = this.connectionInfo.isPreserveTime();
         String finalSourcePath = new File(project.getBasePath(), sourcePath).getAbsolutePath();
         String remotePath = new File(this.connectionInfo.getRootPath(), destinationPath).getPath();
 
