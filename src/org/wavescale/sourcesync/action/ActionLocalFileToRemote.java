@@ -19,7 +19,6 @@ import org.wavescale.sourcesync.config.SCPConfiguration;
 import org.wavescale.sourcesync.config.SFTPConfiguration;
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory;
 import org.wavescale.sourcesync.factory.ModuleConnectionConfig;
-import org.wavescale.sourcesync.logger.BalloonLogger;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 import org.wavescale.sourcesync.synchronizer.FTPFileSynchronizer;
 import org.wavescale.sourcesync.synchronizer.FTPSFileSynchronizer;
@@ -47,10 +46,11 @@ public class ActionLocalFileToRemote extends AnAction {
         String moduleName = currentProject.getName();
         String associationName = ModuleConnectionConfig.getInstance().getAssociationFor(moduleName);
         if (associationName == null) {
-            showNoConnectionSpecifiedError(e, moduleName);
+            Utils.showNoConnectionSpecifiedError(e, moduleName);
             return;
         }
         VirtualFile virtualFile = DataKeys.VIRTUAL_FILE.getData(e.getDataContext());
+
         final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
                 getConnectionConfiguration(associationName);
         if (Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
@@ -85,15 +85,6 @@ public class ActionLocalFileToRemote extends AnAction {
         } else {
             EventDataLogger.logWarning("File <b>" + virtualFile.getName() + "</b> is filtered out!", e.getProject());
         }
-
-    }
-
-    private void showNoConnectionSpecifiedError(AnActionEvent e, String moduleName) {
-        StringBuilder message = new StringBuilder();
-        message.append("There is no connection type associated to <b>").append(moduleName)
-                .append("</b> module.\nPlease right click on module name and then select <b>Module Connection Configuration</b> to select connection type!");
-        BalloonLogger.logBalloonError(message.toString(), e.getProject());
-        EventDataLogger.logError(message.toString(), e.getProject());
     }
 
 }

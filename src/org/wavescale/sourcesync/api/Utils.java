@@ -1,5 +1,9 @@
 package org.wavescale.sourcesync.api;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import org.wavescale.sourcesync.logger.BalloonLogger;
+import org.wavescale.sourcesync.logger.EventDataLogger;
+
 /**
  * ****************************************************************************
  * Copyright (c) 2005-2013 Faur Ioan-Aurel.                                     *
@@ -34,5 +38,13 @@ public class Utils {
         }
 
         return true;
+    }
+
+    public static void showNoConnectionSpecifiedError(AnActionEvent e, String moduleName) {
+        StringBuilder message = new StringBuilder();
+        message.append("There is no connection type associated to <b>").append(moduleName)
+                .append("</b> module.\nPlease right click on module name and then select <b>Module Connection Configuration</b> to select connection type!");
+        BalloonLogger.logBalloonError(message.toString(), e.getProject());
+        EventDataLogger.logError(message.toString(), e.getProject());
     }
 }
