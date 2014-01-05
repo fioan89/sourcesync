@@ -6,7 +6,9 @@
 
     <description><![CDATA[
       Source Synchronizer is a powerful plugin for performing one-way file synchronization for your project.
-      <br>It synchronizes the remote target so that it will match your local project.
+      <br>It synchronizes the remote target so that it will match your local project. It features support for
+      FTP, FTPS, SFTP and SCP protocols. You can filter the uploaded files, or you can simply opt
+      to sync out only selected or changed files.
       ]]></description>
 
     <change-notes><![CDATA[
@@ -16,13 +18,13 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="107.105"/>
+    <idea-version since-build="123.72"/>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
-    <!-- uncomment to enable plugin in all products
-    <depends>com.intellij.modules.lang</depends>
-    -->
+    <!-- uncomment to enable plugin in all products -->
+    <depends>com.intellij.modules.vcs</depends>
+
 
     <application-components>
         <!-- Add your application components here -->
