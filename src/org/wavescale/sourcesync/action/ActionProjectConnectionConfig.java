@@ -17,7 +17,7 @@ import org.wavescale.sourcesync.ui.ModuleConnectionConfigDialog;
  * For any issues or questions send an email at: fioan89@gmail.com              *
  * *****************************************************************************
  */
-public class ActionModuleConnectionConfig extends AnAction {
+public class ActionProjectConnectionConfig extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         String moduleName = DataKeys.PROJECT.getData(e.getDataContext()).getName();
         String[] configConnections = ConfigConnectionFactory.getInstance().getConnectionNames().toArray(new String[0]);

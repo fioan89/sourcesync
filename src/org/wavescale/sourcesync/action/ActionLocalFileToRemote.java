@@ -42,7 +42,8 @@ public class ActionLocalFileToRemote extends AnAction {
     public void actionPerformed(final AnActionEvent e) {
         // first check if there's a connection type associated to this module. If not alert the user
         // and get out
-        Project currentProject = DataKeys.PROJECT.getData(e.getDataContext());
+        Project currentProject = e.getProject();
+
         String moduleName = currentProject.getName();
         String associationName = ModuleConnectionConfig.getInstance().getAssociationFor(moduleName);
         if (associationName == null) {
@@ -54,7 +55,9 @@ public class ActionLocalFileToRemote extends AnAction {
         final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
                 getConnectionConfiguration(associationName);
         if (Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
-            final File relativeFile = new File(virtualFile.getPath().replaceFirst(currentProject.getBasePath(), ""));
+            EventDataLogger.logInfo("virtualFile:" + virtualFile.getPath(), currentProject);
+            EventDataLogger.logInfo("projecteBase:" + currentProject.getBasePath(), currentProject);
+            final File relativeFile = new File(virtualFile.getPath().replaceFirst(currentProject.getBasePath().replace("\\", "/"), ""));
             ProgressManager.getInstance().run(new Task.Backgroundable(e.getProject(), "Uploading", false) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {

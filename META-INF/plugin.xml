@@ -40,9 +40,9 @@
                 text="Source Sync" description="Display the Source Sync config dialog">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
-        <action id="actionModuleConnectionConfig" class="org.wavescale.sourcesync.action.ActionModuleConnectionConfig"
-                text="Module Connection Configuration"
-                description="Display a connection configuration window for the selected module">
+        <action id="actionProjectConnectionConfig" class="org.wavescale.sourcesync.action.ActionProjectConnectionConfig"
+                text="Project Connection Configuration"
+                description="Display a connection configuration window for the selected project">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="Github.Create.Gist"/>
         </action>
         <action id="actionLocalFileToRemote" class="org.wavescale.sourcesync.action.ActionLocalFileToRemote"
@@ -53,7 +53,7 @@
         <action id="actionChangedFilesToRemote" class="org.wavescale.sourcesync.action.ActionChangedFilesToRemote"
                 text="Sync changed files to remote target" description="Sync local changed files to remote target.">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after"
-                          relative-to-action="org.wavescale.sourcesync.action.ActionModuleConnectionConfig"/>
+                          relative-to-action="org.wavescale.sourcesync.action.ActionProjectConnectionConfig"/>
             <add-to-group group-id="EditorPopupMenu" anchor="after"
                           relative-to-action="org.wavescale.sourcesync.action.ActionLocalFileToRemote"/>
             <add-to-group group-id="EditorTabPopupMenu" anchor="after"
