@@ -47,7 +47,7 @@ public class SourceSyncConfig {
         frame.setLocationRelativeTo(null);
         lstTargets.setModel(new DefaultListModel<String>());
 
-        FormLayout layout = new FormLayout("fill:300px:grow(1)", "pref:grow(1)");
+        FormLayout layout = new FormLayout("fill:300:grow(1)", "fill:300:grow(1)");
         CellConstraints cc = new CellConstraints();
         pnConfig.setLayout(layout);
         connectionPanel = ConfigPanelFactory.getInstance().getConnectionConfigPanel();
@@ -63,7 +63,8 @@ public class SourceSyncConfig {
         okButton.addActionListener(new ActionButtonListener());
         applyButton.addActionListener(new ActionButtonListener());
 
-        frame.setSize(600, 400);
+        //frame.setSize(600, 400);
+        frame.pack();
         frame.setVisible(true);
 
         ConfigConnectionFactory connectionFactory = ConfigConnectionFactory.getInstance();
