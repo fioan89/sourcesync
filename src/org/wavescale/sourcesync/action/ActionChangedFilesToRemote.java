@@ -2,7 +2,7 @@ package org.wavescale.sourcesync.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -49,7 +49,7 @@ public class ActionChangedFilesToRemote extends AnAction {
     public void actionPerformed(final AnActionEvent e) {
         // first check if there's a connection type associated to this module. If not alert the user
         // and get out
-        Project currentProject = DataKeys.PROJECT.getData(e.getDataContext());
+        Project currentProject = PlatformDataKeys.PROJECT.getData(e.getDataContext());
         String moduleName = currentProject.getName();
         String associationName = ModuleConnectionConfig.getInstance().getAssociationFor(moduleName);
         if (associationName == null) {

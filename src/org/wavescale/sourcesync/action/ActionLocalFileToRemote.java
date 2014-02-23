@@ -2,7 +2,7 @@ package org.wavescale.sourcesync.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -50,7 +50,7 @@ public class ActionLocalFileToRemote extends AnAction {
             Utils.showNoConnectionSpecifiedError(e, moduleName);
             return;
         }
-        VirtualFile virtualFile = DataKeys.VIRTUAL_FILE.getData(e.getDataContext());
+        VirtualFile virtualFile = PlatformDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
 
         final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
                 getConnectionConfiguration(associationName);
