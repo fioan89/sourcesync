@@ -7,6 +7,7 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
 import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.FileSynchronizer;
+import org.wavescale.sourcesync.api.Utils;
 import org.wavescale.sourcesync.config.FTPSConfiguration;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 
@@ -69,13 +70,12 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
         // preserve timestamp for now
         boolean preserveTimestamp = true;
         File localFile = new File(project.getBasePath(), sourcePath);
-        String finalSourcePath = localFile.getAbsolutePath();
-        File remoteFile = new File(this.connectionInfo.getRootPath(), destinationPath);
-        String remotePath = remoteFile.getPath();
-        String[] dirsToCreate = new File(destinationPath).getPath().split(File.separator);
+        String finalSourcePath = Utils.getUnixPath(localFile.getAbsolutePath());
+        String remotePath = Utils.buildUnixPath(this.connectionInfo.getRootPath(), destinationPath);
+        String[] dirsToCreate = Utils.splitPath(destinationPath);
         // change location to root path
         try {
-            this.ftps.changeWorkingDirectory(this.connectionInfo.getRootPath());
+            this.ftps.changeWorkingDirectory(Utils.getUnixPath(this.connectionInfo.getRootPath()));
         } catch (IOException e) {
             EventDataLogger.logError("Remote dir <b>" + this.connectionInfo.getRootPath() +
                     "</b> might not exist or you don't have permission on this path!", this.project);

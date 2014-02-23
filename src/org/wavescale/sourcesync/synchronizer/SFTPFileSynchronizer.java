@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.jcraft.jsch.*;
 import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.FileSynchronizer;
+import org.wavescale.sourcesync.api.Utils;
 import org.wavescale.sourcesync.config.SFTPConfiguration;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 
@@ -78,47 +79,34 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
         boolean preserveTimestamp = this.connectionInfo.isPreserveTime();
         String finalSourcePath = new File(project.getBasePath(), sourcePath).getAbsolutePath();
         String remotePath = new File(this.connectionInfo.getRootPath(), destinationPath).getPath();
-        EventDataLogger.logInfo("sourcePath:" + sourcePath, this.project);
-        EventDataLogger.logInfo("destinationPath:" + destinationPath, this.project);
-        EventDataLogger.logInfo("finalSourcePath:" + finalSourcePath, this.project);
-        EventDataLogger.logInfo("remotePath:" + remotePath, this.project);
 
-
-        EventDataLogger.logInfo(new File(destinationPath).getPath(), this.project);
-        String fileSeparator = "/";
-        if (File.separator.equals("\\")) {
-            fileSeparator = "\\\\";
-        }
-        String[] dirsToCreate = new File(destinationPath).getPath().split(fileSeparator);
+        String[] dirsToCreate = Utils.splitPath(destinationPath);
         ChannelSftp channelSftp;
         try {
             channelSftp = (ChannelSftp) this.session.openChannel("sftp");
             channelSftp.connect();
-            channelSftp.cd(this.connectionInfo.getRootPath());
+            channelSftp.cd(Utils.getUnixPath(this.connectionInfo.getRootPath()));
         } catch (JSchException e) {
             EventDataLogger.logError(e.toString(), this.project);
             return;
         } catch (SftpException e) {
-            EventDataLogger.logError("Remote dir1 <b>" + this.connectionInfo.getRootPath() +
-                    "</b> might not exist or you don't have permission on this path!" + e.getStackTrace(), this.project);
+            EventDataLogger.logError("Remote dir <b>" + this.connectionInfo.getRootPath() +
+                    "</b> might not exist or you don't have permission on this path!", this.project);
             return;
         }
         // first try to create the path where this must be uploaded
         for (String dirToCreate : dirsToCreate) {
             try {
                 channelSftp.mkdir(dirToCreate);
-                EventDataLogger.logInfo("toCreate:" + dirsToCreate, this.project);
             } catch (SftpException e) {
                 // this dir probably exist so just ignore
             }
             try {
                 channelSftp.cd(dirToCreate);
-                EventDataLogger.logInfo("cdTo" + dirsToCreate, this.project);
-                EventDataLogger.logInfo("path" + channelSftp.pwd(), this.project);
             } catch (SftpException e) {
                 // probably it doesn't exist or maybe no permission
-                EventDataLogger.logError("Remote dir2 <b>" + remotePath +
-                        "</b> might not exist or you don't have permission on this path!" + e.getStackTrace(), this.project);
+                EventDataLogger.logError("Remote dir <b>" + remotePath +
+                        "</b> might not exist or you don't have permission on this path!", this.project);
                 return;
             }
         }

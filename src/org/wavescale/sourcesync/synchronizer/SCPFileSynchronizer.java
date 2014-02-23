@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.jcraft.jsch.*;
 import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.FileSynchronizer;
+import org.wavescale.sourcesync.api.Utils;
 import org.wavescale.sourcesync.config.SCPConfiguration;
 import org.wavescale.sourcesync.logger.BalloonLogger;
 import org.wavescale.sourcesync.logger.EventDataLogger;
@@ -67,8 +68,8 @@ public class SCPFileSynchronizer extends FileSynchronizer {
     public void syncFile(String sourcePath, String destinationPath) {
         boolean preserveTimestamp = this.connectionInfo.isPreserveTime();
         // exec 'scp -t rfile' remotely
-        String finalSourcePath = new File(project.getBasePath(), sourcePath).getAbsolutePath();
-        String remotePath = new File(this.connectionInfo.getRootPath(), destinationPath).getPath();
+        String finalSourcePath = Utils.buildUnixPath(project.getBasePath(), sourcePath);
+        String remotePath = Utils.buildUnixPath(this.connectionInfo.getRootPath(), destinationPath);
 
         try {
             String command = "scp " + (preserveTimestamp ? "-p" : "") + " -t -C " + remotePath;

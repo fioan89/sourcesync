@@ -55,9 +55,8 @@ public class ActionLocalFileToRemote extends AnAction {
         final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
                 getConnectionConfiguration(associationName);
         if (Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
-            EventDataLogger.logInfo("virtualFile:" + virtualFile.getPath(), currentProject);
-            EventDataLogger.logInfo("projecteBase:" + currentProject.getBasePath(), currentProject);
-            final File relativeFile = new File(virtualFile.getPath().replaceFirst(currentProject.getBasePath().replace("\\", "/"), ""));
+            final File relativeFile = new File(Utils.getUnixPath(virtualFile.getPath()).replaceFirst(
+                    Utils.getUnixPath(currentProject.getBasePath()), ""));
             ProgressManager.getInstance().run(new Task.Backgroundable(e.getProject(), "Uploading", false) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
@@ -80,7 +79,8 @@ public class ActionLocalFileToRemote extends AnAction {
                         fileSynchronizer.connect();
                         // so final destination will look like this:
                         // root_home/ + project_name/ + project_relative_path_to_file/
-                        fileSynchronizer.syncFile(relativeFile.getPath(), e.getProject().getName() + File.separator + relativeFile.getParent());
+                        fileSynchronizer.syncFile(Utils.getUnixPath(relativeFile.getPath()),
+                                Utils.buildUnixPath(e.getProject().getName(), relativeFile.getParent()));
                         fileSynchronizer.disconnect();
                     }
                 }
