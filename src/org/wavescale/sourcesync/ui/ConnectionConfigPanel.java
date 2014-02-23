@@ -38,6 +38,7 @@ public class ConnectionConfigPanel {
 
     /**
      * Gets the config panel instance.
+     *
      * @return a <code>JPanel</code> instance.
      */
     public JPanel getConfigPanel() {
@@ -46,6 +47,7 @@ public class ConnectionConfigPanel {
 
     /**
      * Sets the connection type label to the given string.
+     *
      * @param connectionType a <code>String</code> representing the connection type.
      */
     public void setConnectionType(String connectionType) {
@@ -54,6 +56,7 @@ public class ConnectionConfigPanel {
 
     /**
      * Returns the port value stored in the port text field.
+     *
      * @return an int value representing the target port.
      */
     public int getPort() {
@@ -62,6 +65,7 @@ public class ConnectionConfigPanel {
 
     /**
      * Sets the target port.
+     *
      * @param port an int value representing the target port
      */
     public void setPort(int port) {
@@ -70,6 +74,7 @@ public class ConnectionConfigPanel {
 
     /**
      * Returns target hostname.
+     *
      * @return a <code>String</code> representing the address of a remote host.
      */
     public String getHost() {
@@ -78,6 +83,7 @@ public class ConnectionConfigPanel {
 
     /**
      * Sets target hostname.
+     *
      * @param host a <code>String</code> representing the address of a remote host.
      */
     public void setHost(String host) {
@@ -86,6 +92,7 @@ public class ConnectionConfigPanel {
 
     /**
      * Gets the target root path. This is the root where we will sync files.
+     *
      * @return a <code>String</code> representing a path on the remote target.
      */
     public String getRootPath() {
@@ -94,6 +101,7 @@ public class ConnectionConfigPanel {
 
     /**
      * Sets the target root path. This is the root where we will sync files.
+     *
      * @param rootPath a <code>String</code> representing a path on the remote target.
      */
     public void setRootPath(String rootPath) {
@@ -147,6 +155,7 @@ public class ConnectionConfigPanel {
 
     /**
      * Shows or hides the group of implicit and explicit radio buttons.
+     *
      * @param isVisible <code>true</code> for visible, <code>false</code> otherwise.
      */
     public void setConnectionMethodVisible(boolean isVisible) {
@@ -159,7 +168,7 @@ public class ConnectionConfigPanel {
     /**
      * Shows or hides preserve timestamp checkbox.
      *
-     * @param isVisible
+     * @param isVisible {@code true} if checkbox must be visible, {@code false} otherwise.
      */
     public void setPreserveTimestampVisible(boolean isVisible) {
         preserveTimestamp.setVisible(isVisible);

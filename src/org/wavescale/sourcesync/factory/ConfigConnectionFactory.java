@@ -69,6 +69,7 @@ public class ConfigConnectionFactory {
         connectionConfigurationMap.remove(connectionName);
     }
 
+    @SuppressWarnings("unchecked")
     private void initComponent() {
         // try to load the persistence data.
         if (new File(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE)).exists()) {

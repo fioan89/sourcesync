@@ -44,7 +44,8 @@ public class Utils {
 
     /**
      * Logs an error message about no connection specified.
-     * @param e action event instance.
+     *
+     * @param e          action event instance.
      * @param moduleName module or project name.
      */
     public static void showNoConnectionSpecifiedError(AnActionEvent e, String moduleName) {
@@ -57,6 +58,7 @@ public class Utils {
 
     /**
      * Normalizes Windows paths to Unix path.
+     *
      * @param path a Unix or Windows path.
      * @return if a Unix like path.
      */
@@ -66,13 +68,14 @@ public class Utils {
 
     /**
      * Builds a Unix path from the list of specified strings. Array is taken in order.
+     *
      * @param paths a list of relative string paths.
      * @return a string instance representing a Unix path. It may or may not be an absolute path
      * depending on the input array.
      */
     public static String buildUnixPath(String... paths) {
         StringBuilder toReturn = new StringBuilder();
-        for (String path: paths) {
+        for (String path : paths) {
             toReturn.append(getUnixPath(path)).append("/");
         }
         String finalValue = toReturn.toString().replace("//", "/");
@@ -84,6 +87,7 @@ public class Utils {
 
     /**
      * Returns an array of folders that build up a file path
+     *
      * @param path an absolute path.
      * @return an array of strings instances that represent a file or folder path.
      */
@@ -93,6 +97,7 @@ public class Utils {
 
     /**
      * Returns an array of folders that build up a file path
+     *
      * @param path a {@link java.io.File} instance path.
      * @return an array of strings instances that represent a file or folder path.
      */

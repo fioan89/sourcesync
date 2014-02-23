@@ -11,14 +11,13 @@ public class ModuleConnectionConfigDialog extends JDialog {
     private JButton buttonCancel;
     private JComboBox cbModuleConnection;
     private String moduleName;
-    private String[] connectionConfigNames;
 
+    @SuppressWarnings("unchecked")
     public ModuleConnectionConfigDialog(String moduleName, String[] connectionConfigNames) {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         this.moduleName = moduleName;
-        this.connectionConfigNames = connectionConfigNames;
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

@@ -6,6 +6,8 @@ import com.intellij.openapi.actionSystem.DataKeys;
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory;
 import org.wavescale.sourcesync.ui.ModuleConnectionConfigDialog;
 
+import java.util.Set;
+
 /**
  * ****************************************************************************
  * Copyright (c) 2005-2014 Faur Ioan-Aurel.                                     *
@@ -20,7 +22,8 @@ import org.wavescale.sourcesync.ui.ModuleConnectionConfigDialog;
 public class ActionProjectConnectionConfig extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         String moduleName = DataKeys.PROJECT.getData(e.getDataContext()).getName();
-        String[] configConnections = ConfigConnectionFactory.getInstance().getConnectionNames().toArray(new String[0]);
+        Set<String> connectionNames = ConfigConnectionFactory.getInstance().getConnectionNames();
+        String[] configConnections = connectionNames.toArray(new String[connectionNames.size()]);
         ModuleConnectionConfigDialog moduleConnectionConfigDialog = new ModuleConnectionConfigDialog(moduleName, configConnections);
     }
 }

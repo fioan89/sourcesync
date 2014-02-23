@@ -2,7 +2,7 @@
     <id>org.wavescale.sourcesync</id>
     <name>Source Synchronizer</name>
     <version>1.0</version>
-    <vendor email="fioan89@gmail.com" url=""></vendor>
+    <vendor email="fioan89@gmail.com" url="">wavescale.org</vendor>
 
     <description><![CDATA[
       Source Synchronizer is a powerful plugin for performing one-way file synchronization for your project.

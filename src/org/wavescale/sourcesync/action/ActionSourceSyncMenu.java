@@ -21,8 +21,4 @@ public class ActionSourceSyncMenu extends AnAction {
         SourceSyncConfig configForm = new SourceSyncConfig();
     }
 
-    @Override
-    public void update(AnActionEvent e) {
-        super.update(e);
-    }
 }

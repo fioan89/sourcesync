@@ -68,6 +68,7 @@ public class ModuleConnectionConfig {
         return moduleConnection.get(moduleName);
     }
 
+    @SuppressWarnings("unchecked")
     private void tryLoadModulesAssociatedConn() {
         // try to load the persistence file.
         if (new File(userHome.concat(fileSeparator).concat(MODULES_FILE)).exists()) {
