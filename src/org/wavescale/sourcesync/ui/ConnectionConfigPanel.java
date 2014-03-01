@@ -145,7 +145,7 @@ public class ConnectionConfigPanel {
     }
 
     public int getSimultaneousJobs() {
-        return (Integer)this.simultaneousJobs.getValue();
+        return (Integer) this.simultaneousJobs.getValue();
     }
 
     public void setSimultaneousJobs(int nrOfJobs) {

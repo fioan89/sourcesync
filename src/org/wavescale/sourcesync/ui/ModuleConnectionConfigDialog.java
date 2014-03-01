@@ -3,7 +3,6 @@ package org.wavescale.sourcesync.ui;
 import org.wavescale.sourcesync.factory.ModuleConnectionConfig;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 
 public class ModuleConnectionConfigDialog extends JDialog {
