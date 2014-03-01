@@ -38,12 +38,12 @@
     <actions>
         <!-- Add your action here -->
         <action id="actionSourceSyncMenu" class="org.wavescale.sourcesync.action.ActionSourceSyncMenu"
-                text="Source Sync" description="Display the Source Sync config dialog">
+                text="Source Sync" description="Display the Source Sync config dialog" icon="/sourcesync.png">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
         <action id="actionProjectConnectionConfig" class="org.wavescale.sourcesync.action.ActionProjectConnectionConfig"
                 text="Project Connection Configuration"
-                description="Display a connection configuration window for the selected project">
+                description="Display a connection configuration window for the selected project" icon="/projectconfig.png">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="Github.Create.Gist"/>
         </action>
         <action id="actionLocalFileToRemote" class="org.wavescale.sourcesync.action.ActionLocalFileToRemote"

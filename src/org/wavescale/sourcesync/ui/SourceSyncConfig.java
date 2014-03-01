@@ -43,8 +43,9 @@ public class SourceSyncConfig {
     private JFrame frame;
 
     public SourceSyncConfig() {
-        frame = new JFrame("SourceSyncConfig");
+        frame = new JFrame("sourcesync connection configuration");
         frame.setLocationRelativeTo(null);
+        frame.setIconImage(new ImageIcon(getClass().getClassLoader().getResource("/sourcesync.png")).getImage());
         lstTargets.setModel(new DefaultListModel<String>());
 
         FormLayout layout = new FormLayout("fill:300:grow(1)", "fill:300:grow(1)");
