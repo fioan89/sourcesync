@@ -3,6 +3,7 @@ package org.wavescale.sourcesync.ui;
 import org.wavescale.sourcesync.factory.ModuleConnectionConfig;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
 public class ModuleConnectionConfigDialog extends JDialog {
@@ -14,6 +15,7 @@ public class ModuleConnectionConfigDialog extends JDialog {
 
     @SuppressWarnings("unchecked")
     public ModuleConnectionConfigDialog(String moduleName, String[] connectionConfigNames) {
+        this.setTitle("Choose connection for " + moduleName);
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
