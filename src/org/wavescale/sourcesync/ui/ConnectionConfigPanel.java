@@ -160,6 +160,10 @@ public class ConnectionConfigPanel {
         return preserveTimestamp.isSelected();
     }
 
+    public void setPreserveTimestamp(boolean preserveTimestamp)  {
+        this.preserveTimestamp.setSelected(preserveTimestamp);
+    }
+
     public void setExcludedFiles(String excludedFiles) {
         this.crtImlTextField.setText(excludedFiles);
     }
