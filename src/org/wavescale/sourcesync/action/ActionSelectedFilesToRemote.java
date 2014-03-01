@@ -27,6 +27,7 @@ import org.wavescale.sourcesync.synchronizer.SCPFileSynchronizer;
 import org.wavescale.sourcesync.synchronizer.SFTPFileSynchronizer;
 
 import java.io.File;
+import java.util.concurrent.Semaphore;
 
 /**
  * ****************************************************************************
@@ -63,6 +64,7 @@ public class ActionSelectedFilesToRemote extends AnAction {
         // start sync
         final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
                 getConnectionConfiguration(associationName);
+        final Semaphore semaphores = new Semaphore(connectionConfiguration.getSimultaneousJobs());
         for (VirtualFile virtualFile : virtualFiles) {
             if (virtualFile != null && new File(virtualFile.getPath()).isFile()) {
                 if (Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {

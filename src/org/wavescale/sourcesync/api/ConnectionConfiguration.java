@@ -23,10 +23,12 @@ public abstract class ConnectionConfiguration implements Serializable {
     protected String connectionType;
     protected String host;
     protected int port;
+    protected int simultaneousJobs;
     protected String rootPath;
     protected String userName;
     protected String userPassword;
     protected boolean preserveTime;
+
     /**
      * A string containing the ".ext" separated by ";" character,
      * representing a list of file types to be excluded from the sync.
@@ -37,6 +39,7 @@ public abstract class ConnectionConfiguration implements Serializable {
         this.connectionName = connectionName;
         this.excludedFiles = ".crt;.iml";
         this.preserveTime = false;
+        this.simultaneousJobs = 2;
     }
 
     public String getConnectionName() {
@@ -122,6 +125,14 @@ public abstract class ConnectionConfiguration implements Serializable {
 
     public boolean isPreserveTime() {
         return this.preserveTime;
+    }
+
+    public int getSimultaneousJobs() {
+        return simultaneousJobs;
+    }
+
+    public void setSimultaneousJobs(int simultaneousJobs) {
+        this.simultaneousJobs = simultaneousJobs;
     }
 
 

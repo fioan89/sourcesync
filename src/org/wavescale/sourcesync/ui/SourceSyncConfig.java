@@ -127,6 +127,7 @@ public class SourceSyncConfig {
             connectionConfiguration.setUserPassword(connectionPanel.getUserPassword());
             connectionConfiguration.setExcludedFiles(connectionPanel.getExludedFiles());
             connectionConfiguration.setPreserveTime(connectionPanel.isTimestampPreserved());
+            connectionConfiguration.setSimultaneousJobs(connectionConfiguration.getSimultaneousJobs());
             if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
                 boolean value = connectionPanel.isImplicit();
                 ((FTPSConfiguration) connectionConfiguration).setRequireImplicitTLS(value);
@@ -152,12 +153,14 @@ public class SourceSyncConfig {
             connectionPanel.setUserName(connectionConfiguration.getUserName());
             connectionPanel.setUserPassword(connectionConfiguration.getUserPassword());
             connectionPanel.setExcludedFiles(connectionConfiguration.getExcludedFiles());
+            connectionPanel.setSimultaneousJobs(connectionConfiguration.getSimultaneousJobs());
             connectionPanel.setConnectionMethodVisible(false);
             connectionPanel.setPreserveTimestampVisible(true);
             if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
                 boolean value = ((FTPSConfiguration) connectionConfiguration).isRequireImplicitTLS();
                 connectionPanel.setImplicit(value);
                 connectionPanel.setExplicit(!value);
+
                 connectionPanel.setConnectionMethodVisible(true);
                 connectionPanel.setPreserveTimestampVisible(false);
             } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {

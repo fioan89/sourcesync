@@ -33,6 +33,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 /**
  * ****************************************************************************
@@ -78,6 +79,7 @@ public class ActionChangedFilesToRemote extends AnAction {
         // start sync
         final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
                 getConnectionConfiguration(associationName);
+        final Semaphore semaphores = new Semaphore(connectionConfiguration.getSimultaneousJobs());
         for (VirtualFile virtualFile : changedFiles) {
             if (virtualFile != null && Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
                 final File relativeFile = new File(Utils.getUnixPath(virtualFile.getPath()).replaceFirst(
@@ -101,12 +103,19 @@ public class ActionChangedFilesToRemote extends AnAction {
                         }
 
                         if (fileSynchronizer != null) {
-                            fileSynchronizer.connect();
-                            // so final destination will look like this:
-                            // root_home/ + project_name/ + project_relative_path_to_file/
-                            fileSynchronizer.syncFile(Utils.getUnixPath(relativeFile.getPath()),
-                                    Utils.buildUnixPath(e.getProject().getName(), relativeFile.getParent()));
-                            fileSynchronizer.disconnect();
+                            try {
+                                semaphores.acquire();
+                                fileSynchronizer.connect();
+                                // so final destination will look like this:
+                                // root_home/ + project_name/ + project_relative_path_to_file/
+                                fileSynchronizer.syncFile(Utils.getUnixPath(relativeFile.getPath()),
+                                        Utils.buildUnixPath(e.getProject().getName(), relativeFile.getParent()));
+                                fileSynchronizer.disconnect();
+                            } catch (InterruptedException e1) {
+                                e1.printStackTrace();
+                            } finally {
+                                semaphores.release();
+                            }
                         }
                     }
                 });

@@ -26,6 +26,7 @@ public class ConnectionConfigPanel {
     private JRadioButton rbExplicit;
     private JTextField crtImlTextField;
     private JCheckBox preserveTimestamp;
+    private JSpinner simultaneousJobs;
 
     public ConnectionConfigPanel() {
         // group radio buttons
@@ -34,6 +35,8 @@ public class ConnectionConfigPanel {
         group.add(rbExplicit);
         tfPort.setMinimumSize(new Dimension(50, 20));
         tfPort.setMaximumSize(new Dimension(50, 20));
+        simultaneousJobs.setModel(new SpinnerNumberModel(2, 1, 10, 1) {
+        });
     }
 
     /**
@@ -139,6 +142,14 @@ public class ConnectionConfigPanel {
 
     public void setExplicit(boolean explicit) {
         this.rbExplicit.setSelected(explicit);
+    }
+
+    public int getSimultaneousJobs() {
+        return (Integer)this.simultaneousJobs.getValue();
+    }
+
+    public void setSimultaneousJobs(int nrOfJobs) {
+        this.simultaneousJobs.setValue(nrOfJobs);
     }
 
     public String getExludedFiles() {

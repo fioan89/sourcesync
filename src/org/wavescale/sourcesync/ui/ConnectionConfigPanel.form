@@ -52,6 +52,8 @@
         <rowspec value="center:24px:noGrow"/>
         <rowspec value="top:4dlu:noGrow"/>
         <rowspec value="center:max(d;4px):noGrow"/>
+        <rowspec value="top:4dlu:noGrow"/>
+        <rowspec value="center:max(d;4px):noGrow"/>
         <colspec value="fill:max(d;4px):noGrow"/>
         <colspec value="left:4dlu:noGrow"/>
         <colspec value="fill:50px:grow"/>
@@ -213,6 +215,24 @@
             <properties>
               <selected value="true"/>
               <text value="Preserve timestamp"/>
+            </properties>
+          </component>
+          <component id="ca38d" class="javax.swing.JSpinner" binding="simultaneousJobs">
+            <constraints>
+              <grid row="18" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+              <forms defaultalign-horz="false"/>
+            </constraints>
+            <properties>
+              <name value=""/>
+            </properties>
+          </component>
+          <component id="265dc" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="18" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <forms/>
+            </constraints>
+            <properties>
+              <text value="Allowed number of simultaneously sync jobs"/>
             </properties>
           </component>
         </children>
