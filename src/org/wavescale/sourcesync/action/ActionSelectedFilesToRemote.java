@@ -64,7 +64,7 @@ public class ActionSelectedFilesToRemote extends AnAction {
         final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
                 getConnectionConfiguration(associationName);
         for (VirtualFile virtualFile : virtualFiles) {
-            if (Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
+            if (virtualFile != null && Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
                 final File relativeFile = new File(virtualFile.getPath().replaceFirst(Utils.getUnixPath(currentProject.getBasePath()), ""));
                 ProgressManager.getInstance().run(new Task.Backgroundable(e.getProject(), "Uploading", false) {
                     @Override
@@ -95,7 +95,9 @@ public class ActionSelectedFilesToRemote extends AnAction {
                     }
                 });
             } else {
-                EventDataLogger.logWarning("File <b>" + virtualFile.getName() + "</b> is filtered out!", e.getProject());
+                if (virtualFile != null) {
+                    EventDataLogger.logWarning("File <b>" + virtualFile.getName() + "</b> is filtered out!", e.getProject());
+                }
             }
         }
     }

@@ -81,7 +81,7 @@ public abstract class ConnectionConfiguration implements Serializable {
     }
 
     public void setHost(String host) {
-        this.host = host;
+        this.host = host.replace("scp://", "").replace("sftp://", "").replace("ftp://", "").replace("ftps://", "");
     }
 
     public int getPort() {
