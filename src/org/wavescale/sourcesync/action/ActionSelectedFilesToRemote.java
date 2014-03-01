@@ -64,39 +64,45 @@ public class ActionSelectedFilesToRemote extends AnAction {
         final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
                 getConnectionConfiguration(associationName);
         for (VirtualFile virtualFile : virtualFiles) {
-            if (virtualFile != null && Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
-                final File relativeFile = new File(virtualFile.getPath().replaceFirst(Utils.getUnixPath(currentProject.getBasePath()), ""));
-                ProgressManager.getInstance().run(new Task.Backgroundable(e.getProject(), "Uploading", false) {
-                    @Override
-                    public void run(@NotNull ProgressIndicator indicator) {
-                        FileSynchronizer fileSynchronizer = null;
-                        if (ConnectionConstants.CONN_TYPE_SCP.equals(connectionConfiguration.getConnectionType())) {
-                            fileSynchronizer = new SCPFileSynchronizer((SCPConfiguration) connectionConfiguration,
-                                    e.getProject(), indicator);
-                        } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType())) {
-                            fileSynchronizer = new SFTPFileSynchronizer((SFTPConfiguration) connectionConfiguration,
-                                    e.getProject(), indicator);
-                        } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {
-                            fileSynchronizer = new FTPFileSynchronizer((FTPConfiguration) connectionConfiguration,
-                                    e.getProject(), indicator);
-                        } else if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
-                            fileSynchronizer = new FTPSFileSynchronizer((FTPSConfiguration) connectionConfiguration,
-                                    e.getProject(), indicator);
-                        }
+            if (virtualFile != null && new File(virtualFile.getPath()).isFile()) {
+                if (Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
+                    final File relativeFile = new File(virtualFile.getPath().replaceFirst(Utils.getUnixPath(currentProject.getBasePath()), ""));
+                    ProgressManager.getInstance().run(new Task.Backgroundable(e.getProject(), "Uploading", false) {
+                        @Override
+                        public void run(@NotNull ProgressIndicator indicator) {
+                            FileSynchronizer fileSynchronizer = null;
+                            if (ConnectionConstants.CONN_TYPE_SCP.equals(connectionConfiguration.getConnectionType())) {
+                                fileSynchronizer = new SCPFileSynchronizer((SCPConfiguration) connectionConfiguration,
+                                        e.getProject(), indicator);
+                            } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType())) {
+                                fileSynchronizer = new SFTPFileSynchronizer((SFTPConfiguration) connectionConfiguration,
+                                        e.getProject(), indicator);
+                            } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {
+                                fileSynchronizer = new FTPFileSynchronizer((FTPConfiguration) connectionConfiguration,
+                                        e.getProject(), indicator);
+                            } else if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
+                                fileSynchronizer = new FTPSFileSynchronizer((FTPSConfiguration) connectionConfiguration,
+                                        e.getProject(), indicator);
+                            }
 
-                        if (fileSynchronizer != null) {
-                            fileSynchronizer.connect();
-                            // so final destination will look like this:
-                            // root_home/ + project_name/ + project_relative_path_to_file/
-                            fileSynchronizer.syncFile(Utils.getUnixPath(relativeFile.getPath()),
-                                    Utils.buildUnixPath(e.getProject().getName(), relativeFile.getParent()));
-                            fileSynchronizer.disconnect();
+                            if (fileSynchronizer != null) {
+                                fileSynchronizer.connect();
+                                // so final destination will look like this:
+                                // root_home/ + project_name/ + project_relative_path_to_file/
+                                fileSynchronizer.syncFile(Utils.getUnixPath(relativeFile.getPath()),
+                                        Utils.buildUnixPath(e.getProject().getName(), relativeFile.getParent()));
+                                fileSynchronizer.disconnect();
+                            }
                         }
+                    });
+                } else {
+                    if (virtualFile != null) {
+                        EventDataLogger.logWarning("File <b>" + virtualFile.getName() + "</b> is filtered out!", e.getProject());
                     }
-                });
+                }
             } else {
                 if (virtualFile != null) {
-                    EventDataLogger.logWarning("File <b>" + virtualFile.getName() + "</b> is filtered out!", e.getProject());
+                    EventDataLogger.logWarning("File <b>" + virtualFile.getName() + "</b> is a directory!", e.getProject());
                 }
             }
         }
