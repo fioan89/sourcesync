@@ -16,7 +16,7 @@ How to use it
 
 ![Tools --> Source Sync](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/tools_menu.png)  
 
-Hit Add to create connections or remove them:
+Hit Add/Remove to create connections or remove them:
 ![Add / Remove connections](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/new_connection.png)  
 
 After you are done creating/editing the connection, hit *Apply* in order to save the configurations and then *OK* to exit the window.  
