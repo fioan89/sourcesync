@@ -38,8 +38,8 @@ Now that you have done this step you are up and ready to sync files. Just right 
 
 A few notes
 -----------
-* If **SCP** protocol is used, please take note that this type of connection can only sync the file, it cannot create the entire directory tree where the file will be saved. Thus you need to have the tree created. This is not a bug of sourcesync. SCP is not a file protocol like **FTP**. It's only purpose is to transfer files.
-* For **FTP** and **FTPS** preserving timestamp is not yet support. This is a work in progress.
+* If **SCP** protocol is used, please take note that this type of connection can only sync the file, it cannot create the entire directory tree where the file will be saved. Thus you need to have the tree created. This is not a sourcesync bug. SCP is not a file protocol like **FTP**. It's only purpose is to transfer files.
+* For **FTP** and **FTPS** preserving timestamp is not yet supported. This is a work in progress.
 
 
 License
