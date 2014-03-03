@@ -45,7 +45,11 @@ A few notes
 * If **SCP** protocol is used, please take note that this type of connection can only sync the file, it cannot create the entire directory tree where the file will be saved. Thus you need to have the tree created. This is not a bug of sourcesync. SCP is not a file protocol like **FTP**. It's only purpose is to transfer files.  
 * For **FTP** and **FTPS** preserving timestamp is not yet support. This is a work in progress.  
 
-
+Tested on
+---------
+* Windows 7
+* GNU/Linux based OS's
+  
 License
 -------
 **sourcesync** is licensed under MIT License. Please take a look at the *LICENSE* file for more informations.  
