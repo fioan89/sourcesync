@@ -3,8 +3,8 @@
   <grid id="27dc6" binding="configPanel" layout-manager="FormLayout">
     <rowspec value="top:45px:noGrow"/>
     <rowspec value="top:4dlu:noGrow"/>
-    <rowspec value="fill:max(d;300px):grow"/>
-    <rowspec value="center:max(d;75px):grow(0.1)"/>
+    <rowspec value="fill:max(d;370px):grow"/>
+    <rowspec value="center:max(d;46px):noGrow"/>
     <colspec value="fill:50px:noGrow"/>
     <colspec value="fill:249px:grow"/>
     <colspec value="fill:max(d;4px):noGrow"/>
@@ -46,7 +46,7 @@
         </constraints>
         <properties>
           <text value="Ok"/>
-          <toolTipText value="Close the window"/>
+          <toolTipText value="Save and close the window"/>
         </properties>
       </component>
       <component id="5ff74" class="javax.swing.JButton" binding="applyButton" default-binding="true">

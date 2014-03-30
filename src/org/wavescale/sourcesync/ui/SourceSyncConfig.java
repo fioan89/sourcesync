@@ -193,13 +193,10 @@ public class SourceSyncConfig {
         public void actionPerformed(ActionEvent actionEvent) {
             JButton actionButton = (JButton) actionEvent.getSource();
             if (okButton.equals(actionButton)) {
+                saveConnectionPreferences();
                 frame.dispose();
             } else if (applyButton.equals(actionButton)) {
-                String target = lstTargets.getSelectedValue();
-                ConfigConnectionFactory connectionFactory = ConfigConnectionFactory.getInstance();
-                ConnectionConfiguration connectionConfiguration = connectionFactory.getConnectionConfiguration(target);
-                downloadConfigurationToPersistence(connectionConfiguration);
-                connectionFactory.saveConnections();
+                saveConnectionPreferences();
             } else if (btnAdd.equals(actionButton)) {
                 TargetLocation targetConfig = new TargetLocation();
                 targetConfig.setModal(true);
@@ -222,6 +219,14 @@ public class SourceSyncConfig {
                     }
                 }
             }
+        }
+
+        private void saveConnectionPreferences() {
+            String target = lstTargets.getSelectedValue();
+            ConfigConnectionFactory connectionFactory = ConfigConnectionFactory.getInstance();
+            ConnectionConfiguration connectionConfiguration = connectionFactory.getConnectionConfiguration(target);
+            downloadConfigurationToPersistence(connectionConfiguration);
+            connectionFactory.saveConnections();
         }
     }
 }
