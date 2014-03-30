@@ -62,7 +62,6 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
                 EventDataLogger.logWarning(e.toString(), this.project);
             }
         }
-
     }
 
     @Override

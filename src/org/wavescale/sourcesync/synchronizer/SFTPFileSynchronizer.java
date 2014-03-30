@@ -150,7 +150,6 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
 
             }
 
-
         }
 
         @Override
