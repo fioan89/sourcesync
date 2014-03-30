@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.wavescale.sourcesync</id>
     <name>Source Synchronizer</name>
-    <version>1.2</version>
+    <version>1.3</version>
     <vendor email="fioan89@gmail.com" url="">wavescale.org</vendor>
 
     <description><![CDATA[
@@ -60,6 +60,7 @@
                           relative-to-action="org.wavescale.sourcesync.action.ActionLocalFileToRemote"/>
             <add-to-group group-id="EditorTabPopupMenu" anchor="after"
                           relative-to-action="org.wavescale.sourcesync.action.ActionLocalFileToRemote"/>
+            <add-to-group group-id="ChangesViewPopupMenu" anchor="after" relative-to-action="ChangesView.Diff"/>
         </action>
         <action id="actionSelectedFilesToRemote" class="org.wavescale.sourcesync.action.ActionSelectedFilesToRemote"
                 text="Sync selected files to remote target" description="Sync localy selected files to remote target">
@@ -69,6 +70,7 @@
                           relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote"/>
             <add-to-group group-id="EditorTabPopupMenu" anchor="after"
                           relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote"/>
+            <add-to-group group-id="ChangesViewPopupMenu" anchor="after" relative-to-action="ChangesView.Diff"/>
         </action>
     </actions>
 
