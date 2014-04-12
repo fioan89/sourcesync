@@ -13,26 +13,19 @@ import com.intellij.openapi.vcs.changes.LocalChangeList;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
-import org.wavescale.sourcesync.api.ConnectionConstants;
 import org.wavescale.sourcesync.api.FileSynchronizer;
+import org.wavescale.sourcesync.api.SynchronizationQueue;
 import org.wavescale.sourcesync.api.Utils;
-import org.wavescale.sourcesync.config.FTPConfiguration;
-import org.wavescale.sourcesync.config.FTPSConfiguration;
-import org.wavescale.sourcesync.config.SCPConfiguration;
-import org.wavescale.sourcesync.config.SFTPConfiguration;
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory;
 import org.wavescale.sourcesync.factory.ModuleConnectionConfig;
 import org.wavescale.sourcesync.logger.BalloonLogger;
 import org.wavescale.sourcesync.logger.EventDataLogger;
-import org.wavescale.sourcesync.synchronizer.FTPFileSynchronizer;
-import org.wavescale.sourcesync.synchronizer.FTPSFileSynchronizer;
-import org.wavescale.sourcesync.synchronizer.SCPFileSynchronizer;
-import org.wavescale.sourcesync.synchronizer.SFTPFileSynchronizer;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -76,52 +69,51 @@ public class ActionChangedFilesToRemote extends AnAction {
                 changedFiles.add(change.getVirtualFile());
             }
         }
+
         // start sync
         final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
                 getConnectionConfiguration(associationName);
         final Semaphore semaphores = new Semaphore(connectionConfiguration.getSimultaneousJobs());
+        final int allowed_sessions = changedFiles.size() <= connectionConfiguration.getSimultaneousJobs() ?
+                changedFiles.size() : connectionConfiguration.getSimultaneousJobs();
+        final SynchronizationQueue synchronizationQueue = new SynchronizationQueue(e.getProject(), connectionConfiguration, allowed_sessions);
+        synchronizationQueue.startCountingTo(changedFiles.size());
+        final BlockingQueue<FileSynchronizer> queue = synchronizationQueue.getSyncQueue();
+
         for (VirtualFile virtualFile : changedFiles) {
             if (virtualFile != null && Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
                 final File relativeFile = new File(Utils.getUnixPath(virtualFile.getPath()).replaceFirst(
                         Utils.getUnixPath(currentProject.getBasePath()), ""));
+
                 ProgressManager.getInstance().run(new Task.Backgroundable(e.getProject(), "Uploading", false) {
                     @Override
                     public void run(@NotNull ProgressIndicator indicator) {
                         FileSynchronizer fileSynchronizer = null;
-                        if (ConnectionConstants.CONN_TYPE_SCP.equals(connectionConfiguration.getConnectionType())) {
-                            fileSynchronizer = new SCPFileSynchronizer((SCPConfiguration) connectionConfiguration,
-                                    e.getProject(), indicator);
-                        } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType())) {
-                            fileSynchronizer = new SFTPFileSynchronizer((SFTPConfiguration) connectionConfiguration,
-                                    e.getProject(), indicator);
-                        } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {
-                            fileSynchronizer = new FTPFileSynchronizer((FTPConfiguration) connectionConfiguration,
-                                    e.getProject(), indicator);
-                        } else if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
-                            fileSynchronizer = new FTPSFileSynchronizer((FTPSConfiguration) connectionConfiguration,
-                                    e.getProject(), indicator);
-                        }
-
-                        if (fileSynchronizer != null) {
-                            try {
-                                semaphores.acquire();
+                        try {
+                            semaphores.acquire();
+                            fileSynchronizer = queue.take();
+                            fileSynchronizer.setIndicator(indicator);
+                            if (fileSynchronizer != null) {
                                 fileSynchronizer.connect();
                                 // so final destination will look like this:
                                 // root_home/ + project_name/ + project_relative_path_to_file/
                                 fileSynchronizer.syncFile(Utils.getUnixPath(relativeFile.getPath()),
                                         Utils.buildUnixPath(e.getProject().getName(), relativeFile.getParent()));
-                                fileSynchronizer.disconnect();
-                            } catch (InterruptedException e1) {
-                                e1.printStackTrace();
-                            } finally {
-                                semaphores.release();
                             }
+                            queue.put(fileSynchronizer);
+                            synchronizationQueue.count();
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        } finally {
+                            semaphores.release();
                         }
                     }
                 });
+
             } else {
                 if (virtualFile != null) {
                     EventDataLogger.logWarning("File <b>" + virtualFile.getName() + "</b> is filtered out!", e.getProject());
+                    synchronizationQueue.count();
                 }
             }
         }
