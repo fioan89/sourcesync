@@ -31,24 +31,27 @@ public class FTPFileSynchronizer extends FileSynchronizer {
     public FTPFileSynchronizer(@NotNull FTPConfiguration connectionInfo, @NotNull Project project, @NotNull ProgressIndicator indicator) {
         super(connectionInfo, project, indicator);
         this.ftp = new FTPClient();
-        this.indicator.setIndeterminate(true);
+        this.getIndicator().setIndeterminate(true);
     }
 
     @Override
     public boolean connect() {
-        try {
-            this.ftp.connect(this.connectionInfo.getHost(), this.connectionInfo.getPort());
-            this.ftp.login(this.connectionInfo.getUserName(), this.connectionInfo.getUserPassword());
-            // use passive mode to bypass firewall conflicts
-            this.ftp.enterLocalPassiveMode();
-        } catch (IOException e) {
-            EventDataLogger.logWarning(e.toString(), this.project);
-            return false;
-        }
-        // check if successful connection
-        if (!FTPReply.isPositiveCompletion(this.ftp.getReplyCode())) {
-            EventDataLogger.logWarning("Connection to <b>" + this.connectionInfo.getHost() + "</b> failed!", this.project);
-            return false;
+        if (!isConnected()) {
+            try {
+                this.ftp.connect(this.getConnectionInfo().getHost(), this.getConnectionInfo().getPort());
+                this.ftp.login(this.getConnectionInfo().getUserName(), this.getConnectionInfo().getUserPassword());
+                // use passive mode to bypass firewall conflicts
+                this.ftp.enterLocalPassiveMode();
+            } catch (IOException e) {
+                EventDataLogger.logWarning(e.toString(), this.getProject());
+                return false;
+            }
+            // check if successful connection
+            if (!FTPReply.isPositiveCompletion(this.ftp.getReplyCode())) {
+                EventDataLogger.logWarning("Connection to <b>" + this.getConnectionInfo().getHost() + "</b> failed!", this.getProject());
+                return false;
+            }
+            this.setConnected(true);
         }
         return true;
     }
@@ -58,8 +61,9 @@ public class FTPFileSynchronizer extends FileSynchronizer {
         if (this.ftp != null) {
             try {
                 ftp.disconnect();
+                this.setConnected(false);
             } catch (IOException e) {
-                EventDataLogger.logWarning(e.toString(), this.project);
+                EventDataLogger.logWarning(e.toString(), this.getProject());
             }
         }
     }
@@ -68,16 +72,16 @@ public class FTPFileSynchronizer extends FileSynchronizer {
     public void syncFile(String sourcePath, String destinationPath) {
         // preserve timestamp for now
         boolean preserveTimestamp = true;
-        File localFile = new File(project.getBasePath(), sourcePath);
+        File localFile = new File(getProject().getBasePath(), sourcePath);
         String finalSourcePath = Utils.getUnixPath(localFile.getAbsolutePath());
-        String remotePath = Utils.buildUnixPath(this.connectionInfo.getRootPath(), destinationPath);
+        String remotePath = Utils.buildUnixPath(this.getConnectionInfo().getRootPath(), destinationPath);
         String[] dirsToCreate = Utils.splitPath(destinationPath);
         // change location to root path
         try {
-            this.ftp.changeWorkingDirectory(Utils.getUnixPath(this.connectionInfo.getRootPath()));
+            this.ftp.changeWorkingDirectory(Utils.getUnixPath(this.getConnectionInfo().getRootPath()));
         } catch (IOException e) {
-            EventDataLogger.logError("Remote dir <b>" + this.connectionInfo.getRootPath() +
-                    "</b> might not exist or you don't have permission on this path!", this.project);
+            EventDataLogger.logError("Remote dir <b>" + this.getConnectionInfo().getRootPath() +
+                    "</b> might not exist or you don't have permission on this path!", this.getProject());
             return;
         }
         // try to create
@@ -93,7 +97,7 @@ public class FTPFileSynchronizer extends FileSynchronizer {
             } catch (IOException e) {
                 // probably it doesn't exist or maybe no permission
                 EventDataLogger.logError("Remote dir <b>" + remotePath +
-                        "</b> might not exist or you don't have permission on this path!", this.project);
+                        "</b> might not exist or you don't have permission on this path!", this.getProject());
                 return;
             }
         }
@@ -103,8 +107,8 @@ public class FTPFileSynchronizer extends FileSynchronizer {
             this.ftp.setFileType(FTP.BINARY_FILE_TYPE);
             FileInputStream in = new FileInputStream(finalSourcePath);
             OutputStream outputStream = this.ftp.storeFileStream(localFile.getName());
-            this.indicator.setIndeterminate(false);
-            this.indicator.setText("Uploading...[" + localFile.getName() + "]");
+            this.getIndicator().setIndeterminate(false);
+            this.getIndicator().setText("Uploading...[" + localFile.getName() + "]");
             byte[] buffer = new byte[1024];
             int len;
             double totalSize = localFile.length() + 0.0;
@@ -116,7 +120,7 @@ public class FTPFileSynchronizer extends FileSynchronizer {
                 }
                 outputStream.write(buffer, 0, len);
                 totalUploaded += len;
-                this.indicator.setFraction(totalUploaded / totalSize);
+                this.getIndicator().setFraction(totalUploaded / totalSize);
             }
             if (preserveTimestamp) {
                 // TODO - implement preserve timestamp mechanism
@@ -124,9 +128,9 @@ public class FTPFileSynchronizer extends FileSynchronizer {
             in.close();
             outputStream.close();
         } catch (FileNotFoundException e) {
-            EventDataLogger.logWarning(e.toString(), project);
+            EventDataLogger.logWarning(e.toString(), getProject());
         } catch (IOException e) {
-            EventDataLogger.logError(e.toString(), project);
+            EventDataLogger.logError(e.toString(), getProject());
         }
 
     }

@@ -31,28 +31,33 @@ public class SCPFileSynchronizer extends FileSynchronizer {
     public SCPFileSynchronizer(@NotNull SCPConfiguration connectionInfo, @NotNull Project project, @NotNull ProgressIndicator indicator) {
         super(connectionInfo, project, indicator);
         this.jsch = new JSch();
-        this.indicator.setIndeterminate(true);
+        this.getIndicator().setIndeterminate(true);
     }
 
     @Override
     public boolean connect() {
-        try {
-            this.session = jsch.getSession(this.connectionInfo.getUserName(), this.connectionInfo.getHost(),
-                    this.connectionInfo.getPort());
-            this.session.setPassword(this.connectionInfo.getUserPassword());
-            this.session.setConfig("StrictHostKeyChecking", "no");
-            this.session.connect();
-            return true;
-        } catch (JSchException e) {
-            EventDataLogger.logWarning(e.toString(), this.project);
-            return false;
+        if (!isConnected()) {
+            try {
+                this.session = jsch.getSession(this.getConnectionInfo().getUserName(), this.getConnectionInfo().getHost(),
+                        this.getConnectionInfo().getPort());
+                this.session.setPassword(this.getConnectionInfo().getUserPassword());
+                this.session.setConfig("StrictHostKeyChecking", "no");
+                this.session.connect();
+                this.setConnected(true);
+                return true;
+            } catch (JSchException e) {
+                EventDataLogger.logWarning(e.toString(), this.getProject());
+                return false;
+            }
         }
+        return true;
     }
 
     @Override
     public void disconnect() {
         if (this.session != null) {
             this.session.disconnect();
+            this.setConnected(false);
         }
     }
 
@@ -66,10 +71,10 @@ public class SCPFileSynchronizer extends FileSynchronizer {
      */
     @Override
     public void syncFile(String sourcePath, String destinationPath) {
-        boolean preserveTimestamp = this.connectionInfo.isPreserveTime();
+        boolean preserveTimestamp = this.getConnectionInfo().isPreserveTime();
         // exec 'scp -t rfile' remotely
-        String finalSourcePath = Utils.buildUnixPath(project.getBasePath(), sourcePath);
-        String remotePath = Utils.buildUnixPath(this.connectionInfo.getRootPath(), destinationPath);
+        String finalSourcePath = Utils.buildUnixPath(getProject().getBasePath(), sourcePath);
+        String remotePath = Utils.buildUnixPath(this.getConnectionInfo().getRootPath(), destinationPath);
 
         try {
             String command = "scp " + (preserveTimestamp ? "-p" : "") + " -t -C " + remotePath;
@@ -87,8 +92,8 @@ public class SCPFileSynchronizer extends FileSynchronizer {
             }
 
             File _lfile = new File(finalSourcePath);
-            this.indicator.setIndeterminate(false);
-            this.indicator.setText("Uploading...[" + _lfile.getName() + "]");
+            this.getIndicator().setIndeterminate(false);
+            this.getIndicator().setText("Uploading...[" + _lfile.getName() + "]");
             if (preserveTimestamp) {
                 command = "T " + (_lfile.lastModified() / 1000) + " 0";
                 // The access time should be sent here,
@@ -124,7 +129,7 @@ public class SCPFileSynchronizer extends FileSynchronizer {
                 if (len <= 0) break;
                 out.write(buf, 0, len); //out.flush();
                 totalUploaded += len;
-                this.indicator.setFraction(totalUploaded / filesize);
+                this.getIndicator().setFraction(totalUploaded / filesize);
             }
             fis.close();
             // send '\0'
@@ -137,9 +142,9 @@ public class SCPFileSynchronizer extends FileSynchronizer {
             out.close();
             channel.disconnect();
         } catch (IOException e) {
-            EventDataLogger.logWarning(e.toString(), project);
+            EventDataLogger.logWarning(e.toString(), getProject());
         } catch (JSchException e) {
-            EventDataLogger.logWarning(e.toString(), project);
+            EventDataLogger.logWarning(e.toString(), getProject());
         }
 
     }
@@ -162,12 +167,12 @@ public class SCPFileSynchronizer extends FileSynchronizer {
             }
             while (c != '\n');
             if (b == 1) { // error
-                BalloonLogger.logBalloonError(sb.toString(), this.project);
-                EventDataLogger.logError(sb.toString(), project);
+                BalloonLogger.logBalloonError(sb.toString(), this.getProject());
+                EventDataLogger.logError(sb.toString(), getProject());
             }
             if (b == 2) { // fatal error
-                BalloonLogger.logBalloonError(sb.toString(), this.project);
-                EventDataLogger.logError(sb.toString(), project);
+                BalloonLogger.logBalloonError(sb.toString(), this.getProject());
+                EventDataLogger.logError(sb.toString(), getProject());
             }
         }
         return b;

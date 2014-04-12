@@ -21,9 +21,10 @@ import org.jetbrains.annotations.NotNull;
  * Abstract class for uploading a local file to a remote target.
  */
 public abstract class FileSynchronizer {
-    protected ConnectionConfiguration connectionInfo;
-    public Project project;
-    public ProgressIndicator indicator;
+    private ConnectionConfiguration connectionInfo;
+    private Project project;
+    private ProgressIndicator indicator;
+    private boolean isConnected;
 
     /**
      * Build a file synchronizer from general info contained by <b>connectionInfo</b> param.
@@ -31,13 +32,14 @@ public abstract class FileSynchronizer {
      * @param connectionInfo a {@link org.wavescale.sourcesync.api.ConnectionConfiguration} instance
      *                       containing session info like hostname, user, password, etc...
      * @param project        a {@link com.intellij.openapi.project.Project} instance used to gather project relative
-     *                       metadata like name, absoulte path, etc...
+     *                       metadata like name, absolute path, etc...
      * @param indicator      used to report progress on upload process.
      */
     public FileSynchronizer(@NotNull ConnectionConfiguration connectionInfo, @NotNull Project project, @NotNull ProgressIndicator indicator) {
-        this.connectionInfo = connectionInfo;
-        this.project = project;
-        this.indicator = indicator;
+        this.setConnectionInfo(connectionInfo);
+        this.setProject(project);
+        this.setIndicator(indicator);
+        this.setConnected(false);
     }
 
     /**
@@ -61,4 +63,36 @@ public abstract class FileSynchronizer {
      *                        where the source will be uploaded.
      */
     public abstract void syncFile(String sourcePath, String destinationPath);
+
+    public ConnectionConfiguration getConnectionInfo() {
+        return connectionInfo;
+    }
+
+    public void setConnectionInfo(ConnectionConfiguration connectionInfo) {
+        this.connectionInfo = connectionInfo;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public ProgressIndicator getIndicator() {
+        return indicator;
+    }
+
+    public void setIndicator(ProgressIndicator indicator) {
+        this.indicator = indicator;
+    }
+
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    public void setConnected(boolean isConnected) {
+        this.isConnected = isConnected;
+    }
 }
