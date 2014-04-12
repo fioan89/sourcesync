@@ -7,3 +7,7 @@ Version 1.3
 --> Fix a few visual bugs (the Allow ... number connections is not visible until resize)
 --> Added Sync selected and change files into the Changes View Popup-Menu
 --> Added "this" changelog 3:)
+
+Version 1.4
+--> added a file sync manager, which forces sourcesync to reuse existing opened connections during the commanf.
+--> Sync selected jobs no longer has problems with "Allow simultaneous sync jobs" option.
