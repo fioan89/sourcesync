@@ -160,7 +160,7 @@ public class ConnectionConfigPanel {
         return preserveTimestamp.isSelected();
     }
 
-    public void setPreserveTimestamp(boolean preserveTimestamp)  {
+    public void setPreserveTimestamp(boolean preserveTimestamp) {
         this.preserveTimestamp.setSelected(preserveTimestamp);
     }
 
