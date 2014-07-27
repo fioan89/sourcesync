@@ -19,6 +19,7 @@ import org.wavescale.sourcesync.config.SCPConfiguration;
 import org.wavescale.sourcesync.config.SFTPConfiguration;
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory;
 import org.wavescale.sourcesync.factory.ModuleConnectionConfig;
+import org.wavescale.sourcesync.logger.BalloonLogger;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 import org.wavescale.sourcesync.synchronizer.FTPFileSynchronizer;
 import org.wavescale.sourcesync.synchronizer.FTPSFileSynchronizer;
@@ -51,9 +52,17 @@ public class ActionLocalFileToRemote extends AnAction {
             return;
         }
         VirtualFile virtualFile = PlatformDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
+        if (virtualFile != null) {
+            StringBuilder builder = new StringBuilder("Project <b>");
+            builder.append(e.getProject().getName()).append("</b>! does not have a selected file!");
+            BalloonLogger.logBalloonInfo(builder.toString(), e.getProject());
+            EventDataLogger.logInfo(builder.toString(), e.getProject());
+            return;
+        }
 
         final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
                 getConnectionConfiguration(associationName);
+        final String projectName = e.getProject().getName();
         if (Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
             final File relativeFile = new File(Utils.getUnixPath(virtualFile.getPath()).replaceFirst(
                     Utils.getUnixPath(currentProject.getBasePath()), ""));
@@ -80,7 +89,7 @@ public class ActionLocalFileToRemote extends AnAction {
                         // so final destination will look like this:
                         // root_home/ + project_name/ + project_relative_path_to_file/
                         fileSynchronizer.syncFile(Utils.getUnixPath(relativeFile.getPath()),
-                                Utils.buildUnixPath(e.getProject().getName(), relativeFile.getParent()));
+                                Utils.buildUnixPath(projectName, relativeFile.getParent()));
                         fileSynchronizer.disconnect();
                     }
                 }

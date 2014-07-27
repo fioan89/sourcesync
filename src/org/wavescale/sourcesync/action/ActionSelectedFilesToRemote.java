@@ -64,7 +64,7 @@ public class ActionSelectedFilesToRemote extends AnAction {
         final SynchronizationQueue synchronizationQueue = new SynchronizationQueue(e.getProject(), connectionConfiguration, allowed_sessions);
         synchronizationQueue.startCountingTo(virtualFiles.length);
         final BlockingQueue<FileSynchronizer> queue = synchronizationQueue.getSyncQueue();
-
+        final String projectName = e.getProject().getName();
         for (VirtualFile virtualFile : virtualFiles) {
             if (virtualFile != null && new File(virtualFile.getPath()).isFile()) {
                 if (Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
@@ -83,7 +83,7 @@ public class ActionSelectedFilesToRemote extends AnAction {
                                     // so final destination will look like this:
                                     // root_home/ + project_name/ + project_relative_path_to_file/
                                     fileSynchronizer.syncFile(Utils.getUnixPath(relativeFile.getPath()),
-                                            Utils.buildUnixPath(e.getProject().getName(), relativeFile.getParent()));
+                                            Utils.buildUnixPath(projectName, relativeFile.getParent()));
                                 }
                                 queue.put(fileSynchronizer);
                                 synchronizationQueue.count();

@@ -79,7 +79,7 @@ public class ActionChangedFilesToRemote extends AnAction {
         final SynchronizationQueue synchronizationQueue = new SynchronizationQueue(e.getProject(), connectionConfiguration, allowed_sessions);
         synchronizationQueue.startCountingTo(changedFiles.size());
         final BlockingQueue<FileSynchronizer> queue = synchronizationQueue.getSyncQueue();
-
+        final String projectName = e.getProject().getName();
         for (VirtualFile virtualFile : changedFiles) {
             if (virtualFile != null && Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
                 final File relativeFile = new File(Utils.getUnixPath(virtualFile.getPath()).replaceFirst(
@@ -98,7 +98,7 @@ public class ActionChangedFilesToRemote extends AnAction {
                                 // so final destination will look like this:
                                 // root_home/ + project_name/ + project_relative_path_to_file/
                                 fileSynchronizer.syncFile(Utils.getUnixPath(relativeFile.getPath()),
-                                        Utils.buildUnixPath(e.getProject().getName(), relativeFile.getParent()));
+                                        Utils.buildUnixPath(projectName, relativeFile.getParent()));
                             }
                             queue.put(fileSynchronizer);
                             synchronizationQueue.count();
