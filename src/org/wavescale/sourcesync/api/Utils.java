@@ -31,15 +31,17 @@ public class Utils {
     public static boolean canBeUploaded(String fileName, String extensionsToFilter) {
         String extension = ".";
 
-        int i = fileName.lastIndexOf('.');
-        if (i >= 0) {
-            extension += fileName.substring(i + 1);
-            if (extensionsToFilter.contains(extension)) {
-                return false;
+        if (fileName != null) {
+            int i = fileName.lastIndexOf('.');
+            if (i >= 0) {
+                extension += fileName.substring(i + 1);
+                if (extensionsToFilter.contains(extension)) {
+                    return false;
+                }
             }
+            return true;
         }
-
-        return true;
+        return false;
     }
 
     /**
