@@ -12,3 +12,8 @@ Version 1.4
 --> added a file sync manager, which forces sourcesync to reuse existing opened connections during the command.
 --> Sync selected jobs no longer has problems with "Allow simultaneous sync jobs" option.
 --> build with java 1.6 support
+
+Version 1.5
+--> added shortcut support
+--> fixed some NPE when no default file was selected.
+--> fixed exception due to context switching when using shortcuts.
