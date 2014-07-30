@@ -27,6 +27,9 @@ public class ConnectionConfigPanel {
     private JTextField crtImlTextField;
     private JCheckBox preserveTimestamp;
     private JSpinner simultaneousJobs;
+    private JCheckBox cbSshKeys;
+    private JTextField tfCertfile;
+    private JButton btnBrowse;
 
     public ConnectionConfigPanel() {
         // group radio buttons
@@ -168,10 +171,28 @@ public class ConnectionConfigPanel {
         this.crtImlTextField.setText(excludedFiles);
     }
 
+    public boolean shouldUsePasswordlessSSH() {
+        return this.cbSshKeys.isSelected();
+    }
+
+    public void setPasswordlessSSH(boolean value) {
+        this.cbSshKeys.setSelected(value);
+        tfCertfile.setEnabled(value);
+        btnBrowse.setEnabled(value);
+    }
+
+    public String getSSHCertificatePath() {
+        return this.tfCertfile.getText();
+    }
+
+    public void setSSHCertificatePath(String certificatePath) {
+        this.tfCertfile.setText(certificatePath);
+    }
+
     /**
      * Shows or hides the group of implicit and explicit radio buttons.
      *
-     * @param isVisible <code>true</code> for visible, <code>false</code> otherwise.
+     * @param isVisible <code>true</code> for visible, <code>false</code> otherwise
      */
     public void setConnectionMethodVisible(boolean isVisible) {
         rbExplicit.setVisible(isVisible);
@@ -183,10 +204,23 @@ public class ConnectionConfigPanel {
     /**
      * Shows or hides preserve timestamp checkbox.
      *
-     * @param isVisible {@code true} if checkbox must be visible, {@code false} otherwise.
+     * @param isVisible {@code true} if checkbox must be visible, {@code false} otherwise
      */
     public void setPreserveTimestampVisible(boolean isVisible) {
         preserveTimestamp.setVisible(isVisible);
         preserveTimestamp.setEnabled(isVisible);
+    }
+
+    /**
+     * Shows or hides the ssh key related widgets.
+     *
+     * @param isVisible {@code true} if the connection supports ssh keys, {@code false} otherwise
+     */
+    public void setSSHKeysVisible(boolean isVisible) {
+        cbSshKeys.setVisible(isVisible);
+        cbSshKeys.setEnabled(isVisible);
+
+        tfCertfile.setVisible(isVisible);
+        btnBrowse.setVisible(isVisible);
     }
 }
