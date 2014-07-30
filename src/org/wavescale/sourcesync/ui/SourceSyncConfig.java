@@ -135,6 +135,9 @@ public class SourceSyncConfig {
                 connectionConfiguration.setPreserveTime(false);
             } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {
                 connectionConfiguration.setPreserveTime(false);
+            } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType())) {
+                ((SFTPConfiguration) connectionConfiguration).setPasswordlessSSHSelected(connectionPanel.shouldUsePasswordlessSSH());
+                ((SFTPConfiguration) connectionConfiguration).setCertificatePath(connectionPanel.getSSHCertificatePath());
             }
         }
     }
@@ -158,6 +161,7 @@ public class SourceSyncConfig {
             connectionPanel.setSimultaneousJobs(connectionConfiguration.getSimultaneousJobs());
             connectionPanel.setConnectionMethodVisible(false);
             connectionPanel.setPreserveTimestampVisible(true);
+            connectionPanel.setSSHKeysVisible(false);
             if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
                 boolean value = ((FTPSConfiguration) connectionConfiguration).isRequireImplicitTLS();
                 connectionPanel.setImplicit(value);
@@ -167,6 +171,12 @@ public class SourceSyncConfig {
                 connectionPanel.setPreserveTimestampVisible(false);
             } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {
                 connectionPanel.setPreserveTimestampVisible(false);
+            } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType())) {
+                boolean shouldUseSSHKeys = ((SFTPConfiguration) connectionConfiguration).isPasswordlessSSHSelected();
+                String certFile = ((SFTPConfiguration) connectionConfiguration).getCertificatePath();
+                connectionPanel.setSSHKeysVisible(true);
+                connectionPanel.setPasswordlessSSH(shouldUseSSHKeys);
+                connectionPanel.setSSHCertificatePath(certFile);
             }
             pnConfig.setVisible(true);
         }

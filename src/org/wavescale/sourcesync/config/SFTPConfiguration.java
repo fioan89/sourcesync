@@ -3,6 +3,8 @@ package org.wavescale.sourcesync.config;
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 import org.wavescale.sourcesync.api.ConnectionConstants;
 
+import java.io.File;
+
 /**
  * ****************************************************************************
  * Copyright (c) 2005-2014 Faur Ioan-Aurel.                                     *
@@ -15,6 +17,8 @@ import org.wavescale.sourcesync.api.ConnectionConstants;
  * *****************************************************************************
  */
 public class SFTPConfiguration extends ConnectionConfiguration {
+    private boolean shouldUseCertificate;
+    private String certificatePath;
 
     public SFTPConfiguration(String connectionName) {
         super(connectionName);
@@ -24,5 +28,24 @@ public class SFTPConfiguration extends ConnectionConfiguration {
         this.host = "sftp://";
         this.userName = "";
         this.userPassword = "";
+        this.shouldUseCertificate = false;
+        this.certificatePath = new File("user.home" + File.separator + "id_rsa.pub").getAbsolutePath();
+
+    }
+
+    public boolean isPasswordlessSSHSelected() {
+        return shouldUseCertificate;
+    }
+
+    public void setPasswordlessSSHSelected(boolean shouldUseCertificate) {
+        this.shouldUseCertificate = shouldUseCertificate;
+    }
+
+    public String getCertificatePath() {
+        return certificatePath;
+    }
+
+    public void setCertificatePath(String certificatePath) {
+        this.certificatePath = certificatePath;
     }
 }

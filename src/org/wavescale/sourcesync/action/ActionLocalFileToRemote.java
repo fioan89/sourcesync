@@ -52,7 +52,8 @@ public class ActionLocalFileToRemote extends AnAction {
             return;
         }
         VirtualFile virtualFile = PlatformDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
-        if (virtualFile != null) {
+
+        if (virtualFile == null) {
             StringBuilder builder = new StringBuilder("Project <b>");
             builder.append(e.getProject().getName()).append("</b>! does not have a selected file!");
             BalloonLogger.logBalloonInfo(builder.toString(), e.getProject());
