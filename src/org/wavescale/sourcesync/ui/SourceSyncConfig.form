@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="configPanel" layout-manager="FormLayout">
     <rowspec value="top:45px:noGrow"/>
     <rowspec value="top:4dlu:noGrow"/>
-    <rowspec value="fill:max(d;370px):grow"/>
+    <rowspec value="fill:404px:grow"/>
     <rowspec value="center:max(d;46px):noGrow"/>
     <colspec value="fill:50px:noGrow"/>
     <colspec value="fill:249px:grow"/>
