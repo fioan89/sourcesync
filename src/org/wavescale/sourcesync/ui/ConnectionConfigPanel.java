@@ -1,7 +1,14 @@
 package org.wavescale.sourcesync.ui;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.File;
 
 /**
  * ****************************************************************************
@@ -15,6 +22,7 @@ import java.awt.*;
  * *****************************************************************************
  */
 public class ConnectionConfigPanel {
+    private final JFileChooser certificateChooser = new JFileChooser();
     private JPanel panel1;
     private JLabel lbConnType;
     private JTextField tfHost;
@@ -39,6 +47,35 @@ public class ConnectionConfigPanel {
         tfPort.setMinimumSize(new Dimension(50, 20));
         tfPort.setMaximumSize(new Dimension(50, 20));
         simultaneousJobs.setModel(new SpinnerNumberModel(2, 1, 10, 1) {
+        });
+
+        // enable/disable the certificate text box and browse button based
+        // on how the "Use SSH keys" is enabled.
+        cbSshKeys.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                JCheckBox source = (JCheckBox) e.getSource();
+                if (cbSshKeys == source) {
+                    enableCertificateWidgets(source.isSelected());
+                    enableLoginForm(!source.isSelected());
+                }
+            }
+        });
+
+        // open the file chooser when the select certificate button is hit
+        btnBrowse.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JButton button = (JButton) e.getSource();
+                if (btnBrowse == button) {
+                    //In response to a button click:
+                    int returnVal = certificateChooser.showOpenDialog(ConnectionConfigPanel.this.panel1);
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        File file = certificateChooser.getSelectedFile();
+                        tfCertfile.setText(file.getAbsolutePath());
+                    }
+                }
+            }
         });
     }
 
@@ -177,8 +214,6 @@ public class ConnectionConfigPanel {
 
     public void setPasswordlessSSH(boolean value) {
         this.cbSshKeys.setSelected(value);
-        tfCertfile.setEnabled(value);
-        btnBrowse.setEnabled(value);
     }
 
     public String getSSHCertificatePath() {
@@ -220,7 +255,36 @@ public class ConnectionConfigPanel {
         cbSshKeys.setVisible(isVisible);
         cbSshKeys.setEnabled(isVisible);
 
+        showCertificateWidgets(isVisible);
+    }
+
+    /**
+     * Sets the visibility of certificate widgets (certificate text field, and select certificate button).
+     *
+     * @param isVisible
+     */
+    private void showCertificateWidgets(boolean isVisible) {
         tfCertfile.setVisible(isVisible);
         btnBrowse.setVisible(isVisible);
+    }
+
+    /**
+     * Enables or disables the certificate text field and the select certificate button.
+     *
+     * @param isEnabled
+     */
+    private void enableCertificateWidgets(boolean isEnabled) {
+        tfCertfile.setEnabled(isEnabled);
+        btnBrowse.setEnabled(isEnabled);
+    }
+
+    /**
+     * Enables or disables the login form.
+     *
+     * @param isEnabled
+     */
+    private void enableLoginForm(boolean isEnabled) {
+        tfUserName.setEnabled(isEnabled);
+        pfUserPassword.setEnabled(isEnabled);
     }
 }
