@@ -29,7 +29,7 @@ public class SFTPConfiguration extends ConnectionConfiguration {
         this.userName = "";
         this.userPassword = "";
         this.shouldUseCertificate = false;
-        this.certificatePath = new File("user.home" + File.separator + "id_rsa.pub").getAbsolutePath();
+        this.certificatePath = new File(System.getProperty("user.home") + File.separator + ".ssh" + File.separator + "id_rsa").getAbsolutePath();
 
     }
 

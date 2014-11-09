@@ -271,7 +271,7 @@
                 </constraints>
                 <properties>
                   <enabled value="false"/>
-                  <text value="Browse Key"/>
+                  <text value="Select Private Key"/>
                 </properties>
               </component>
             </children>

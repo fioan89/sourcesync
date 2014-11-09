@@ -288,7 +288,8 @@ public class ConnectionConfigPanel {
      * @param isEnabled
      */
     private void enableLoginForm(boolean isEnabled) {
-        tfUserName.setEnabled(isEnabled);
+        // stupid me - you need the username to connect to a server
+//        tfUserName.setEnabled(isEnabled);
         pfUserPassword.setEnabled(isEnabled);
     }
 }
