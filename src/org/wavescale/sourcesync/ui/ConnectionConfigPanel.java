@@ -1,8 +1,8 @@
 package org.wavescale.sourcesync.ui;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -63,6 +63,10 @@ public class ConnectionConfigPanel {
         });
 
         // open the file chooser when the select certificate button is hit
+        certificateChooser.setDialogTitle("Please select a public SSH Key");
+        certificateChooser.setMultiSelectionEnabled(false);
+        FileFilter sshKeyFilter = new FileNameExtensionFilter("SSH Public Key", "pub");
+        certificateChooser.setFileFilter(sshKeyFilter);
         btnBrowse.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
