@@ -48,8 +48,7 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
     public boolean connect() {
         if (!isConnected()) {
             try {
-                session = this.jsch.getSession(this.getConnectionInfo().getUserName(), this.getConnectionInfo().getHost(),
-                        this.getConnectionInfo().getPort());
+                initSession();
                 session.setPassword(this.getConnectionInfo().getUserPassword());
                 this.session.setConfig("StrictHostKeyChecking", "no");
                 this.session.connect();
@@ -61,6 +60,23 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
             }
         }
         return true;
+    }
+
+    private void initSession() throws JSchException {
+        SFTPConfiguration configuration = (SFTPConfiguration) this.getConnectionInfo();
+        session = this.jsch.getSession(this.getConnectionInfo().getUserName(), this.getConnectionInfo().getHost(),
+                this.getConnectionInfo().getPort());
+        if (configuration.isPasswordlessSSHSelected()) {
+            EventDataLogger.logInfo("Creating passwordless session", this.getProject());
+            session.setConfig("PreferredAuthentications", "publickey");
+            this.jsch.setKnownHosts("~/.ssh/known_hosts");
+            // add private key
+            this.jsch.addIdentity(configuration.getCertificatePath());
+
+        } else {
+            EventDataLogger.logInfo("Creating standard username/password based session", this.getProject());
+            session.setPassword(this.getConnectionInfo().getUserPassword());
+        }
     }
 
     @Override
