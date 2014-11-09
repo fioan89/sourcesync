@@ -9,7 +9,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="jsch-0.1.50" level="project" />
+    <orderEntry type="library" name="jsch-0.1.51" level="project" />
     <orderEntry type="library" name="commons-net-3.3" level="project" />
   </component>
 </module>
