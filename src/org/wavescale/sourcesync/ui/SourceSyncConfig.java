@@ -226,6 +226,14 @@ public class SourceSyncConfig {
                         // remove from config
                         ConfigConnectionFactory configConnectionFactory = ConfigConnectionFactory.getInstance();
                         configConnectionFactory.removeConnectionConfiguration(target);
+                        // select the bottom index
+                        if (index > 0) {
+                            lstTargets.setSelectedIndex(index - 1);
+                            pnConfig.setVisible(true);
+                        } else {
+                            lbTarget.setText("");
+                            pnConfig.setVisible(false);
+                        }
                     }
                 }
             }
