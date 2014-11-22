@@ -67,14 +67,12 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
         session = this.jsch.getSession(this.getConnectionInfo().getUserName(), this.getConnectionInfo().getHost(),
                 this.getConnectionInfo().getPort());
         if (configuration.isPasswordlessSSHSelected()) {
-            EventDataLogger.logInfo("Creating passwordless session", this.getProject());
             session.setConfig("PreferredAuthentications", "publickey");
             this.jsch.setKnownHosts("~/.ssh/known_hosts");
             // add private key
             this.jsch.addIdentity(configuration.getCertificatePath());
 
         } else {
-            EventDataLogger.logInfo("Creating standard username/password based session", this.getProject());
             session.setPassword(this.getConnectionInfo().getUserPassword());
         }
     }
