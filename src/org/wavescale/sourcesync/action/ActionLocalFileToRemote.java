@@ -53,7 +53,7 @@ public class ActionLocalFileToRemote extends AnAction {
         }
         VirtualFile virtualFile = PlatformDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
 
-        if (virtualFile == null) {
+        if (virtualFile == null || virtualFile.isDirectory()) {
             StringBuilder builder = new StringBuilder("Project <b>");
             builder.append(e.getProject().getName()).append("</b>! does not have a selected file!");
             BalloonLogger.logBalloonInfo(builder.toString(), e.getProject());
@@ -63,7 +63,8 @@ public class ActionLocalFileToRemote extends AnAction {
 
         final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
                 getConnectionConfiguration(associationName);
-        final String projectName = e.getProject().getName();
+        final Project project = e.getProject();
+        final String projectName = project.getName();
         if (Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
             final File relativeFile = new File(Utils.getUnixPath(virtualFile.getPath()).replaceFirst(
                     Utils.getUnixPath(currentProject.getBasePath()), ""));
@@ -73,16 +74,16 @@ public class ActionLocalFileToRemote extends AnAction {
                     FileSynchronizer fileSynchronizer = null;
                     if (ConnectionConstants.CONN_TYPE_SCP.equals(connectionConfiguration.getConnectionType())) {
                         fileSynchronizer = new SCPFileSynchronizer((SCPConfiguration) connectionConfiguration,
-                                e.getProject(), indicator);
+                                project, indicator);
                     } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType())) {
                         fileSynchronizer = new SFTPFileSynchronizer((SFTPConfiguration) connectionConfiguration,
-                                e.getProject(), indicator);
+                                project, indicator);
                     } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {
                         fileSynchronizer = new FTPFileSynchronizer((FTPConfiguration) connectionConfiguration,
-                                e.getProject(), indicator);
+                                project, indicator);
                     } else if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionConfiguration.getConnectionType())) {
                         fileSynchronizer = new FTPSFileSynchronizer((FTPSConfiguration) connectionConfiguration,
-                                e.getProject(), indicator);
+                                project, indicator);
                     }
 
                     if (fileSynchronizer != null) {
