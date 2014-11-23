@@ -28,6 +28,14 @@ Now that you have done this step you are up and ready to sync files. Just right 
 
 ![Sync files](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/sync_files.png)  
 
+Passwordless ssh
+----------------
+Currently, only **SFTP** connections support passwordless ssh. In order to take full advantage of this feature you are advised to create a pair of public/private keys on your local machine - where IntelliJ or PyCharm IDE resides. Then copy the public key on every remote host you will connect to:  
+Eg:```scp ~/.ssh/id_dsa.pub my_user_id@remote_hostname_or_IP:~/.ssh/id_dsa.pub```
+After this step is done, you should open a ssh shell to the remote machine where you will be prompted to authorize the key. Next you should open the **config window** and create a new **SFTP** connection. Then just like in the bellow picture, select **Use SSH key** and then browse and select the generated private key.  
+![SFTP connection with passwordless support](https://raw.githubusercontent.com/fioan89/sourcesync/master/resources/sourcesync/passwordlessSSH.png)  
+Also don't forget to set the username to connect on the remote machine.
+
 Donations
 =========
 Any support is graciously accepted :)  
