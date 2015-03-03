@@ -40,7 +40,7 @@ Donations
 =========
 Any support is graciously accepted :)  
 
-https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=E6F2NPVCNZK4C&lc=US&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted  
+ [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=W3SKYN2L99GMQ)  
 
 A few notes
 -----------  
