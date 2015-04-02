@@ -4,8 +4,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.wavescale.sourcesync.logger.BalloonLogger;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 
-import java.io.File;
-
 /**
  * ****************************************************************************
  * Copyright (c) 2005-2014 Faur Ioan-Aurel.                                     *
@@ -97,13 +95,4 @@ public class Utils {
         return getUnixPath(path).split("/");
     }
 
-    /**
-     * Returns an array of folders that build up a file path
-     *
-     * @param path a {@link java.io.File} instance path.
-     * @return an array of strings instances that represent a file or folder path.
-     */
-    public static String[] splitPath(File path) {
-        return splitPath(path.getPath());
-    }
 }
