@@ -81,9 +81,9 @@ public class ActionSelectedFilesToRemote extends AnAction {
                                 if (fileSynchronizer != null) {
                                     fileSynchronizer.connect();
                                     // so final destination will look like this:
-                                    // root_home/ + project_name/ + project_relative_path_to_file/
+                                    // root_home/ + project_relative_path_to_file/
                                     fileSynchronizer.syncFile(Utils.getUnixPath(relativeFile.getPath()),
-                                            Utils.buildUnixPath(projectName, relativeFile.getParent()));
+                                            Utils.buildUnixPath(relativeFile.getParent().substring(1) /**Something like src/org/.../package**/));
                                 }
                                 queue.put(fileSynchronizer);
                                 synchronizationQueue.count();
