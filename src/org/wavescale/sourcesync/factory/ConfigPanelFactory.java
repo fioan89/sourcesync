@@ -17,12 +17,12 @@ public class ConfigPanelFactory {
     private static final ConfigPanelFactory ourInstance = new ConfigPanelFactory();
     private ConnectionConfigPanel configPanel;
 
-    public static ConfigPanelFactory getInstance() {
-        return ourInstance;
-    }
-
     private ConfigPanelFactory() {
         configPanel = new ConnectionConfigPanel();
+    }
+
+    public static ConfigPanelFactory getInstance() {
+        return ourInstance;
     }
 
     public ConnectionConfigPanel getConnectionConfigPanel() {

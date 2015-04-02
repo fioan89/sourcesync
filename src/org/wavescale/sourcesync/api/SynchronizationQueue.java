@@ -157,23 +157,23 @@ public class SynchronizationQueue {
         }
 
         @Override
-        public void setText(String text) {
-
-        }
-
-        @Override
         public String getText() {
             return null;
         }
 
         @Override
-        public void setText2(String text) {
+        public void setText(String text) {
 
         }
 
         @Override
         public String getText2() {
             return null;
+        }
+
+        @Override
+        public void setText2(String text) {
+
         }
 
         @Override

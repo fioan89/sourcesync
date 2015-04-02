@@ -26,8 +26,8 @@ import java.util.Set;
 public class ConfigConnectionFactory {
     private static final ConfigConnectionFactory CONFIG_CONNECTION_FACTORY = new ConfigConnectionFactory();
     private static final String CONNECTIONS_FILE = ".connectionconfig.ser";
-    private String userHome;
     String fileSeparator;
+    private String userHome;
     private Map<String, ConnectionConfiguration> connectionConfigurationMap;
 
     private ConfigConnectionFactory() {

@@ -23,9 +23,9 @@ import java.util.Map;
 public class ModuleConnectionConfig {
     private static final ModuleConnectionConfig instance = new ModuleConnectionConfig();
     private static final String MODULES_FILE = ".modulesconfig.ser";
+    String fileSeparator;
     private Map<String, String> moduleConnection;
     private String userHome;
-    String fileSeparator;
 
     private ModuleConnectionConfig() {
         moduleConnection = new HashMap<String, String>();

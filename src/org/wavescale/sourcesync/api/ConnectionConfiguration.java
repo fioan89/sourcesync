@@ -19,6 +19,11 @@ import java.io.Serializable;
  */
 
 public abstract class ConnectionConfiguration implements Serializable {
+    /**
+     * A string containing the ".ext" separated by ";" character,
+     * representing a list of file types to be excluded from the sync.
+     */
+    public String excludedFiles;
     protected String connectionName;
     protected String connectionType;
     protected String host;
@@ -28,12 +33,6 @@ public abstract class ConnectionConfiguration implements Serializable {
     protected String userName;
     protected String userPassword;
     protected boolean preserveTime;
-
-    /**
-     * A string containing the ".ext" separated by ";" character,
-     * representing a list of file types to be excluded from the sync.
-     */
-    public String excludedFiles;
 
     public ConnectionConfiguration(String connectionName) {
         this.connectionName = connectionName;
@@ -119,12 +118,12 @@ public abstract class ConnectionConfiguration implements Serializable {
         this.userPassword = userPassword;
     }
 
-    public void setPreserveTime(boolean shouldPreserveTimestamp) {
-        this.preserveTime = shouldPreserveTimestamp;
-    }
-
     public boolean isPreserveTime() {
         return this.preserveTime;
+    }
+
+    public void setPreserveTime(boolean shouldPreserveTimestamp) {
+        this.preserveTime = shouldPreserveTimestamp;
     }
 
     public int getSimultaneousJobs() {
