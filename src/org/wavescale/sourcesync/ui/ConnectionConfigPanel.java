@@ -63,9 +63,9 @@ public class ConnectionConfigPanel {
         });
 
         // open the file chooser when the select certificate button is hit
-        certificateChooser.setDialogTitle("Please select a public SSH Key");
+        certificateChooser.setDialogTitle("Please select a private SSH Key");
         certificateChooser.setMultiSelectionEnabled(false);
-        FileFilter sshKeyFilter = new FileNameExtensionFilter("SSH Public Key", "pub");
+        FileFilter sshKeyFilter = new FileNameExtensionFilter("SSH Private Key", "pub");
         certificateChooser.setFileFilter(sshKeyFilter);
         btnBrowse.addActionListener(new ActionListener() {
             @Override
