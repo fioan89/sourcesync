@@ -4,6 +4,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.wavescale.sourcesync.logger.BalloonLogger;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * ****************************************************************************
  * Copyright (c) 2005-2014 Faur Ioan-Aurel.                                     *
@@ -93,6 +96,27 @@ public class Utils {
      */
     public static String[] splitPath(String path) {
         return getUnixPath(path).split("/");
+    }
+
+    /**
+     * Tries to create a file with the given absolute path, even if the parent directories do not exist.
+     *
+     * @param path absolute file path name to create
+     * @return <code>true</code> if the path was created, <code>false</code> otherwise. If false is returned it might
+     * be that the file already exists
+     * @throws IOException if an I/O error occurred
+     */
+    public static boolean createFile(String path) throws IOException {
+        File fileToCreate = new File(path);
+        if (fileToCreate.exists()) {
+            return false;
+        }
+        // the file doesn't exist so try creat it
+        String dirPath = fileToCreate.getParent();
+        // try create the path
+        new File(dirPath).mkdirs();
+        // try create the file
+        return fileToCreate.createNewFile();
     }
 
 }

@@ -12,6 +12,7 @@ import org.wavescale.sourcesync.logger.EventDataLogger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * ****************************************************************************
@@ -26,6 +27,7 @@ import java.io.FileNotFoundException;
  */
 public class SFTPFileSynchronizer extends FileSynchronizer {
 
+    public static final String SSH_KNOWN_HOSTS = "~/.ssh/known_hosts";
     private final JSch jsch;
     private Session session;
 
@@ -68,7 +70,12 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
                 this.getConnectionInfo().getPort());
         if (configuration.isPasswordlessSSHSelected()) {
             session.setConfig("PreferredAuthentications", "publickey");
-            this.jsch.setKnownHosts("~/.ssh/known_hosts");
+            try {
+                Utils.createFile(SSH_KNOWN_HOSTS);
+            } catch (IOException e) {
+                EventDataLogger.logError("Could not identify nor create the ssh known hosts file at " + SSH_KNOWN_HOSTS + ". The returned error is:" + e.getMessage(), this.getProject());
+            }
+            this.jsch.setKnownHosts(SSH_KNOWN_HOSTS);
             // add private key
             this.jsch.addIdentity(configuration.getCertificatePath());
 
