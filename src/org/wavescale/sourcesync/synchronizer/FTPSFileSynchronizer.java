@@ -40,6 +40,8 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
                 this.ftps.connect(this.getConnectionInfo().getHost(), this.getConnectionInfo().getPort());
                 this.ftps.login(this.getConnectionInfo().getUserName(), this.getConnectionInfo().getUserPassword());
                 // use passive mode to bypass firewall conflicts
+                this.ftps.execPBSZ(0);  // Set protection buffer size
+                this.ftps.execPROT("P"); // Set data channel protection to private
                 this.ftps.enterLocalPassiveMode();
             } catch (IOException e) {
                 EventDataLogger.logWarning(e.toString(), this.getProject());
