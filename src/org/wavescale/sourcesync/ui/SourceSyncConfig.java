@@ -67,6 +67,7 @@ public class SourceSyncConfig {
         //frame.setSize(600, 400);
         frame.pack();
         frame.setVisible(true);
+        frame.setAlwaysOnTop(true);
 
         ConfigConnectionFactory connectionFactory = ConfigConnectionFactory.getInstance();
         loadConnections(connectionFactory);
