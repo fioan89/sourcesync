@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.wavescale.sourcesync</id>
     <name>Source Synchronizer</name>
-    <version>1.7</version>
+    <version>1.8</version>
     <vendor email="fioan89@gmail.com" url="">wavescale.org</vendor>
 
     <description><![CDATA[
@@ -12,8 +12,14 @@
       ]]></description>
 
     <change-notes><![CDATA[
-      Add change notes here.<br>
-      <small>most HTML tags may be used</small>
+      <h3>Changes in version 1.8:</h3>
+      <ul>
+        <li>Add support for IntelliJ IDEA 15.x</li>
+        <li>Add support for PyCharm 5.x</li>
+        <li>Fix upload of files over FTPS connections using explicit TLS security</li>
+        <li>Set the configuration window to be always on top</li>
+      </ul>
+
       ]]>
     </change-notes>
 
