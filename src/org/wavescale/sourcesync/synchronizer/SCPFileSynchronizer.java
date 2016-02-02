@@ -42,7 +42,6 @@ public class SCPFileSynchronizer extends FileSynchronizer {
                         this.getConnectionInfo().getPort());
                 this.session.setPassword(this.getConnectionInfo().getUserPassword());
                 this.session.setConfig("StrictHostKeyChecking", "no");
-				this.session.setConfig("kex", "diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256");
                 this.session.connect();
                 this.setConnected(true);
                 return true;
