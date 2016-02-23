@@ -107,7 +107,11 @@ public class ConnectionConfigPanel {
      * @return an int value representing the target port.
      */
     public int getPort() {
-        return Integer.valueOf(tfPort.getText());
+        try {
+            return Integer.valueOf(tfPort.getText());
+        } catch (NumberFormatException e) {
+            return 22;
+        }
     }
 
     /**
