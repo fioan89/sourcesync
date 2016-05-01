@@ -76,8 +76,12 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
                 EventDataLogger.logError("Could not identify nor create the ssh known hosts file at " + SSH_KNOWN_HOSTS + ". The returned error is:" + e.getMessage(), this.getProject());
             }
             this.jsch.setKnownHosts(SSH_KNOWN_HOSTS);
-            // add private key
-            this.jsch.addIdentity(configuration.getCertificatePath());
+            // add private key and passphrase if exists
+            if (configuration.isPasswordlessWithPassphrase()) {
+                this.jsch.addIdentity(configuration.getCertificatePath(), configuration.getUserPassword());
+            } else {
+                this.jsch.addIdentity(configuration.getCertificatePath());
+            }
 
         } else {
             session.setPassword(this.getConnectionInfo().getUserPassword());
