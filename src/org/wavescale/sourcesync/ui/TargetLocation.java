@@ -3,20 +3,22 @@ package org.wavescale.sourcesync.ui;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.*;
 import java.awt.event.*;
 
-public class TargetLocation extends JDialog {
+public class TargetLocation extends CenterDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JTextField targetField;
     private JComboBox typeOption;
     private JLabel errorLabel;
 
-    public TargetLocation() {
+    public TargetLocation(Window parent) {
+        super(parent);
         setTitle("Add target");
         setContentPane(contentPane);
         setModal(true);
-        setLocationRelativeTo(null);
+        setModalityType(ModalityType.APPLICATION_MODAL);
         getRootPane().setDefaultButton(buttonOK);
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -24,13 +26,7 @@ public class TargetLocation extends JDialog {
             }
         });
 
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                dispose();
-            }
-        });
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(new ActionListener() {
@@ -57,6 +53,7 @@ public class TargetLocation extends JDialog {
         });
 
         this.setSize(400, 140);
+        centerOnParent();
         this.setResizable(false);
         this.setVisible(true);
     }

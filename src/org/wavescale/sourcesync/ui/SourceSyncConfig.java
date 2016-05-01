@@ -14,6 +14,7 @@ import org.wavescale.sourcesync.factory.ConfigPanelFactory;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;
@@ -40,37 +41,46 @@ public class SourceSyncConfig {
     private JButton applyButton;
 
     private ConnectionConfigPanel connectionPanel;
-    private JFrame frame;
+    private JDialog configDialog;
 
     public SourceSyncConfig() {
-        frame = new JFrame("sourcesync connection configuration");
-        frame.setLocationRelativeTo(null);
-        frame.setIconImage(new ImageIcon(getClass().getClassLoader().getResource("/sourcesync.png")).getImage());
-        lstTargets.setModel(new DefaultListModel<String>());
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                configDialog = new CenterDialog();
+                configDialog.setTitle("sourcesync connection configuration");
+                configDialog.setIconImage(new ImageIcon(getClass().getClassLoader().getResource("/sourcesync.png")).getImage());
+                lstTargets.setModel(new DefaultListModel<String>());
 
-        FormLayout layout = new FormLayout("fill:300:grow(1)", "fill:300:grow(1)");
-        CellConstraints cc = new CellConstraints();
-        pnConfig.setLayout(layout);
-        connectionPanel = ConfigPanelFactory.getInstance().getConnectionConfigPanel();
-        pnConfig.add(connectionPanel.getConfigPanel(), cc.xy(1, 1));
-        pnConfig.setVisible(false);
+                FormLayout layout = new FormLayout("fill:300:grow(1)", "fill:300:grow(1)");
+                CellConstraints cc = new CellConstraints();
+                pnConfig.setLayout(layout);
+                connectionPanel = ConfigPanelFactory.getInstance().getConnectionConfigPanel();
+                pnConfig.add(connectionPanel.getConfigPanel(), cc.xy(1, 1));
+                pnConfig.setVisible(false);
 
-        frame.setContentPane(configPanel);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        lstTargets.getSelectionModel().addListSelectionListener(new TargetListListener());
+                configDialog.setContentPane(configPanel);
+                configDialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                lstTargets.getSelectionModel().addListSelectionListener(new TargetListListener());
 
-        btnAdd.addActionListener(new ActionButtonListener());
-        btnRemove.addActionListener(new ActionButtonListener());
-        okButton.addActionListener(new ActionButtonListener());
-        applyButton.addActionListener(new ActionButtonListener());
+                btnAdd.addActionListener(new ActionButtonListener());
+                btnRemove.addActionListener(new ActionButtonListener());
+                okButton.addActionListener(new ActionButtonListener());
+                applyButton.addActionListener(new ActionButtonListener());
 
-        //frame.setSize(600, 400);
-        frame.pack();
-        frame.setVisible(true);
-        frame.setAlwaysOnTop(true);
+                ConfigConnectionFactory connectionFactory = ConfigConnectionFactory.getInstance();
+                loadConnections(connectionFactory);
 
-        ConfigConnectionFactory connectionFactory = ConfigConnectionFactory.getInstance();
-        loadConnections(connectionFactory);
+                configDialog.pack();
+                ((CenterDialog)configDialog).centerOnParent();
+                configDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+                configDialog.setModal(true);
+                configDialog.setVisible(true);
+                configDialog.setAlwaysOnTop(true);
+
+
+            }
+        });
     }
 
     /**
@@ -181,6 +191,8 @@ public class SourceSyncConfig {
             }
             pnConfig.setVisible(true);
         }
+
+
     }
 
     class TargetListListener implements ListSelectionListener {
@@ -205,12 +217,12 @@ public class SourceSyncConfig {
             JButton actionButton = (JButton) actionEvent.getSource();
             if (okButton.equals(actionButton)) {
                 saveConnectionPreferences();
-                frame.dispose();
+                configDialog.dispose();
             } else if (applyButton.equals(actionButton)) {
                 saveConnectionPreferences();
             } else if (btnAdd.equals(actionButton)) {
-                TargetLocation targetConfig = new TargetLocation();
-                targetConfig.setModal(true);
+                Window parentWindow = SwingUtilities.windowForComponent(SourceSyncConfig.this.configDialog);
+                TargetLocation targetConfig = new TargetLocation(parentWindow);
                 String name = targetConfig.getTargetName();
                 String type = targetConfig.getTargetType();
                 ((DefaultListModel) lstTargets.getModel()).addElement(name);
