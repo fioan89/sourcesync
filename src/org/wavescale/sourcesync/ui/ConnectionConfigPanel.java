@@ -21,7 +21,7 @@ import java.io.File;
  * For any issues or questions send an email at: fioan89@gmail.com              *
  * *****************************************************************************
  */
-public class ConnectionConfigPanel {
+public class ConnectionConfigPanel implements ItemListener {
     private final JFileChooser certificateChooser = new JFileChooser();
     private JPanel panel1;
     private JLabel lbConnType;
@@ -38,6 +38,8 @@ public class ConnectionConfigPanel {
     private JCheckBox cbSshKeys;
     private JTextField tfCertfile;
     private JButton btnBrowse;
+    private JCheckBox cbSSHPassphrase;
+    private JLabel txtUserPassword;
 
     public ConnectionConfigPanel() {
         // group radio buttons
@@ -51,16 +53,8 @@ public class ConnectionConfigPanel {
 
         // enable/disable the certificate text box and browse button based
         // on how the "Use SSH keys" is enabled.
-        cbSshKeys.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                JCheckBox source = (JCheckBox) e.getSource();
-                if (cbSshKeys == source) {
-                    enableCertificateWidgets(source.isSelected());
-                    enableLoginForm(!source.isSelected());
-                }
-            }
-        });
+        cbSshKeys.addItemListener(this);
+        cbSSHPassphrase.addItemListener(this);
 
         // open the file chooser when the select certificate button is hit
         certificateChooser.setDialogTitle("Please select a private SSH Key");
@@ -274,6 +268,7 @@ public class ConnectionConfigPanel {
     private void showCertificateWidgets(boolean isVisible) {
         tfCertfile.setVisible(isVisible);
         btnBrowse.setVisible(isVisible);
+        cbSSHPassphrase.setVisible(isVisible);
     }
 
     /**
@@ -284,6 +279,7 @@ public class ConnectionConfigPanel {
     private void enableCertificateWidgets(boolean isEnabled) {
         tfCertfile.setEnabled(isEnabled);
         btnBrowse.setEnabled(isEnabled);
+        cbSSHPassphrase.setEnabled(isEnabled);
     }
 
     /**
@@ -293,7 +289,24 @@ public class ConnectionConfigPanel {
      */
     private void enableLoginForm(boolean isEnabled) {
         // stupid me - you need the username to connect to a server
-//        tfUserName.setEnabled(isEnabled);
+        // the password field should be disabled only if it's passwordless ssh
         pfUserPassword.setEnabled(isEnabled);
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        JCheckBox source = (JCheckBox) e.getSource();
+        if (cbSshKeys == source || cbSSHPassphrase == source) {
+            enableCertificateWidgets(source.isSelected());
+            // the password field can be enabled only when
+            // Use ssh with password
+            if (cbSshKeys.isSelected() && cbSSHPassphrase.isSelected()) {
+                txtUserPassword.setText("Passphrase:");
+                enableLoginForm(true);
+            } else {
+                txtUserPassword.setText("User password:");
+                enableLoginForm(!cbSshKeys.isSelected());
+            }
+        }
     }
 }
