@@ -18,6 +18,7 @@ import java.io.File;
  */
 public class SFTPConfiguration extends ConnectionConfiguration {
     private boolean shouldUseCertificate;
+    private boolean shouldUseCertificateWithPassphrase;
     private String certificatePath;
 
     public SFTPConfiguration(String connectionName) {
@@ -39,6 +40,14 @@ public class SFTPConfiguration extends ConnectionConfiguration {
 
     public void setPasswordlessSSHSelected(boolean shouldUseCertificate) {
         this.shouldUseCertificate = shouldUseCertificate;
+    }
+
+    public boolean isPasswordlessWithPassphrase() {
+        return shouldUseCertificateWithPassphrase;
+    }
+
+    public void setPasswordlessWithPassphrase(boolean shouldUseCertificateWithPassphrase) {
+        this.shouldUseCertificateWithPassphrase = shouldUseCertificateWithPassphrase;
     }
 
     public String getCertificatePath() {

@@ -214,8 +214,16 @@ public class ConnectionConfigPanel implements ItemListener {
         return this.cbSshKeys.isSelected();
     }
 
-    public void setPasswordlessSSH(boolean value) {
+    public void usePasswordlessSSH(boolean value) {
         this.cbSshKeys.setSelected(value);
+    }
+
+    public boolean shouldUsePasswordlessWithPassphrase() {
+        return this.cbSSHPassphrase.isSelected();
+    }
+
+    public void usePassphraseForPasswordlessSSH(boolean value) {
+        this.cbSSHPassphrase.setSelected(value);
     }
 
     public String getSSHCertificatePath() {
@@ -296,17 +304,18 @@ public class ConnectionConfigPanel implements ItemListener {
     @Override
     public void itemStateChanged(ItemEvent e) {
         JCheckBox source = (JCheckBox) e.getSource();
-        if (cbSshKeys == source || cbSSHPassphrase == source) {
+        if (cbSshKeys == source) {
             enableCertificateWidgets(source.isSelected());
-            // the password field can be enabled only when
-            // Use ssh with password
-            if (cbSshKeys.isSelected() && cbSSHPassphrase.isSelected()) {
-                txtUserPassword.setText("Passphrase:");
-                enableLoginForm(true);
-            } else {
-                txtUserPassword.setText("User password:");
-                enableLoginForm(!cbSshKeys.isSelected());
-            }
         }
+        // the password field can be enabled only when
+        // Use ssh with password
+        if (cbSshKeys.isSelected() && cbSSHPassphrase.isSelected()) {
+            txtUserPassword.setText("Passphrase:");
+            enableLoginForm(true);
+        } else {
+            txtUserPassword.setText("User password:");
+            enableLoginForm(!cbSshKeys.isSelected());
+        }
+
     }
 }

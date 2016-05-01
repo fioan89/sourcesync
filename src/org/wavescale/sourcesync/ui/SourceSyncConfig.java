@@ -149,6 +149,7 @@ public class SourceSyncConfig {
             } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType())) {
                 ((SFTPConfiguration) connectionConfiguration).setPasswordlessSSHSelected(connectionPanel.shouldUsePasswordlessSSH());
                 ((SFTPConfiguration) connectionConfiguration).setCertificatePath(connectionPanel.getSSHCertificatePath());
+                ((SFTPConfiguration) connectionConfiguration).setPasswordlessWithPassphrase(connectionPanel.shouldUsePasswordlessWithPassphrase());
             }
         }
     }
@@ -184,9 +185,11 @@ public class SourceSyncConfig {
                 connectionPanel.setPreserveTimestampVisible(false);
             } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType())) {
                 boolean shouldUseSSHKeys = ((SFTPConfiguration) connectionConfiguration).isPasswordlessSSHSelected();
+                boolean shouldUseSSHKeysWithPassphrase = ((SFTPConfiguration) connectionConfiguration).isPasswordlessWithPassphrase();
                 String certFile = ((SFTPConfiguration) connectionConfiguration).getCertificatePath();
                 connectionPanel.setSSHKeysVisible(true);
-                connectionPanel.setPasswordlessSSH(shouldUseSSHKeys);
+                connectionPanel.usePasswordlessSSH(shouldUseSSHKeys);
+                connectionPanel.usePassphraseForPasswordlessSSH(shouldUseSSHKeysWithPassphrase);
                 connectionPanel.setSSHCertificatePath(certFile);
             }
             pnConfig.setVisible(true);
