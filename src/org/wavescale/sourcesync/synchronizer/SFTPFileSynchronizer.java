@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
  * ****************************************************************************
@@ -27,7 +28,7 @@ import java.io.IOException;
  */
 public class SFTPFileSynchronizer extends FileSynchronizer {
 
-    public static final String SSH_KNOWN_HOSTS = "~/.ssh/known_hosts";
+    public static final String SSH_KNOWN_HOSTS = Paths.get(System.getProperty("user.home"), ".ssh", "known_hosts").toString();
     private final JSch jsch;
     private Session session;
 
