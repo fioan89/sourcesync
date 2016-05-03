@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.wavescale.sourcesync</id>
     <name>Source Synchronizer</name>
-    <version>1.8</version>
+    <version>1.9</version>
     <vendor email="fioan89@gmail.com" url="">wavescale.org</vendor>
 
     <description><![CDATA[
@@ -12,6 +12,17 @@
       ]]></description>
 
     <change-notes><![CDATA[
+      <h3>Changes in version 1.9:</h3>
+      <ul>
+        <li>Add support for OS 10.11</li>
+        <li>Fix passwordless SSH for SFTP connections</li>
+        <li>Add support for passphrase keys for SFTP connections</li>
+        <li>Add support for passwordless SCP connections</li>
+        <li>Fix issues with known_hosts file on Windows machines</li>
+        <li>Fix issues with configuration and target window not getting on top of the IDE</li>
+        <li>Make the configuration, target and module selection window to always open in the center of IDE</li>
+      </ul>
+      </br></br>
       <h3>Changes in version 1.8:</h3>
       <ul>
         <li>Add support for IntelliJ IDEA 15.x</li>

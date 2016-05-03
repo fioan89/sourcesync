@@ -17,3 +17,11 @@ Version 1.5
 --> added shortcut support
 --> fixed some NPE when no default file was selected.
 --> fixed exception due to context switching when using shortcuts.
+
+Version 1.9
+--> support for OS X 10.11
+--> fix support for passwordless ssh for sftp connections
+--> add support for passphrase keys for sftp connections
+--> add support for passwordless ssh for scp connections
+--> changed the configuration window, the add target and module selection to centered dialogs
+--> fix issues with known_hosts file on windows
