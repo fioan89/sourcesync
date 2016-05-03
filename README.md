@@ -30,7 +30,7 @@ Now that you have done this step you are up and ready to sync files. Just right 
 
 Passwordless ssh
 ----------------
-Currently, only **SFTP** connections support passwordless ssh. In order to take full advantage of this feature you are advised to create a pair of public/private keys on your local machine - where IntelliJ or PyCharm IDE resides. Then copy the public key on every remote host you will connect to:  
+The plugin support passwordless SSH for both **SFTP** and **SCP** connections. In order to take full advantage of this feature you are advised to create a pair of public/private keys on your local machine - where IntelliJ or PyCharm IDE resides. Then copy the public key on every remote host you will connect to:
 Eg:```scp ~/.ssh/id_dsa.pub my_user_id@remote_hostname_or_IP:~/.ssh/id_dsa.pub```
 After this step is done, you should open a ssh shell to the remote machine where you will be prompted to authorize the key. Next you should open the **config window** and create a new **SFTP** connection. Then just like in the bellow picture, select **Use SSH key** and then browse and select the generated private key.  
 ![SFTP connection with passwordless support](https://raw.githubusercontent.com/fioan89/sourcesync/master/resources/sourcesync/passwordlessSSH.png)  
@@ -51,12 +51,13 @@ A few notes
 **Sync selected files to remote target** this one is pretty straight forward. It will upload just the selected files.  
 
 * If **SCP** protocol is used, please take note that this type of connection can only sync the file, it cannot create the entire directory tree where the file will be saved. Thus you need to have the tree created. This is not a bug of sourcesync. SCP is not a file protocol like **FTP**. It's only purpose is to transfer files.  
-* For **FTP** and **FTPS** preserving timestamp is not yet support. This is a work in progress.  
+* For **FTP** and **FTPS** preserving timestamp is not yet supported. This is a work in progress.
 
 Tested on
 ---------
 * Windows 7
 * GNU/Linux based OS's
+* OS X 10.11
   
 License
 -------
