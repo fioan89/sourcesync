@@ -5,7 +5,7 @@ import org.wavescale.sourcesync.factory.ModuleConnectionConfig;
 import javax.swing.*;
 import java.awt.event.*;
 
-public class ModuleConnectionConfigDialog extends JDialog {
+public class ModuleConnectionConfigDialog extends CenterDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -50,6 +50,7 @@ public class ModuleConnectionConfigDialog extends JDialog {
             this.cbModuleConnection.addItem(item);
         }
         pack();
+        centerOnParent();
         setVisible(true);
     }
 
