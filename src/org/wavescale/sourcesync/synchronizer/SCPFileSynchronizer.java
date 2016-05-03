@@ -11,6 +11,7 @@ import org.wavescale.sourcesync.logger.BalloonLogger;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 
 import java.io.*;
+import java.nio.file.Paths;
 
 /**
  * ****************************************************************************
@@ -24,6 +25,7 @@ import java.io.*;
  * *****************************************************************************
  */
 public class SCPFileSynchronizer extends FileSynchronizer {
+    public static final String SSH_KNOWN_HOSTS = Paths.get(System.getProperty("user.home"), ".ssh", "known_hosts").toString();
     private JSch jsch;
     private Session session;
 
@@ -38,9 +40,8 @@ public class SCPFileSynchronizer extends FileSynchronizer {
     public boolean connect() {
         if (!isConnected()) {
             try {
-                this.session = jsch.getSession(this.getConnectionInfo().getUserName(), this.getConnectionInfo().getHost(),
-                        this.getConnectionInfo().getPort());
-                this.session.setPassword(this.getConnectionInfo().getUserPassword());
+                initSession();
+                session.setPassword(this.getConnectionInfo().getUserPassword());
                 this.session.setConfig("StrictHostKeyChecking", "no");
                 this.session.connect();
                 this.setConnected(true);
@@ -51,6 +52,30 @@ public class SCPFileSynchronizer extends FileSynchronizer {
             }
         }
         return true;
+    }
+
+    private void initSession() throws JSchException {
+        SCPConfiguration configuration = (SCPConfiguration) this.getConnectionInfo();
+        session = this.jsch.getSession(this.getConnectionInfo().getUserName(), this.getConnectionInfo().getHost(),
+                this.getConnectionInfo().getPort());
+        if (configuration.isPasswordlessSSHSelected()) {
+            session.setConfig("PreferredAuthentications", "publickey");
+            try {
+                Utils.createFile(SSH_KNOWN_HOSTS);
+            } catch (IOException e) {
+                EventDataLogger.logError("Could not identify nor create the ssh known hosts file at " + SSH_KNOWN_HOSTS + ". The returned error is:" + e.getMessage(), this.getProject());
+            }
+            this.jsch.setKnownHosts(SSH_KNOWN_HOSTS);
+            // add private key and passphrase if exists
+            if (configuration.isPasswordlessWithPassphrase()) {
+                this.jsch.addIdentity(configuration.getCertificatePath(), configuration.getUserPassword());
+            } else {
+                this.jsch.addIdentity(configuration.getCertificatePath());
+            }
+
+        } else {
+            session.setPassword(this.getConnectionInfo().getUserPassword());
+        }
     }
 
     @Override
