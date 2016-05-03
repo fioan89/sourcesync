@@ -2,6 +2,7 @@ package org.wavescale.sourcesync.config;
 
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 import org.wavescale.sourcesync.api.ConnectionConstants;
+import org.wavescale.sourcesync.api.PasswordlessSSH;
 
 /**
  * ****************************************************************************
@@ -14,7 +15,10 @@ import org.wavescale.sourcesync.api.ConnectionConstants;
  * For any issues or questions send an email at: fioan89@gmail.com              *
  * *****************************************************************************
  */
-public class SCPConfiguration extends ConnectionConfiguration {
+public class SCPConfiguration extends ConnectionConfiguration implements PasswordlessSSH {
+    private boolean shouldUseCertificate;
+    private boolean shouldUseCertificateWithPassphrase;
+    private String certificatePath;
 
     public SCPConfiguration(String connectionName) {
         super(connectionName);
@@ -24,5 +28,35 @@ public class SCPConfiguration extends ConnectionConfiguration {
         this.host = "scp://";
         this.userName = "";
         this.userPassword = "";
+    }
+
+    @Override
+    public boolean isPasswordlessSSHSelected() {
+        return shouldUseCertificate;
+    }
+
+    @Override
+    public void setPasswordlessSSHSelected(boolean shouldUseCertificate) {
+        this.shouldUseCertificate = shouldUseCertificate;
+    }
+
+    @Override
+    public boolean isPasswordlessWithPassphrase() {
+        return shouldUseCertificateWithPassphrase;
+    }
+
+    @Override
+    public void setPasswordlessWithPassphrase(boolean shouldUseCertificateWithPassphrase) {
+        this.shouldUseCertificateWithPassphrase = shouldUseCertificateWithPassphrase;
+    }
+
+    @Override
+    public String getCertificatePath() {
+        return certificatePath;
+    }
+
+    @Override
+    public void setCertificatePath(String certificatePath) {
+        this.certificatePath = certificatePath;
     }
 }

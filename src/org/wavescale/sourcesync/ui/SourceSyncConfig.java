@@ -4,6 +4,7 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 import org.wavescale.sourcesync.api.ConnectionConstants;
+import org.wavescale.sourcesync.api.PasswordlessSSH;
 import org.wavescale.sourcesync.config.FTPConfiguration;
 import org.wavescale.sourcesync.config.FTPSConfiguration;
 import org.wavescale.sourcesync.config.SCPConfiguration;
@@ -72,7 +73,7 @@ public class SourceSyncConfig {
                 loadConnections(connectionFactory);
 
                 configDialog.pack();
-                ((CenterDialog)configDialog).centerOnParent();
+                ((CenterDialog) configDialog).centerOnParent();
                 configDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
                 configDialog.setModal(true);
                 configDialog.setVisible(true);
@@ -146,10 +147,11 @@ public class SourceSyncConfig {
                 connectionConfiguration.setPreserveTime(false);
             } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {
                 connectionConfiguration.setPreserveTime(false);
-            } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType())) {
-                ((SFTPConfiguration) connectionConfiguration).setPasswordlessSSHSelected(connectionPanel.shouldUsePasswordlessSSH());
-                ((SFTPConfiguration) connectionConfiguration).setCertificatePath(connectionPanel.getSSHCertificatePath());
-                ((SFTPConfiguration) connectionConfiguration).setPasswordlessWithPassphrase(connectionPanel.shouldUsePasswordlessWithPassphrase());
+            } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType()) ||
+                    ConnectionConstants.CONN_TYPE_SCP.equals(connectionConfiguration.getConnectionType())) {
+                ((PasswordlessSSH) connectionConfiguration).setPasswordlessSSHSelected(connectionPanel.shouldUsePasswordlessSSH());
+                ((PasswordlessSSH) connectionConfiguration).setCertificatePath(connectionPanel.getSSHCertificatePath());
+                ((PasswordlessSSH) connectionConfiguration).setPasswordlessWithPassphrase(connectionPanel.shouldUsePasswordlessWithPassphrase());
             }
         }
     }
@@ -183,10 +185,11 @@ public class SourceSyncConfig {
                 connectionPanel.setPreserveTimestampVisible(false);
             } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionConfiguration.getConnectionType())) {
                 connectionPanel.setPreserveTimestampVisible(false);
-            } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType())) {
-                boolean shouldUseSSHKeys = ((SFTPConfiguration) connectionConfiguration).isPasswordlessSSHSelected();
-                boolean shouldUseSSHKeysWithPassphrase = ((SFTPConfiguration) connectionConfiguration).isPasswordlessWithPassphrase();
-                String certFile = ((SFTPConfiguration) connectionConfiguration).getCertificatePath();
+            } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionConfiguration.getConnectionType()) ||
+                    ConnectionConstants.CONN_TYPE_SCP.equals(connectionConfiguration.getConnectionType())) {
+                boolean shouldUseSSHKeys = ((PasswordlessSSH) connectionConfiguration).isPasswordlessSSHSelected();
+                boolean shouldUseSSHKeysWithPassphrase = ((PasswordlessSSH) connectionConfiguration).isPasswordlessWithPassphrase();
+                String certFile = ((PasswordlessSSH) connectionConfiguration).getCertificatePath();
                 connectionPanel.setSSHKeysVisible(true);
                 connectionPanel.usePasswordlessSSH(shouldUseSSHKeys);
                 connectionPanel.usePassphraseForPasswordlessSSH(shouldUseSSHKeysWithPassphrase);
