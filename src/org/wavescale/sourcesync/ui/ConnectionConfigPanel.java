@@ -59,6 +59,7 @@ public class ConnectionConfigPanel implements ItemListener {
         // open the file chooser when the select certificate button is hit
         certificateChooser.setDialogTitle("Please select a private SSH Key");
         certificateChooser.setMultiSelectionEnabled(false);
+        certificateChooser.setFileHidingEnabled(false);
         FileFilter sshKeyFilter = new FileNameExtensionFilter("SSH Private Key", "pub");
         certificateChooser.setFileFilter(sshKeyFilter);
         btnBrowse.addActionListener(new ActionListener() {
