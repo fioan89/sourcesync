@@ -14,13 +14,17 @@
     <change-notes><![CDATA[
       <h3>Changes in version 1.9:</h3>
       <ul>
-        <li>Add support for OS 10.11</li>
+        <li>Add support for OS X 10.11</li>
         <li>Fix passwordless SSH for SFTP connections</li>
         <li>Add support for passphrase keys for SFTP connections</li>
         <li>Add support for passwordless SCP connections</li>
         <li>Fix issues with known_hosts file on Windows machines</li>
+        <li>Fix issue with hidden files and directories not showing through private key file chooser</li>
+        <li>Fix issue with private key file chooser forcing you to select the public key instead of the private one</li>
         <li>Fix issues with configuration and target window not getting on top of the IDE</li>
         <li>Make the configuration, target and module selection window to always open in the center of IDE</li>
+        </p>
+        <li><b>All previous configurations will be lost!</b></li>
       </ul>
       </br></br>
       <h3>Changes in version 1.8:</h3>
