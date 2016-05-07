@@ -23,7 +23,7 @@
 * fix support for passwordless ssh for sftp connections
 * add support for passphrase keys for sftp connections
 * add support for passwordless ssh for scp connections
-* fix issues with known_hosts file on Windows machines<
+* fix issues with known_hosts file on Windows machines
 * fix issue with hidden files and directories not showing through private key file chooser
 * fix issue with private key file chooser forcing you to select the public key instead of the private one
 * fix issues with configuration and target window not getting on top of the IDE
