@@ -2,7 +2,7 @@
 * add option to limit the number of upload threads
 * fix support for PyCharm
 
-Version 1.3**
+**Version 1.3**
 * force OK button to save connection preferences
 * Fix a few visual bugs (the Allow ... number connections is not visible until resize)
 * Added Sync selected and change files into the Changes View Popup-Menu
@@ -28,4 +28,4 @@ Version 1.3**
 * fix issue with private key file chooser forcing you to select the public key instead of the private one
 * fix issues with configuration and target window not getting on top of the IDE
 * changed the configuration window, the add target and module selection to centered dialogs
-* all previous configurations will be lost
+* ***All previous configurations will be lost***
