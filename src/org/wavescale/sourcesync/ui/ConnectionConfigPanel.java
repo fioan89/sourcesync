@@ -1,8 +1,6 @@
 package org.wavescale.sourcesync.ui;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -60,8 +58,7 @@ public class ConnectionConfigPanel implements ItemListener {
         certificateChooser.setDialogTitle("Please select a private SSH Key");
         certificateChooser.setMultiSelectionEnabled(false);
         certificateChooser.setFileHidingEnabled(false);
-        FileFilter sshKeyFilter = new FileNameExtensionFilter("SSH Private Key", "pub");
-        certificateChooser.setFileFilter(sshKeyFilter);
+
         btnBrowse.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
