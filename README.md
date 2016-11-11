@@ -1,6 +1,6 @@
 sourcesync
 ==========
-Source Synchronizer is a powerful plugin for performing one-way file synchronization for your Intellij Idea and Pycharm projects. It synchronizes the remote target so that it will match your local project. It features **SFTP**, **SCP**, **FTP** and **FTPS** protocol support.
+Source Synchronizer is a powerful plugin for performing one-way file synchronization for PhpStorm, IntelliJ IDEA and Pycharm projects. It synchronizes the remote target so that it will match your local project. It features **SFTP**, **SCP**, **FTP** and **FTPS** protocol support.
 
 Installation
 ------------  
