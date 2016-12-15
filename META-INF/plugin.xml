@@ -5,6 +5,12 @@
     <vendor email="fioan89@gmail.com" url="">wavescale.org</vendor>
 
     <description><![CDATA[
+      <br>
+      <a href="https://github.com/fioan89/sourcesync" rel="nofollow">GitHub</a> |
+      <a href="https://github.com/fioan89/sourcesync/issues" rel="nofollow">Issues</a> | Donate (
+      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=E6F2NPVCNZK4C&amp;lc=US&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted" rel="nofollow">PayPal)</a>
+      <br>
+      <br>
       Source Synchronizer is a powerful plugin for performing one-way file synchronization for your project.
       <br>It synchronizes the remote target so that it will match your local project. It features support for
       FTP, FTPS, SFTP and SCP protocols. You can filter the uploaded files, or you can simply opt
