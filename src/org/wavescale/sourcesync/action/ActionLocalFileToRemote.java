@@ -18,7 +18,7 @@ import org.wavescale.sourcesync.config.FTPSConfiguration;
 import org.wavescale.sourcesync.config.SCPConfiguration;
 import org.wavescale.sourcesync.config.SFTPConfiguration;
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory;
-import org.wavescale.sourcesync.factory.ModuleConnectionConfig;
+import org.wavescale.sourcesync.factory.ConnectionConfig;
 import org.wavescale.sourcesync.logger.BalloonLogger;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 import org.wavescale.sourcesync.synchronizer.FTPFileSynchronizer;
@@ -26,11 +26,11 @@ import org.wavescale.sourcesync.synchronizer.FTPSFileSynchronizer;
 import org.wavescale.sourcesync.synchronizer.SCPFileSynchronizer;
 import org.wavescale.sourcesync.synchronizer.SFTPFileSynchronizer;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * ****************************************************************************
- * Copyright (c) 2005-2014 Faur Ioan-Aurel.                                     *
+ * Copyright (c) 2014-2107 Faur Ioan-Aurel.                                     *
  * All rights reserved. This program and the accompanying materials             *
  * are made available under the terms of the MIT License                        *
  * which accompanies this distribution, and is available at                     *
@@ -41,33 +41,29 @@ import java.io.File;
  */
 public class ActionLocalFileToRemote extends AnAction {
     public void actionPerformed(final AnActionEvent e) {
-        // first check if there's a connection type associated to this module. If not alert the user
-        // and get out
-        Project currentProject = e.getProject();
+        // first check if there's a connection type associated to this module.
+        // If not alert the user and get out
+        final Project project = e.getProject();
 
-        String moduleName = currentProject.getName();
-        String associationName = ModuleConnectionConfig.getInstance().getAssociationFor(moduleName);
+        String projectName = project.getName();
+        String associationName = ConnectionConfig.getInstance().getAssociationFor(projectName);
         if (associationName == null) {
-            Utils.showNoConnectionSpecifiedError(e, moduleName);
+            Utils.showNoConnectionSpecifiedError(projectName);
             return;
         }
-        VirtualFile virtualFile = PlatformDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
+        final VirtualFile virtualFile = PlatformDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
 
         if (virtualFile == null || virtualFile.isDirectory()) {
             StringBuilder builder = new StringBuilder("Project <b>");
-            builder.append(e.getProject().getName()).append("</b>! does not have a selected file!");
-            BalloonLogger.logBalloonInfo(builder.toString(), e.getProject());
-            EventDataLogger.logInfo(builder.toString(), e.getProject());
+            builder.append(projectName).append("</b>! does not have a selected file!");
+            BalloonLogger.logBalloonInfo(builder.toString(), project);
+            EventDataLogger.logInfo(builder.toString(), project);
             return;
         }
 
-        final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().
-                getConnectionConfiguration(associationName);
-        final Project project = e.getProject();
-        final String projectName = project.getName();
+        final ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().getConnectionConfiguration(associationName);
         if (Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
-            final File relativeFile = new File(Utils.getUnixPath(virtualFile.getPath()).replaceFirst(
-                    Utils.getUnixPath(currentProject.getBasePath()), ""));
+            final Path uploadLocation = Utils.dirsToFileFromProjectRoot(virtualFile, project);
             ProgressManager.getInstance().run(new Task.Backgroundable(e.getProject(), "Uploading", false) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
@@ -90,8 +86,7 @@ public class ActionLocalFileToRemote extends AnAction {
                         fileSynchronizer.connect();
                         // so final destination will look like this:
                         // root_home/ + project_relative_path_to_file/
-                        fileSynchronizer.syncFile(Utils.getUnixPath(relativeFile.getPath()),
-                                Utils.buildUnixPath(relativeFile.getParent().substring(1) /**Something like src/org/.../package**/));
+                        fileSynchronizer.syncFile(virtualFile.getPath(), uploadLocation);
                         fileSynchronizer.disconnect();
                     }
                 }

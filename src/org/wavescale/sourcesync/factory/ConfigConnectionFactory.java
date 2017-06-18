@@ -31,7 +31,7 @@ public class ConfigConnectionFactory {
     private Map<String, ConnectionConfiguration> connectionConfigurationMap;
 
     private ConfigConnectionFactory() {
-        connectionConfigurationMap = new HashMap<String, ConnectionConfiguration>();
+        connectionConfigurationMap = new HashMap<>();
         userHome = System.getProperty("user.home");
         fileSeparator = System.getProperty("file.separator");
         initComponent();

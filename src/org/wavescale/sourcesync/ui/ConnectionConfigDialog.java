@@ -1,24 +1,24 @@
 package org.wavescale.sourcesync.ui;
 
-import org.wavescale.sourcesync.factory.ModuleConnectionConfig;
+import org.wavescale.sourcesync.factory.ConnectionConfig;
 
 import javax.swing.*;
 import java.awt.event.*;
 
-public class ModuleConnectionConfigDialog extends CenterDialog {
+public class ConnectionConfigDialog extends CenterDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JComboBox cbModuleConnection;
-    private String moduleName;
+    private String projectName;
 
     @SuppressWarnings("unchecked")
-    public ModuleConnectionConfigDialog(String moduleName, String[] connectionConfigNames) {
-        this.setTitle("Choose connection for " + moduleName);
+    public ConnectionConfigDialog(String projectName, String[] connectionConfigNames) {
+        this.setTitle("Choose connection for " + projectName);
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        this.moduleName = moduleName;
+        this.projectName = projectName;
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -32,7 +32,7 @@ public class ModuleConnectionConfigDialog extends CenterDialog {
             }
         });
 
-// call onCancel() when cross is clicked
+        // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -40,7 +40,7 @@ public class ModuleConnectionConfigDialog extends CenterDialog {
             }
         });
 
-// call onCancel() on ESCAPE
+        // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancel();
@@ -49,6 +49,9 @@ public class ModuleConnectionConfigDialog extends CenterDialog {
         for (String item : connectionConfigNames) {
             this.cbModuleConnection.addItem(item);
         }
+    }
+
+    public void openDialog() {
         pack();
         centerOnParent();
         setVisible(true);
@@ -56,8 +59,8 @@ public class ModuleConnectionConfigDialog extends CenterDialog {
 
     private void onOK() {
         String connectionConfig = (String) cbModuleConnection.getSelectedItem();
-        ModuleConnectionConfig.getInstance().associateModuleWithConnection(moduleName, connectionConfig);
-        ModuleConnectionConfig.getInstance().saveModuleAssociatedConn();
+        ConnectionConfig.getInstance().associateProjectWithConnection(projectName, connectionConfig);
+        ConnectionConfig.getInstance().saveModuleAssociatedConn();
 
         dispose();
 

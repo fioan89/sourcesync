@@ -7,11 +7,15 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
 import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.FileSynchronizer;
-import org.wavescale.sourcesync.api.Utils;
 import org.wavescale.sourcesync.config.FTPSConfiguration;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * ****************************************************************************
@@ -71,31 +75,29 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
     }
 
     @Override
-    public void syncFile(String sourcePath, String destinationPath) {
+    public void syncFile(String sourceLocation, Path uploadLocation) {
         // preserve timestamp for now
         boolean preserveTimestamp = true;
-        File localFile = new File(getProject().getBasePath(), sourcePath);
-        String finalSourcePath = Utils.getUnixPath(localFile.getAbsolutePath());
-        String remotePath = Utils.buildUnixPath(this.getConnectionInfo().getRootPath(), destinationPath);
-        String[] dirsToCreate = Utils.splitPath(destinationPath);
-        // change location to root path
+        Path sourcePathLocation = Paths.get(sourceLocation);
+        String sourceFileName = sourcePathLocation.getFileName().toString();
+        Path remotePath = Paths.get(this.getConnectionInfo().getRootPath()).resolve(uploadLocation);
+
+        // first try to create the path where this must be uploaded
         try {
-            this.ftps.changeWorkingDirectory(Utils.getUnixPath(this.getConnectionInfo().getRootPath()));
+            this.ftps.changeWorkingDirectory(remotePath.getRoot().toString());
         } catch (IOException e) {
-            EventDataLogger.logError("Remote dir <b>" + this.getConnectionInfo().getRootPath() +
-                    "</b> might not exist or you don't have permission on this path!", this.getProject());
-            return;
+            EventDataLogger.logError("On remote we could not change directory into root: " + remotePath.getRoot(), this.getProject());
         }
-        // try to create
-        for (String dirToCreate : dirsToCreate) {
+        for (Path current : remotePath) {
+            String location = current.toString();
             try {
-                this.ftps.makeDirectory(dirToCreate);
+                this.ftps.makeDirectory(location);
             } catch (IOException e) {
                 // this dir probably exist so just ignore now it will fail later
                 // if there are other reasons this could not be executed.
             }
             try {
-                this.ftps.changeWorkingDirectory(dirToCreate);
+                this.ftps.changeWorkingDirectory(location);
             } catch (IOException e) {
                 // probably it doesn't exist or maybe no permission
                 EventDataLogger.logError("Remote dir <b>" + remotePath +
@@ -107,13 +109,13 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
         // upload
         try {
             this.ftps.setFileType(FTP.BINARY_FILE_TYPE);
-            FileInputStream in = new FileInputStream(finalSourcePath);
-            OutputStream outputStream = this.ftps.storeFileStream(localFile.getName());
+            FileInputStream in = new FileInputStream(sourceLocation);
+            OutputStream outputStream = this.ftps.storeFileStream(sourceFileName);
             this.getIndicator().setIndeterminate(false);
-            this.getIndicator().setText("Uploading...[" + localFile.getName() + "]");
+            this.getIndicator().setText("Uploading...[" + sourceFileName + "]");
             byte[] buffer = new byte[1024];
             int len;
-            double totalSize = localFile.length() + 0.0;
+            double totalSize = sourcePathLocation.toFile().length() + 0.0;
             long totalUploaded = 0;
             while (true) {
                 len = in.read(buffer, 0, buffer.length);

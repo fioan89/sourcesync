@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -97,43 +98,35 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
         }
     }
 
-    /**
-     * Uploads the given file to the remote target.
-     *
-     * @param sourcePath      a <code>String</code> representing a file path to be uploaded. This is a relative path
-     *                        to project base path.
-     * @param destinationPath a <code>String</code> representing a location path on the remote target
-     *                        where the source will be uploaded.
-     */
     @Override
-    public void syncFile(String sourcePath, String destinationPath) {
+    public void syncFile(String sourcePath, Path uploadLocation) {
         boolean preserveTimestamp = this.getConnectionInfo().isPreserveTime();
-        String finalSourcePath = new File(getProject().getBasePath(), sourcePath).getAbsolutePath();
-        String remotePath = new File(this.getConnectionInfo().getRootPath(), destinationPath).getPath();
+        Path remotePath = Paths.get(this.getConnectionInfo().getRootPath()).resolve(uploadLocation);
 
-        String[] dirsToCreate = Utils.splitPath(destinationPath);
         ChannelSftp channelSftp;
         try {
             channelSftp = (ChannelSftp) this.session.openChannel("sftp");
             channelSftp.connect();
-            channelSftp.cd(Utils.getUnixPath(this.getConnectionInfo().getRootPath()));
         } catch (JSchException e) {
             EventDataLogger.logError(e.toString(), this.getProject());
             return;
-        } catch (SftpException e) {
-            EventDataLogger.logError("Remote dir <b>" + this.getConnectionInfo().getRootPath() +
-                    "</b> might not exist or you don't have permission on this path!", this.getProject());
-            return;
         }
+
         // first try to create the path where this must be uploaded
-        for (String dirToCreate : dirsToCreate) {
+        try {
+            channelSftp.cd(remotePath.getRoot().toString());
+        } catch (SftpException e) {
+            EventDataLogger.logError("On remote we could not change directory into root: " + remotePath.getRoot(), this.getProject());
+        }
+        for (Path current : remotePath) {
+            String location = current.toString();
             try {
-                channelSftp.mkdir(dirToCreate);
+                channelSftp.mkdir(location);
             } catch (SftpException e) {
                 // this dir probably exist so just ignore
             }
             try {
-                channelSftp.cd(dirToCreate);
+                channelSftp.cd(location);
             } catch (SftpException e) {
                 // probably it doesn't exist or maybe no permission
                 EventDataLogger.logError("Remote dir <b>" + remotePath +
@@ -141,8 +134,9 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
                 return;
             }
         }
+
         // upload file
-        File toUpload = new File(finalSourcePath);
+        File toUpload = new File(sourcePath);
         SftpProgressMonitor progressMonitor = new SftpMonitor(toUpload.length());
         try {
             channelSftp.put(new FileInputStream(toUpload), toUpload.getName(), progressMonitor, ChannelSftp.OVERWRITE);

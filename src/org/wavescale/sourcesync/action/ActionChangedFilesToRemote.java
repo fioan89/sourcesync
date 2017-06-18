@@ -17,11 +17,11 @@ import org.wavescale.sourcesync.api.FileSynchronizer;
 import org.wavescale.sourcesync.api.SynchronizationQueue;
 import org.wavescale.sourcesync.api.Utils;
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory;
-import org.wavescale.sourcesync.factory.ModuleConnectionConfig;
+import org.wavescale.sourcesync.factory.ConnectionConfig;
 import org.wavescale.sourcesync.logger.BalloonLogger;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.concurrent.Semaphore;
 
 /**
  * ****************************************************************************
- * Copyright (c) 2005-2014 Faur Ioan-Aurel.                                     *
+ * Copyright (c) 2014-2107 Faur Ioan-Aurel.                                     *
  * All rights reserved. This program and the accompanying materials             *
  * are made available under the terms of the MIT License                        *
  * which accompanies this distribution, and is available at                     *
@@ -41,13 +41,13 @@ import java.util.concurrent.Semaphore;
  */
 public class ActionChangedFilesToRemote extends AnAction {
     public void actionPerformed(final AnActionEvent e) {
-        // first check if there's a connection type associated to this module. If not alert the user
-        // and get out
-        Project currentProject = PlatformDataKeys.PROJECT.getData(e.getDataContext());
-        String moduleName = currentProject.getName();
-        String associationName = ModuleConnectionConfig.getInstance().getAssociationFor(moduleName);
+        // first check if there's a connection type associated to this module.
+        // If not alert the user and get out
+        Project project = PlatformDataKeys.PROJECT.getData(e.getDataContext());
+        String projectName = project.getName();
+        String associationName = ConnectionConfig.getInstance().getAssociationFor(projectName);
         if (associationName == null) {
-            Utils.showNoConnectionSpecifiedError(e, moduleName);
+            Utils.showNoConnectionSpecifiedError(projectName);
             return;
         }
 
@@ -79,12 +79,9 @@ public class ActionChangedFilesToRemote extends AnAction {
         final SynchronizationQueue synchronizationQueue = new SynchronizationQueue(e.getProject(), connectionConfiguration, allowed_sessions);
         synchronizationQueue.startCountingTo(changedFiles.size());
         final BlockingQueue<FileSynchronizer> queue = synchronizationQueue.getSyncQueue();
-        final String projectName = e.getProject().getName();
-        for (VirtualFile virtualFile : changedFiles) {
+        for (final VirtualFile virtualFile : changedFiles) {
             if (virtualFile != null && Utils.canBeUploaded(virtualFile.getName(), connectionConfiguration.getExcludedFiles())) {
-                final File relativeFile = new File(Utils.getUnixPath(virtualFile.getPath()).replaceFirst(
-                        Utils.getUnixPath(currentProject.getBasePath()), ""));
-
+                final Path uploadLocation = Utils.dirsToFileFromProjectRoot(virtualFile, project);
                 ProgressManager.getInstance().run(new Task.Backgroundable(e.getProject(), "Uploading", false) {
                     @Override
                     public void run(@NotNull ProgressIndicator indicator) {
@@ -97,8 +94,7 @@ public class ActionChangedFilesToRemote extends AnAction {
                                 fileSynchronizer.connect();
                                 // so final destination will look like this:
                                 // root_home/ + project_relative_path_to_file/
-                                fileSynchronizer.syncFile(Utils.getUnixPath(relativeFile.getPath()),
-                                        Utils.buildUnixPath(relativeFile.getParent().substring(1) /**Something like src/org/.../package**/));
+                                fileSynchronizer.syncFile(virtualFile.getPath(), uploadLocation);
                             }
                             queue.put(fileSynchronizer);
                             synchronizationQueue.count();

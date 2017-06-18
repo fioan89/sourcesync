@@ -11,6 +11,7 @@ import org.wavescale.sourcesync.logger.BalloonLogger;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -91,15 +92,13 @@ public class SCPFileSynchronizer extends FileSynchronizer {
      *
      * @param sourcePath      a <code>String</code> representing a file path to be uploaded. This is a relative path
      *                        to project base path.
-     * @param destinationPath a <code>String</code> representing a location path on the remote target
+     * @param uploadLocation a <code>String</code> representing a location path on the remote target
      *                        where the source will be uploaded.
      */
     @Override
-    public void syncFile(String sourcePath, String destinationPath) {
+    public void syncFile(String sourcePath, Path uploadLocation) {
         boolean preserveTimestamp = this.getConnectionInfo().isPreserveTime();
-        // exec 'scp -t rfile' remotely
-        String finalSourcePath = Utils.buildUnixPath(getProject().getBasePath(), sourcePath);
-        String remotePath = Utils.buildUnixPath(this.getConnectionInfo().getRootPath(), destinationPath);
+        Path remotePath = Paths.get(this.getConnectionInfo().getRootPath()).resolve(uploadLocation);
 
         try {
             String command = "scp " + (preserveTimestamp ? "-p" : "") + " -t -C " + remotePath;
@@ -116,7 +115,8 @@ public class SCPFileSynchronizer extends FileSynchronizer {
                 return;
             }
 
-            File _lfile = new File(finalSourcePath);
+
+            File _lfile = new File(sourcePath);
             this.getIndicator().setIndeterminate(false);
             this.getIndicator().setText("Uploading...[" + _lfile.getName() + "]");
             if (preserveTimestamp) {
@@ -133,11 +133,7 @@ public class SCPFileSynchronizer extends FileSynchronizer {
             // send "C0644 filesize filename", where filename should not include '/'
             long filesize = _lfile.length();
             command = "C0644 " + filesize + " ";
-            if (finalSourcePath.lastIndexOf('/') > 0) {
-                command += finalSourcePath.substring(finalSourcePath.lastIndexOf('/') + 1);
-            } else {
-                command += finalSourcePath;
-            }
+            command += Paths.get(sourcePath).getFileName().toString();
             command += "\n";
             out.write(command.getBytes());
             out.flush();
@@ -146,7 +142,7 @@ public class SCPFileSynchronizer extends FileSynchronizer {
             }
 
             // send content of finalSourcePath
-            FileInputStream fis = new FileInputStream(finalSourcePath);
+            FileInputStream fis = new FileInputStream(sourcePath);
             double totalUploaded = 0.0;
             byte[] buf = new byte[1024];
             while (true) {

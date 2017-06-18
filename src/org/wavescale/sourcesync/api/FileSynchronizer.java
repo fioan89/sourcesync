@@ -17,6 +17,8 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
+
 /**
  * Abstract class for uploading a local file to a remote target.
  */
@@ -59,10 +61,10 @@ public abstract class FileSynchronizer {
      *
      * @param sourcePath      a <code>String</code> representing a file path to be uploaded. This can be a
      *                        relative path or an absolute path, depending on the implementation.
-     * @param destinationPath a <code>String</code> representing a location path on the remote target
-     *                        where the source will be uploaded.
+     * @param uploadLocation a <code>Path</code> representing a location path on the remote target
+     *                        where the source will be uploaded. This path is relative to root location.
      */
-    public abstract void syncFile(String sourcePath, String destinationPath);
+    public abstract void syncFile(String sourcePath, Path uploadLocation);
 
     public ConnectionConfiguration getConnectionInfo() {
         return connectionInfo;

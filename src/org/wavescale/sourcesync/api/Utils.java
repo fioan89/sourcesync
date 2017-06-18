@@ -1,15 +1,17 @@
 package org.wavescale.sourcesync.api;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import org.wavescale.sourcesync.logger.BalloonLogger;
-import org.wavescale.sourcesync.logger.EventDataLogger;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.VirtualFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * ****************************************************************************
- * Copyright (c) 2005-2014 Faur Ioan-Aurel.                                     *
+ * Copyright (c) 2014-2107 Faur Ioan-Aurel.                                     *
  * All rights reserved. This program and the accompanying materials             *
  * are made available under the terms of the MIT License                        *
  * which accompanies this distribution, and is available at                     *
@@ -48,15 +50,27 @@ public class Utils {
     /**
      * Logs an error message about no connection specified.
      *
-     * @param e          action event instance.
-     * @param moduleName module or project name.
+     * @param projectName module or project name.
      */
-    public static void showNoConnectionSpecifiedError(AnActionEvent e, String moduleName) {
+    public static void showNoConnectionSpecifiedError(String projectName) {
         StringBuilder message = new StringBuilder();
-        message.append("There is no connection type associated to <b>").append(moduleName)
+        message.append("There is no connection type associated to <b>")
+                .append(projectName)
                 .append("</b> module.\nPlease right click on module name and then select <b>Module Connection Configuration</b> to select connection type!");
-        BalloonLogger.logBalloonError(message.toString(), e.getProject());
-        EventDataLogger.logError(message.toString(), e.getProject());
+        Messages.showErrorDialog(message.toString(), "No connection specified for project " + projectName);
+    }
+
+    /**
+     * Extracts an ordered list of directories from project
+     * root path to the file
+     */
+    public static Path dirsToFileFromProjectRoot(VirtualFile virtualFile, Project project) {
+        String projectBaseDirUrl = project.getBaseDir().getUrl();
+        String relativeVirtualFilePath = virtualFile.getParent().getUrl().replace(projectBaseDirUrl, "");
+        relativeVirtualFilePath = relativeVirtualFilePath.replaceFirst("/", "");
+        return Paths.get(relativeVirtualFilePath);
+
+
     }
 
     /**
@@ -111,7 +125,7 @@ public class Utils {
         if (fileToCreate.exists()) {
             return false;
         }
-        // the file doesn't exist so try creat it
+        // the file doesn't exist so try create it
         String dirPath = fileToCreate.getParent();
         // try create the path
         new File(dirPath).mkdirs();
