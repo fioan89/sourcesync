@@ -22,7 +22,7 @@ import java.util.Set;
 
 /**
  * ****************************************************************************
- * Copyright (c) 2005-2014 Faur Ioan-Aurel.                                     *
+ * Copyright (c) 2014-2107 Faur Ioan-Aurel.                                     *
  * All rights reserved. This program and the accompanying materials             *
  * are made available under the terms of the MIT License                        *
  * which accompanies this distribution, and is available at                     *

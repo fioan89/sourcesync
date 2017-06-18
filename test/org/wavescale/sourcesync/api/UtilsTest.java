@@ -18,7 +18,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by fauri on 17/06/2017.
+ * ****************************************************************************
+ * Copyright (c) 2014-2107 Faur Ioan-Aurel.                                     *
+ * All rights reserved. This program and the accompanying materials             *
+ * are made available under the terms of the MIT License                        *
+ * which accompanies this distribution, and is available at                     *
+ * http://opensource.org/licenses/MIT                                           *
+ * *
+ * For any issues or questions send an email at: fioan89@gmail.com              *
+ * *****************************************************************************
  */
 @RunWith(DataProviderRunner.class)
 public class UtilsTest {
