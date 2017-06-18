@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.wavescale.sourcesync</id>
     <name>Source Synchronizer</name>
-    <version>1.9</version>
+    <version>2.0</version>
     <vendor email="fioan89@gmail.com" url="">wavescale.org</vendor>
 
     <description><![CDATA[
