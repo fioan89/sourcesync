@@ -114,7 +114,7 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
 
         // first try to create the path where this must be uploaded
         try {
-            channelSftp.cd(remotePath.getRoot().toString());
+            channelSftp.cd("/");
         } catch (SftpException e) {
             EventDataLogger.logError("On remote we could not change directory into root: " + remotePath.getRoot(), this.getProject());
         }
