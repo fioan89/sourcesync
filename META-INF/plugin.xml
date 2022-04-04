@@ -21,6 +21,7 @@
       <h3>Changes in version 2.0:</h3>
       <ul>
         <li>fixed issues with resource location due to trailing "/"<li>
+        <li>removed usages of scheduled to be removed API</li>
       </ul>
       <h3>Changes in version 1.9:</h3>
       <ul>

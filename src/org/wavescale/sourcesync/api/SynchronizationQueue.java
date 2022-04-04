@@ -197,16 +197,6 @@ public class SynchronizationQueue {
         }
 
         @Override
-        public void startNonCancelableSection() {
-
-        }
-
-        @Override
-        public void finishNonCancelableSection() {
-
-        }
-
-        @Override
         public boolean isModal() {
             return false;
         }
