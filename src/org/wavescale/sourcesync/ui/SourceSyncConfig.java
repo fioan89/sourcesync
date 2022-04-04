@@ -50,7 +50,7 @@ public class SourceSyncConfig {
             public void run() {
                 configDialog = new CenterDialog();
                 configDialog.setTitle("sourcesync connection configuration");
-                configDialog.setIconImage(new ImageIcon(getClass().getClassLoader().getResource("/sourcesync.png")).getImage());
+                configDialog.setIconImage(new ImageIcon(getClass().getClassLoader().getResource("sourcesync.png")).getImage());
                 lstTargets.setModel(new DefaultListModel<String>());
 
                 FormLayout layout = new FormLayout("fill:300:grow(1)", "fill:300:grow(1)");
