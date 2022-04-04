@@ -1,4 +1,5 @@
 **Version 2.0**
+- drop support for builds before IntelliJ IDEA 2021.1
 - fixed issues with resource location due to trailing "/"
 - removed usages of scheduled to be removed API
 

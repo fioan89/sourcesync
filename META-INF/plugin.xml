@@ -1,4 +1,4 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>org.wavescale.sourcesync</id>
     <name>Source Synchronizer</name>
     <version>2.0</version>
@@ -20,7 +20,8 @@
     <change-notes><![CDATA[
       <h3>Changes in version 2.0:</h3>
       <ul>
-        <li>fixed issues with resource location due to trailing "/"<li>
+        <li>drop support for builds before IntelliJ IDEA 2021.1</li>
+        <li>fixed issues with resource location due to trailing "/"</li>
         <li>removed usages of scheduled to be removed API</li>
       </ul>
       <h3>Changes in version 1.9:</h3>
@@ -50,7 +51,7 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="123.72"/>
+    <idea-version since-build="211"/>
 
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
@@ -83,15 +84,14 @@
 
         </action>
         <action id="actionLocalFileToRemote" class="org.wavescale.sourcesync.action.ActionLocalFileToRemote"
-                text="Sync this file to remote target" description="Upload current local file to remote location"
-                keymap="">
+                text="Sync This File to Remote Target" description="Upload current local file to remote location">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="Github.Create.Gist"/>
             <add-to-group group-id="EditorTabPopupMenu" anchor="after" relative-to-action="Github.Create.Gist"/>
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F1"/>
         </action>
 
         <action id="actionChangedFilesToRemote" class="org.wavescale.sourcesync.action.ActionChangedFilesToRemote"
-                text="Sync changed files to remote target" description="Sync local changed files to remote target.">
+                text="Sync Changed Files to Remote Target" description="Sync local changed files to remote target.">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after"
                           relative-to-action="org.wavescale.sourcesync.action.ActionProjectConnectionConfig"/>
             <add-to-group group-id="EditorPopupMenu" anchor="after"
@@ -104,7 +104,7 @@
         </action>
 
         <action id="actionSelectedFilesToRemote" class="org.wavescale.sourcesync.action.ActionSelectedFilesToRemote"
-                text="Sync selected files to remote target" description="Sync localy selected files to remote target">
+                text="Sync Selected Files to Remote Target" description="Sync locally selected files to remote target">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after"
                           relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote"/>
             <add-to-group group-id="EditorPopupMenu" anchor="after"
