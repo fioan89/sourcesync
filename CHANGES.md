@@ -1,3 +1,6 @@
+**Version 2.0**
+- fixed issues with resource location due to trailing "/"
+
 **Version 1.9**
 * support for OS X 10.11
 * fix support for passwordless ssh for sftp connections

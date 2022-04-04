@@ -18,6 +18,10 @@
       ]]></description>
 
     <change-notes><![CDATA[
+      <h3>Changes in version 2.0:</h3>
+      <ul>
+        <li>fixed issues with resource location due to trailing "/"<li>
+      </ul>
       <h3>Changes in version 1.9:</h3>
       <ul>
         <li>Add support for OS X 10.11</li>
