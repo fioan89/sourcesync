@@ -36,7 +36,6 @@ public class SourceSyncConfig {
     private JButton btnAdd;
     private JButton btnRemove;
     private JPanel pnConfig;
-    private JLabel lbTarget;
     private JButton okButton;
     private JButton applyButton;
     private JPanel panelOfActionButtons;
@@ -51,7 +50,7 @@ public class SourceSyncConfig {
             @Override
             public void run() {
                 configDialog = new CenterDialog();
-                configDialog.setTitle("sourcesync connection configuration");
+                configDialog.setTitle("Sourcesync Configurations");
                 configDialog.setIconImage(new ImageIcon(getClass().getClassLoader().getResource("sourcesync.png")).getImage());
                 lstTargets.setModel(new DefaultListModel<String>());
 
@@ -207,7 +206,6 @@ public class SourceSyncConfig {
             int index = selectionModel.getMinSelectionIndex();
             if (lstTargets.getModel() != null && index >= 0) {
                 String target = lstTargets.getModel().getElementAt(index);
-                lbTarget.setText(target);
                 ConnectionConfiguration connectionConfiguration = ConfigConnectionFactory.getInstance().getConnectionConfiguration(target);
                 uploadConfigurationFromPersistance(connectionConfiguration);
             }
@@ -249,7 +247,6 @@ public class SourceSyncConfig {
                             lstTargets.setSelectedIndex(index - 1);
                             pnConfig.setVisible(true);
                         } else {
-                            lbTarget.setText("");
                             pnConfig.setVisible(false);
                         }
                     }
