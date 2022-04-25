@@ -1,7 +1,6 @@
 package org.wavescale.sourcesync.ui;
 
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
+import com.intellij.uiDesigner.core.GridConstraints;
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 import org.wavescale.sourcesync.api.ConnectionConstants;
 import org.wavescale.sourcesync.api.PasswordlessSSH;
@@ -40,6 +39,9 @@ public class SourceSyncConfig {
     private JLabel lbTarget;
     private JButton okButton;
     private JButton applyButton;
+    private JPanel panelOfActionButtons;
+    private JPanel panelOfPersistenceButtons;
+    private JPanel contentPanel;
 
     private ConnectionConfigPanel connectionPanel;
     private JDialog configDialog;
@@ -53,11 +55,8 @@ public class SourceSyncConfig {
                 configDialog.setIconImage(new ImageIcon(getClass().getClassLoader().getResource("sourcesync.png")).getImage());
                 lstTargets.setModel(new DefaultListModel<String>());
 
-                FormLayout layout = new FormLayout("fill:300:grow(1)", "fill:300:grow(1)");
-                CellConstraints cc = new CellConstraints();
-                pnConfig.setLayout(layout);
                 connectionPanel = ConfigPanelFactory.getInstance().getConnectionConfigPanel();
-                pnConfig.add(connectionPanel.getConfigPanel(), cc.xy(1, 1));
+                pnConfig.add(connectionPanel.getConfigPanel(), new GridConstraints());
                 pnConfig.setVisible(false);
 
                 configDialog.setContentPane(configPanel);
