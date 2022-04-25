@@ -1,58 +1,7 @@
 <idea-plugin>
     <id>org.wavescale.sourcesync</id>
     <name>Source Synchronizer</name>
-    <version>2.0</version>
-    <vendor email="fioan89@gmail.com" url="">wavescale.org</vendor>
-
-    <description><![CDATA[
-      <br>
-      <a href="https://github.com/fioan89/sourcesync" rel="nofollow">GitHub</a> |
-      <a href="https://github.com/fioan89/sourcesync/issues" rel="nofollow">Issues</a> | Donate (
-      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=E6F2NPVCNZK4C&amp;lc=US&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted" rel="nofollow">PayPal)</a>
-      <br>
-      <br>
-      Source Synchronizer is a powerful plugin for performing one-way file synchronization for your project.
-      <br>It synchronizes the remote target so that it will match your local project. It features support for
-      FTP, FTPS, SFTP and SCP protocols. You can filter the uploaded files, or you can simply opt
-      to sync out only selected or changed files.
-      ]]></description>
-
-    <change-notes><![CDATA[
-      <h3>Changes in version 2.0:</h3>
-      <ul>
-        <li>drop support for builds before IntelliJ IDEA 2021.1</li>
-        <li>fixed issues with resource location due to trailing "/"</li>
-        <li>removed usages of scheduled to be removed API</li>
-      </ul>
-      <h3>Changes in version 1.9:</h3>
-      <ul>
-        <li>Add support for OS X 10.11</li>
-        <li>Fix passwordless SSH for SFTP connections</li>
-        <li>Add support for passphrase keys for SFTP connections</li>
-        <li>Add support for passwordless SCP connections</li>
-        <li>Fix issues with known_hosts file on Windows machines</li>
-        <li>Fix issue with hidden files and directories not showing through private key file chooser</li>
-        <li>Fix issue with private key file chooser forcing you to select the public key instead of the private one</li>
-        <li>Fix issues with configuration and target window not getting on top of the IDE</li>
-        <li>Make the configuration, target and module selection window to always open in the center of IDE</li>
-        </p>
-        <li><b>All previous configurations will be lost!</b></li>
-      </ul>
-      </br></br>
-      <h3>Changes in version 1.8:</h3>
-      <ul>
-        <li>Add support for IntelliJ IDEA 15.x</li>
-        <li>Add support for PyCharm 5.x</li>
-        <li>Fix upload of files over FTPS connections using explicit TLS security</li>
-        <li>Set the configuration window to be always on top</li>
-      </ul>
-
-      ]]>
-    </change-notes>
-
-    <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="211"/>
-
+    <vendor email="fioan89@gmail.com" url="">Ioan Faur</vendor>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
