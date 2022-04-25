@@ -1,13 +1,3 @@
-package org.wavescale.sourcesync.ui;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.io.File;
-
 /**
  * ****************************************************************************
  * Copyright (c) 2014-2107 Faur Ioan-Aurel.                                     *
@@ -19,6 +9,16 @@ import java.io.File;
  * For any issues or questions send an email at: fioan89@gmail.com              *
  * *****************************************************************************
  */
+package org.wavescale.sourcesync.ui;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.File;
+
 public class ConnectionConfigPanel implements ItemListener {
     private final JFileChooser certificateChooser = new JFileChooser();
     private JPanel panel1;
@@ -150,7 +150,6 @@ public class ConnectionConfigPanel implements ItemListener {
     public void setRootPath(String rootPath) {
         tfRootPath.setText(rootPath);
     }
-
 
     public String getUserName() {
         return tfUserName.getText();
