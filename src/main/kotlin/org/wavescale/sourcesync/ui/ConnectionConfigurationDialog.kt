@@ -69,7 +69,8 @@ class ConnectionConfigurationDialog(project: Project) : DialogWrapper(project, t
         title = SourcesyncBundle.message("connectionConfigurationDialogTitle")
     }
 
-    override fun createCenterPanel(): JComponent? {
+    @Suppress("UnstableApiUsage")
+    override fun createCenterPanel(): JComponent {
         val splitter = JBSplitter()
         val leftPanel = leftSidePanel()
         leftPanel.border = IdeBorderFactory.createBorder(SideBorder.RIGHT)
