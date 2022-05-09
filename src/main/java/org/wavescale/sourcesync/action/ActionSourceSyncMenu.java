@@ -1,8 +1,8 @@
 package org.wavescale.sourcesync.action;
 
+import org.wavescale.sourcesync.ui.ConnectionConfigurationDialog;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import org.wavescale.sourcesync.ui.SourceSyncConfig;
 
 /**
  * ****************************************************************************
@@ -16,9 +16,11 @@ import org.wavescale.sourcesync.ui.SourceSyncConfig;
  * *****************************************************************************
  */
 
-public class ActionSourceSyncMenu extends AnAction {
-    public void actionPerformed(AnActionEvent e) {
-        SourceSyncConfig configForm = new SourceSyncConfig();
+public class ActionSourceSyncMenu extends AnAction
+{
+    public void actionPerformed(AnActionEvent e)
+    {
+        new ConnectionConfigurationDialog(e.getProject()).show();
     }
 
 }
