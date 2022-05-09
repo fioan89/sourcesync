@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.CollectionListModel
-import com.intellij.ui.CommonActionsPanel
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.SideBorder
@@ -39,7 +38,7 @@ import javax.swing.ScrollPaneConstants
 import javax.swing.SwingConstants
 import javax.swing.border.Border
 
-class ConnectionConfigurationDialog(project: Project) : DialogWrapper(project, true), CommonActionsPanel.Listener {
+class ConnectionConfigurationDialog(project: Project) : DialogWrapper(project, true) {
     private var listModel = CollectionListModel<String>()
     private var configurationsList = JBList(listModel)
 
