@@ -7,6 +7,7 @@
 
 ### Changed
 - migrated UI layout from JGoodie's `FormLayout` to java.awt + IntelliJ layouts
+- migrated most of the dialogs and panels to programmatic code. Reduces the UI Designer footprint
 
 ### Removed
 - support for builds before IntelliJ IDEA 2021.1
