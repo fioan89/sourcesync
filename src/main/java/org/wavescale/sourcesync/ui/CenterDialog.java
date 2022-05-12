@@ -12,10 +12,6 @@ import java.awt.*;
 
 public class CenterDialog extends JDialog {
 
-    public CenterDialog() {
-        super();
-    }
-
     public CenterDialog(Window parent) {
         super(parent);
     }

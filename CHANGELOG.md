@@ -8,11 +8,14 @@
 ### Changed
 - migrated UI layout from JGoodie's `FormLayout` to java.awt + IntelliJ layouts
 - migrated most of the dialogs and panels to programmatic code. Reduces the UI Designer footprint
+- connection configuration  and selection dialogs can now be done from a single place, a combo
+  box placed in the toolbar. Similar to run/edit configurations.
 
 ### Removed
 - support for builds before IntelliJ IDEA 2021.1
 - removed usages of scheduled to be removed API
 - support for builds with Java 1.6
+- context menus to create and select connection configurations 
 
 ### Fixed
 - fixed issues with resource location due to trailing "/"
