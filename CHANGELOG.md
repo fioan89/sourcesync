@@ -4,6 +4,7 @@
 - support for semver
 - build with Kotlin&Gradle
 - support for Java 11
+- new menu icons
 
 ### Changed
 - migrated UI layout from JGoodie's `FormLayout` to java.awt + IntelliJ layouts

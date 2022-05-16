@@ -11,6 +11,7 @@ import com.intellij.openapi.actionSystem.Presentation
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction
 
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.ui.IconManager
 import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory
 import org.wavescale.sourcesync.factory.ConnectionConfig
@@ -37,7 +38,7 @@ class ConnectionConfigurationsComboBoxAction : ComboBoxAction() {
     }
 
     override fun update(e: AnActionEvent) {
-        val projectName = e.getData(CommonDataKeys.PROJECT)!!.name
+        val projectName = e.getData(CommonDataKeys.PROJECT)?.name
         e.presentation.apply {
             isEnabled = true
             text = ConnectionConfig.getInstance().getAssociationFor(projectName)
@@ -57,9 +58,11 @@ class ConnectionConfigurationsComboBoxAction : ComboBoxAction() {
     }
 
     internal class SourceSyncConfigAction(private val configuration: String) : DumbAwareAction() {
+
         init {
             val presentation = templatePresentation
             presentation.setText(configuration, false)
+            presentation.icon = IconManager.getInstance().getIcon("sourcesync.svg", SourceSyncConfigAction::class.java)
         }
 
         override fun actionPerformed(e: AnActionEvent) {
