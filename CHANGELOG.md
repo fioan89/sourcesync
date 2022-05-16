@@ -20,7 +20,7 @@
 
 ### Fixed
 - fixed issues with resource location due to trailing "/"
-
+- remove all project associations when there is no Sourcesync connection available 
 
 ## [1.9.0]
 ### Added

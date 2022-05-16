@@ -35,6 +35,7 @@ import org.wavescale.sourcesync.config.FTPSConfiguration
 import org.wavescale.sourcesync.config.SCPConfiguration
 import org.wavescale.sourcesync.config.SFTPConfiguration
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory
+import org.wavescale.sourcesync.factory.ConnectionConfig
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.ActionEvent
@@ -189,6 +190,12 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
                             // select the bottom index
                             if (index > 0) {
                                 configurationsList.selectedIndex = index - 1
+                            }
+                        }
+                        if (listModel.size == 0) {
+                            ConnectionConfig.getInstance().apply {
+                                removeAssociations()
+                                saveModuleAssociatedConn()
                             }
                         }
                     }.createPanel()

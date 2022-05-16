@@ -58,6 +58,10 @@ public class ConnectionConfig {
         return projectToConnection.get(projectName);
     }
 
+    public void removeAssociations() {
+        projectToConnection.clear();
+    }
+
     @SuppressWarnings("unchecked")
     private void tryLoadModulesAssociatedConn() {
         // try to load the persistence file.
