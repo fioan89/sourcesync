@@ -19,7 +19,7 @@ http://www.jetbrains.com/idea/webhelp/installing-updating-and-uninstalling-repos
 
 ## How to use it
 
-**Sourcesync** is pretty easy to use. First of all you need to configure a remote connection so that the plugin will know where to sync the files. To do so please access the *Tools* menu, and then **Source Sync** like in the below picture:  
+First you need to configure a remote connection so that the plugin will know where to sync the files. To do so please access the *Tools* menu, and then **Source Sync** like in the below picture:  
 
 ![Tools --> Source Sync](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/tools_menu.png)  
 

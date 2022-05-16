@@ -9,13 +9,14 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.Presentation
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction
-
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.ui.IconManager
 import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory
 import org.wavescale.sourcesync.factory.ConnectionConfig
 import org.wavescale.sourcesync.ui.ConnectionConfigurationDialog
+import java.awt.Component
+import java.awt.event.MouseEvent
 import javax.swing.JComponent
 
 class ConnectionConfigurationsComboBoxAction : ComboBoxAction() {
@@ -37,11 +38,30 @@ class ConnectionConfigurationsComboBoxAction : ComboBoxAction() {
         return ActionManager.getInstance().getAction("actionSourceSyncMenu")
     }
 
+    private fun performWhenButton(src: Component, place: String) {
+        val manager = ActionManager.getInstance()
+        manager.tryToExecute(
+            manager.getAction("actionSourceSyncMenu"),
+            MouseEvent(src, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), 0, 0, 0, 0, false, 0),
+            src, place, true
+        )
+    }
+
     override fun update(e: AnActionEvent) {
         val projectName = e.getData(CommonDataKeys.PROJECT)?.name
-        e.presentation.apply {
-            isEnabled = true
-            text = ConnectionConfig.getInstance().getAssociationFor(projectName)
+        val associationFor = ConnectionConfig.getInstance().getAssociationFor(projectName)
+        if (associationFor.isNullOrBlank()) {
+            e.presentation.apply {
+                isEnabled = true
+                text = SourcesyncBundle.message("sourcesyncAddConfigurations")
+                icon = null
+            }
+        } else {
+            e.presentation.apply {
+                isEnabled = true
+                text = ConnectionConfig.getInstance().getAssociationFor(projectName)
+                icon = IconManager.getInstance().getIcon("sourcesync.svg", ConnectionConfigurationsComboBox::class.java)
+            }
         }
     }
 
@@ -73,7 +93,6 @@ class ConnectionConfigurationsComboBoxAction : ComboBoxAction() {
         }
 
         private fun associateProjectWithConnection(projectName: String) {
-
             ConnectionConfig.getInstance().associateProjectWithConnection(projectName, configuration)
             ConnectionConfig.getInstance().saveModuleAssociatedConn()
         }
