@@ -10,28 +10,39 @@ The plugin replicates local changes on the remote infrastructure with support fo
 - FTPS
 <!-- Plugin description end -->
 
-## Installation
+## How to install
 
-Sourcesync Plugin can be found at http://plugins.jetbrains.com/plugin/7374?pr=idea_ce
+Sourcesync plugin can be found at http://plugins.jetbrains.com/plugin/7374?pr=idea_ce
 
 Details about how to install a plugin from JetBrains plugin repository can be found at: 
 http://www.jetbrains.com/idea/webhelp/installing-updating-and-uninstalling-repository-plugins.html
 
 ## How to use it
 
-First you need to configure a remote connection so that the plugin will know where to sync the files. To do so please access the *Tools* menu, and then **Source Sync** like in the below picture:  
+Remote connection configurations can be added in the combo box placed in the **Navigation bar** at the right of **Run/Debug Configuration** combo box.
 
-![Tools --> Source Sync](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/tools_menu.png)  
+### Create Sourcesync remote connection configurations
 
-Hit Add to create connections or remove them:
-![Add / Remove connections](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/new_connection.png)  
+1. With the Navigation bar visible (**View | Appearance | Navigation Bar**), choose **Edit Sourcesync Configurations** from the remote connection configuration selector or press
+  `Ctrl + Shift + D`.
+   ![Tools --> Source Sync](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/tools_menu.png)
+2. In the *Sourcesync Remote Configurations* dialog, click the **Add** icon (+) on the toolbar or press `Alt + Insert`
+   ![Add / Remove connections](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/new_connection.png)
+3. Input a remote connection name and the protocol to use
+4. Close the dialog and edit the connection details, hit *Apply* in order to save the configurations and then *OK* to exit the window.  
 
-After you are done creating/editing the connection, hit *Apply* in order to save the configurations and then *OK* to exit the window.  
-Now - after you created the configuration you need to specify which connection you want to use for the current project. For that matter please select you project in your *Project View* (Alt + 1 shortcut to bring the view forward) and then right click on the desired project and select *Project Connection Configuration*  
+### Select the remote configuration
+
+The remote configurations created in the previous step will be available for all projects. But **Sourcesync** needs a single connection
+to be associated with a project:
+1. With the Navigation bar visible (**View | Appearance | Navigation Bar**), click the drop-down icon in the **Sourcesync Configurations** combo box.
+2. Select one configuration listed under `Sourcesync Configurations` section.
 
 ![Right click on the desired project --> Project Connection Configuration](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/select_connection.png)  
 
-Now that you have done this step you are up and ready to sync files. Just right click on the project, module, or even on a opened file. You will be presented with three options like in the below screenshot:  
+### Synchronize files
+
+Right-click on the project, module, or even on an opened file. You will be presented with three options like in the below screenshot:  
 
 ![Sync files](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/sync_files.png)  
 
