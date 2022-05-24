@@ -25,7 +25,7 @@ Remote connection configurations can be added in the combo box placed in the **N
 
 1. With the Navigation bar visible (**View | Appearance | Navigation Bar**), choose **Edit Sourcesync Configurations** from the remote connection configuration selector or press
   `Ctrl + Shift + D`.
-   ![Tools --> Source Sync](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/tools_menu.png)
+   ![Tools --> Source Sync](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/edit_remote_configurations_combo_box.png)
 2. In the *Sourcesync Remote Configurations* dialog, click the **Add** icon (+) on the toolbar or press `Alt + Insert`
    ![Add / Remove connections](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/new_connection.png)
 3. Input a remote connection name and the protocol to use
