@@ -5,6 +5,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
+import org.wavescale.sourcesync.SourcesyncBundle;
 
 public class TargetLocation extends CenterDialog {
     private JPanel contentPane;
@@ -15,7 +16,7 @@ public class TargetLocation extends CenterDialog {
 
     public TargetLocation(Window parent) {
         super(parent);
-        setTitle("Add target");
+        setTitle(SourcesyncBundle.message("newRemoteConnectionConfigurationDialogTitle"));
         setContentPane(contentPane);
         setModal(true);
         setModalityType(ModalityType.APPLICATION_MODAL);
@@ -52,9 +53,9 @@ public class TargetLocation extends CenterDialog {
             }
         });
 
-        this.setSize(400, 140);
+        this.setMinimumSize(new Dimension(500, 140));
         centerOnParent();
-        this.setResizable(false);
+        this.setResizable(true);
         this.setVisible(true);
     }
 
