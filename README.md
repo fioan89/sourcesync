@@ -25,9 +25,9 @@ Remote connection configurations can be added in the combo box placed in the **N
 
 1. With the Navigation bar visible (**View | Appearance | Navigation Bar**), choose **Edit Sourcesync Configurations** from the remote connection configuration selector or press
   `Ctrl + Shift + D`.
-   ![Tools --> Source Sync](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/edit_remote_configurations_combo_box.png)
+   ![Navigation Bar --> Edit Sourcesync Configurations](https://raw.github.com/fioan89//sourcesync/master/src/main/resources/sourcesync/edit_remote_configurations_combo_box.png)
 2. In the *Sourcesync Remote Configurations* dialog, click the **Add** icon (+) on the toolbar or press `Alt + Insert`
-   ![Add / Remove connections](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/new_connection.png)
+   ![Add / Remove connections](https://raw.github.com/fioan89/sourcesync/master/src/main/resources/sourcesync/new_connection.png)
 3. Input a remote connection name and the protocol to use
 4. Close the dialog and edit the connection details, hit *Apply* in order to save the configurations and then *OK* to exit the window.  
 
@@ -38,13 +38,13 @@ to be associated with a project:
 1. With the Navigation bar visible (**View | Appearance | Navigation Bar**), click the drop-down icon in the **Sourcesync Configurations** combo box.
 2. Select one configuration listed under `Sourcesync Configurations` section.
 
-![Right click on the desired project --> Project Connection Configuration](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/select_connection.png)  
+![Navigation Bar --> drop-down icon Sourcesyn Configurations](https://raw.github.com/fioan89/sourcesync/master/src/main/resources/sourcesync/select_connection.png)  
 
 ### Synchronize files
 
 Right-click on the project, module, or even on an opened file. You will be presented with three options like in the below screenshot:  
 
-![Sync files](https://raw.github.com/fioan89/sourcesync/master/resources/sourcesync/sync_files.png)  
+![Sync files](https://raw.github.com/fioan89/sourcesync/master/src/main/resources/sourcesync/sync_files.png)  
 
 ## Passwordless SSH
 
