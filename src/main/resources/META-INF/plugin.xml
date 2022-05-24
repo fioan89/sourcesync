@@ -1,0 +1,74 @@
+<idea-plugin>
+    <id>org.wavescale.sourcesync</id>
+    <name>Source Synchronizer</name>
+    <vendor email="fioan89@gmail.com" url="">Ioan Faur</vendor>
+
+    <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products -->
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.vcs</depends>
+
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
+
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
+
+    <actions>
+        <!-- Add your action here -->
+        <action id="actionSourceSyncMenu" class="org.wavescale.sourcesync.action.ActionSourceSyncMenu"
+                text="Edit Sourcesync Configurations">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift D" />
+        </action>
+
+        <action id="actionConnectionConfigurationsComboBox" class="org.wavescale.sourcesync.action.ConnectionConfigurationsComboBoxAction"
+                text="Sourcesync Configurations"
+                description="Open 'Sourcesync configurations' dialog"
+                icon="/sourcesync.svg">
+            <add-to-group group-id="NavBarToolBar" />
+        </action>
+
+        <action id="actionLocalFileToRemote" class="org.wavescale.sourcesync.action.ActionLocalFileToRemote"
+                text="Sync This File to Remote Target" description="Upload current local file to remote location"
+                icon="/sourcesync.svg">
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="Github.Create.Gist" />
+            <add-to-group group-id="EditorTabPopupMenu" anchor="after" relative-to-action="Github.Create.Gist" />
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F1" />
+
+        </action>
+
+        <action id="actionChangedFilesToRemote" class="org.wavescale.sourcesync.action.ActionChangedFilesToRemote"
+                text="Sync Changed Files to Remote Target" description="Sync local changed files to remote target."
+                icon="/sourcesync.svg">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="after"
+                          relative-to-action="org.wavescale.sourcesync.action.ActionProjectConnectionConfig" />
+            <add-to-group group-id="EditorPopupMenu" anchor="after"
+                          relative-to-action="org.wavescale.sourcesync.action.ActionLocalFileToRemote" />
+            <add-to-group group-id="EditorTabPopupMenu" anchor="after"
+                          relative-to-action="org.wavescale.sourcesync.action.ActionLocalFileToRemote" />
+            <add-to-group group-id="ChangesViewPopupMenu" anchor="after" relative-to-action="ChangesView.Diff" />
+
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F2" />
+        </action>
+
+        <action id="actionSelectedFilesToRemote" class="org.wavescale.sourcesync.action.ActionSelectedFilesToRemote"
+                text="Sync Selected Files to Remote Target" description="Sync locally selected files to remote target"
+                icon="/sourcesync.svg">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="after"
+                          relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote" />
+            <add-to-group group-id="EditorPopupMenu" anchor="after"
+                          relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote" />
+            <add-to-group group-id="EditorTabPopupMenu" anchor="after"
+                          relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote" />
+            <add-to-group group-id="ChangesViewPopupMenu" anchor="after" relative-to-action="ChangesView.Diff" />
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F3" />
+        </action>
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+</idea-plugin>
