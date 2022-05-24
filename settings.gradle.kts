@@ -1,1 +1,1 @@
-rootProject.name = "Sourcesync Plugin"
+rootProject.name = "sourcesync"
