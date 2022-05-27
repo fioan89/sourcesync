@@ -16,8 +16,10 @@ import org.wavescale.sourcesync.factory.ConfigConnectionFactory
 import org.wavescale.sourcesync.factory.ConnectionConfig
 import org.wavescale.sourcesync.ui.ConnectionConfigurationDialog
 import java.awt.Component
+import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JComponent
+import javax.swing.SwingUtilities
 
 class ConnectionConfigurationsComboBoxAction : ComboBoxAction() {
     override fun createPopupActionGroup(button: JComponent?): DefaultActionGroup {
@@ -67,7 +69,24 @@ class ConnectionConfigurationsComboBoxAction : ComboBoxAction() {
 
 
     inner class ConnectionConfigurationsComboBox(presentation: Presentation) : ComboBoxButton(presentation) {
-        override fun doShiftClick() {
+        init {
+
+            addMouseListener(object : MouseAdapter() {
+                override fun mousePressed(e: MouseEvent) {
+                    if (performClickOnMousePress()) {
+                        if (SwingUtilities.isLeftMouseButton(e)) {
+                            e.consume()
+                            if (e.isShiftDown) {
+                                onShiftClick()
+                            }
+                        }
+                    }
+                }
+            })
+        }
+
+        // TODO remove the listener and override doShiftClick when is no longer experimental
+        fun onShiftClick() {
             val context = DataManager.getInstance().getDataContext(this)
             val project = CommonDataKeys.PROJECT.getData(context)
             if (project != null) {
