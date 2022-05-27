@@ -92,7 +92,6 @@ class ConnectionConfigurationsComboBoxAction : ComboBoxAction() {
             if (project != null) {
                 ConnectionConfigurationDialog(project).show()
             }
-            super.doShiftClick()
         }
     }
 
