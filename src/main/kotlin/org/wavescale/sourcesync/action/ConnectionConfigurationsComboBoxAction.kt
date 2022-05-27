@@ -73,12 +73,10 @@ class ConnectionConfigurationsComboBoxAction : ComboBoxAction() {
 
             addMouseListener(object : MouseAdapter() {
                 override fun mousePressed(e: MouseEvent) {
-                    if (performClickOnMousePress()) {
-                        if (SwingUtilities.isLeftMouseButton(e)) {
-                            e.consume()
-                            if (e.isShiftDown) {
-                                onShiftClick()
-                            }
+                    if (SwingUtilities.isLeftMouseButton(e)) {
+                        e.consume()
+                        if (e.isShiftDown) {
+                            onShiftClick()
                         }
                     }
                 }
