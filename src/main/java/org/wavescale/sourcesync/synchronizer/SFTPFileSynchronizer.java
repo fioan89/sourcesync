@@ -118,20 +118,22 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
         } catch (SftpException e) {
             EventDataLogger.logError("On remote we could not change directory into root: " + remotePath.getRoot(), this.getProject());
         }
-        for (Path current : remotePath) {
-            String location = current.toString();
-            try {
-                channelSftp.mkdir(location);
-            } catch (SftpException e) {
-                // this dir probably exist so just ignore
-            }
-            try {
-                channelSftp.cd(location);
-            } catch (SftpException e) {
-                // probably it doesn't exist or maybe no permission
-                EventDataLogger.logError("Remote dir <b>" + remotePath +
-                        "</b> might not exist or you don't have permission on this path!", this.getProject());
-                return;
+        if (remotePath.getParent() != null) {
+            for (Path current : remotePath.getParent()) {
+                String location = current.toString();
+                try {
+                    channelSftp.mkdir(location);
+                } catch (SftpException e) {
+                    // this dir probably exist so just ignore
+                }
+                try {
+                    channelSftp.cd(location);
+                } catch (SftpException e) {
+                    // probably it doesn't exist or maybe no permission
+                    EventDataLogger.logError("Remote dir <b>" + remotePath +
+                            "</b> might not exist or you don't have permission on this path!", this.getProject());
+                    return;
+                }
             }
         }
 
