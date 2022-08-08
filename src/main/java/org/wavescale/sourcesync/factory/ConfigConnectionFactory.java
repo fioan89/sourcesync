@@ -12,9 +12,15 @@ package org.wavescale.sourcesync.factory;
  * *****************************************************************************
  */
 
+import com.intellij.openapi.diagnostic.Logger;
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +30,7 @@ import java.util.Set;
  * during the runtime.
  */
 public class ConfigConnectionFactory {
+    private static final Logger logger = Logger.getInstance(ConfigConnectionFactory.class);
     private static final ConfigConnectionFactory CONFIG_CONNECTION_FACTORY = new ConfigConnectionFactory();
     private static final String CONNECTIONS_FILE = ".connectionconfig.ser";
     String fileSeparator;
@@ -73,30 +80,20 @@ public class ConfigConnectionFactory {
     private void initComponent() {
         // try to load the persistence data.
         if (new File(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE)).exists()) {
-            try {
-                FileInputStream inputStream = new FileInputStream(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE));
-                ObjectInputStream in = new ObjectInputStream(inputStream);
+            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE)))) {
                 connectionConfigurationMap = (Map<String, ConnectionConfiguration>) in.readObject();
-                in.close();
-                inputStream.close();
-            } catch (IOException i) {
-                i.printStackTrace();
-            } catch (ClassNotFoundException c) {
-                c.printStackTrace();
+            } catch (IOException | ClassNotFoundException e) {
+                logger.warn("Could not load connections because", e);
             }
         }
     }
 
     public void saveConnections() {
         // try to write the persistence data
-        try {
-            FileOutputStream outputStream = new FileOutputStream(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE));
-            ObjectOutputStream out = new ObjectOutputStream(outputStream);
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE)))) {
             out.writeObject(connectionConfigurationMap);
-            out.close();
-            outputStream.close();
-        } catch (IOException i) {
-            i.printStackTrace();
+        } catch (IOException e) {
+            logger.warn("Could not save connections because", e);
         }
     }
 }

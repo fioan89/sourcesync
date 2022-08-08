@@ -66,7 +66,7 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
     private val lbConnType = JLabel("------")
     private val tfHost = JTextField()
     private val tfPort = JTextField("21").apply { horizontalAlignment = SwingConstants.CENTER }
-    private val tfProjectBasePath = JTextField("/").apply { horizontalAlignment = SwingConstants.LEFT }
+    private val tfWorkspaceBasePath = JTextField("/").apply { horizontalAlignment = SwingConstants.LEFT }
     private val cbUseSSHKeys = JCheckBox(SourcesyncBundle.message("useSSHKeyCheckBox"), false)
     private val tfCertFile = JTextField()
     private val btnBrowse = JButton(SourcesyncBundle.message("browseButton"))
@@ -109,9 +109,9 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
             }
         }
 
-        cbUseSSHKeys.addItemListener(updateConnectionAuthFormsCallback())
-        cbSSHPassphrase.addItemListener(updateConnectionAuthFormsCallback())
-
+        cbUseSSHKeys.addItemListener(sshKeysCallback())
+        cbSSHPassphrase.addItemListener(sshKeysPassphraseCallback())
+        enableCertificateWidgets(false)
         configurationsList.selectionModel.addListSelectionListener(highlightConnectionConfigurationCallback())
 
         val connectionFactory = ConfigConnectionFactory.getInstance()
@@ -122,14 +122,24 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
         tfCertFile.isEnabled = isEnabled
         btnBrowse.isEnabled = isEnabled
         cbSSHPassphrase.isEnabled = isEnabled
-        pfUserPassword.isEnabled = isEnabled
+        pfUserPassword.isEnabled = !isEnabled
     }
 
-    private fun updateConnectionAuthFormsCallback(): (e: ItemEvent) -> Unit = {
+    private fun sshKeysCallback(): (e: ItemEvent) -> Unit = {
         val source = it.source as JCheckBox
-        enableCertificateWidgets(source.isEnabled)
-        // the password field can be enabled only when ssh with password is configured
-        if (cbUseSSHKeys.isSelected && cbSSHPassphrase.isSelected) lbPassword.text = SourcesyncBundle.message("passphraseLabel") else lbPassword.text = SourcesyncBundle.message("passwordLabel")
+        enableCertificateWidgets(source.isSelected)
+        if (!cbUseSSHKeys.isSelected) {
+            cbSSHPassphrase.isSelected = false
+        }
+    }
+
+    private fun sshKeysPassphraseCallback(): (e: ItemEvent) -> Unit = {
+        if (cbUseSSHKeys.isSelected && cbSSHPassphrase.isSelected) {
+            lbPassword.text = SourcesyncBundle.message("passphraseLabel")
+        } else {
+            lbPassword.text = SourcesyncBundle.message("passwordLabel")
+        }
+        pfUserPassword.isEnabled = (cbUseSSHKeys.isSelected && cbSSHPassphrase.isSelected) || (!cbUseSSHKeys.isSelected && !cbSSHPassphrase.isSelected)
     }
 
     private fun highlightConnectionConfigurationCallback(): (event: ListSelectionEvent) -> Unit = {
@@ -238,7 +248,7 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
                     add(tfPort, GridConstraints().apply { row = 1; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
 
                     add(JLabel(SourcesyncBundle.message("workspaceDirectoyLabel")), GridConstraints().apply { row = 2; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
-                    add(tfProjectBasePath, GridConstraints().apply { row = 2; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
+                    add(tfWorkspaceBasePath, GridConstraints().apply { row = 2; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
                     // empty row
                     add(JPanel(), GridConstraints().apply { row = 3; column = 0; colSpan = 2; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
 
@@ -338,16 +348,16 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
      * @return a `String` representing a path on the remote target.
      */
     private fun getRootPath(): String? {
-        return tfProjectBasePath.text
+        return tfWorkspaceBasePath.text
     }
 
     /**
-     * Sets the target root path. This is the root where we will sync files.
+     * Sets the target base path. This is the place where we will sync files.
      *
-     * @param projectBasePath a `String` representing a path on the remote target.
+     * @param workspaceBasePath a `String` representing a path on the remote target.
      */
-    private fun setProjectBasePath(projectBasePath: String?) {
-        tfProjectBasePath.text = projectBasePath
+    private fun setWorkspaceBasePath(workspaceBasePath: String?) {
+        tfWorkspaceBasePath.text = workspaceBasePath
     }
 
     private fun getUserName(): String? {
@@ -525,7 +535,7 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
     private fun downloadConfigurationToPersistence(connectionConfiguration: ConnectionConfiguration?) {
         if (connectionConfiguration != null) {
             connectionConfiguration.host = getHost()
-            connectionConfiguration.projectBasePath = getRootPath()
+            connectionConfiguration.workspaceBasePath = getRootPath()
             connectionConfiguration.port = getPort()
             connectionConfiguration.userName = getUserName()
             connectionConfiguration.userPassword = getUserPassword()
@@ -556,7 +566,7 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
         if (connectionConfiguration != null) {
             setConnectionType(connectionConfiguration.connectionType)
             setHost(connectionConfiguration.host)
-            setProjectBasePath(connectionConfiguration.projectBasePath)
+            setWorkspaceBasePath(connectionConfiguration.workspaceBasePath)
             setPort(connectionConfiguration.port)
             setUserName(connectionConfiguration.userName)
             setUserPassword(connectionConfiguration.userPassword)

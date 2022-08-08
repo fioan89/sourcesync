@@ -29,7 +29,7 @@ public abstract class ConnectionConfiguration implements Serializable {
     protected String host;
     protected int port;
     protected int simultaneousJobs;
-    protected String projectBasePath;
+    protected String workspaceBasePath;
     protected String userName;
     protected String userPassword;
     protected boolean preserveTime;
@@ -94,12 +94,12 @@ public abstract class ConnectionConfiguration implements Serializable {
         this.port = port;
     }
 
-    public String getProjectBasePath() {
-        return projectBasePath;
+    public String getWorkspaceBasePath() {
+        return workspaceBasePath;
     }
 
-    public void setProjectBasePath(String projectBasePath) {
-        this.projectBasePath = projectBasePath;
+    public void setWorkspaceBasePath(String workspaceBasePath) {
+        this.workspaceBasePath = workspaceBasePath;
     }
 
     public String getUserName() {

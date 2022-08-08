@@ -24,7 +24,7 @@ public class SCPConfiguration extends ConnectionConfiguration implements Passwor
         super(connectionName);
         this.connectionType = ConnectionConstants.CONN_TYPE_SCP;
         this.port = 22;
-        this.projectBasePath = "";
+        this.workspaceBasePath = "";
         this.host = "scp://";
         this.userName = "";
         this.userPassword = "";
