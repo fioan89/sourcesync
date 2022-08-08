@@ -1,4 +1,9 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
+
+# Source Synchronizer Changelog
+
+## [Unreleased]
+
 ## [2.0.0]
 ### Added
 - support for semver
