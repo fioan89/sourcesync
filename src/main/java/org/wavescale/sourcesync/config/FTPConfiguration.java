@@ -20,7 +20,7 @@ public class FTPConfiguration extends ConnectionConfiguration {
         super(connectionName);
         this.connectionType = ConnectionConstants.CONN_TYPE_FTP;
         this.port = 21;
-        this.projectBasePath = "";
+        this.workspaceBasePath = "";
         this.host = "ftp://";
         this.userName = "";
         this.userPassword = "";

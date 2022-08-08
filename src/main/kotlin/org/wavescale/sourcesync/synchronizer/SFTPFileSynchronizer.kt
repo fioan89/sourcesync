@@ -105,12 +105,12 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
             return
         }
 
-        if (!channelSftp.absoluteDirExists(connectionInfo.projectBasePath)) {
-            EventDataLogger.logError("Remote project base path ${connectionInfo.projectBasePath} does not exist or is not a directory. Please make sure the value is a valid absolute directory path", project)
+        if (!channelSftp.absoluteDirExists(connectionInfo.workspaceBasePath)) {
+            EventDataLogger.logError("Remote project base path ${connectionInfo.workspaceBasePath} does not exist or is not a directory. Please make sure the value is a valid absolute directory path", project)
             return
         }
 
-        channelSftp.cd(connectionInfo.projectBasePath)
+        channelSftp.cd(connectionInfo.workspaceBasePath)
 
         if (!channelSftp.localDirExistsOnRemote(uploadLocation.toString())) {
             EventDataLogger.logInfo("Upload path $uploadLocation does not exist or is not a directory. Going to create it.", project)

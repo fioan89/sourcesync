@@ -91,10 +91,10 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
      */
     override fun syncFile(sourcePath: String, uploadLocation: Path) {
         val preserveTimestamp = connectionInfo.isPreserveTime
-        val remotePath = Paths.get(connectionInfo.projectBasePath).resolve(uploadLocation)
+        val remotePath = Paths.get(connectionInfo.workspaceBasePath).resolve(uploadLocation)
         try {
             var command = "scp " + (if (preserveTimestamp) "-p" else "") + " -t -C " + remotePath
-            val channel = session!!.openChannel("exec")
+            val channel = session.openChannel("exec")
             (channel as ChannelExec).setCommand(command)
 
             // get I/O streams for remote scp

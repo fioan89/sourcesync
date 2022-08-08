@@ -8,7 +8,7 @@
 
 ### Changed
 
-- project's base location label from "Root path" to "Project base path". This is a breaking change, users
+- project's base location label from "Root path" to "Workspace base path". This is a breaking change, users
   will have to reconfigure the connections again.
 
 ## [2.0.0]
