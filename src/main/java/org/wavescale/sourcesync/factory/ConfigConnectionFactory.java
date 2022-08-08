@@ -12,6 +12,7 @@ package org.wavescale.sourcesync.factory;
  * *****************************************************************************
  */
 
+import com.intellij.openapi.diagnostic.Logger;
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 
 import java.io.File;
@@ -29,6 +30,7 @@ import java.util.Set;
  * during the runtime.
  */
 public class ConfigConnectionFactory {
+    private static final Logger logger = Logger.getInstance(ConfigConnectionFactory.class);
     private static final ConfigConnectionFactory CONFIG_CONNECTION_FACTORY = new ConfigConnectionFactory();
     private static final String CONNECTIONS_FILE = ".connectionconfig.ser";
     String fileSeparator;
@@ -80,10 +82,8 @@ public class ConfigConnectionFactory {
         if (new File(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE)).exists()) {
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE)))) {
                 connectionConfigurationMap = (Map<String, ConnectionConfiguration>) in.readObject();
-            } catch (IOException i) {
-                i.printStackTrace();
-            } catch (ClassNotFoundException c) {
-                c.printStackTrace();
+            } catch (IOException | ClassNotFoundException e) {
+                logger.warn("Could not load connections because", e);
             }
         }
     }
@@ -92,8 +92,8 @@ public class ConfigConnectionFactory {
         // try to write the persistence data
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE)))) {
             out.writeObject(connectionConfigurationMap);
-        } catch (IOException i) {
-            i.printStackTrace();
+        } catch (IOException e) {
+            logger.warn("Could not save connections because", e);
         }
     }
 }
