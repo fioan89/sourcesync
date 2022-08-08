@@ -1,6 +1,11 @@
 package org.wavescale.sourcesync.factory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +29,7 @@ public class ConnectionConfig {
     private static final String CONFIG_FILE = ".modulesconfig.ser";
     String fileSeparator;
     private Map<String, String> projectToConnection;
-    private String userHome;
+    private final String userHome;
 
     private ConnectionConfig() {
         projectToConnection = new HashMap<>();
@@ -40,7 +45,7 @@ public class ConnectionConfig {
     /**
      * Links project with the given connection name.
      *
-     * @param projectName     a string representing a project name.
+     * @param projectName    a string representing a project name.
      * @param connectionName a string representing a connection config.
      */
     public void associateProjectWithConnection(String projectName, String connectionName) {
@@ -56,6 +61,10 @@ public class ConnectionConfig {
      */
     public String getAssociationFor(String projectName) {
         return projectToConnection.get(projectName);
+    }
+
+    public void removeAssociationFor(String projectName) {
+        projectToConnection.remove(projectName);
     }
 
     public void removeAssociations() {
