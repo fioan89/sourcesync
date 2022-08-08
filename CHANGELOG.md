@@ -3,6 +3,8 @@
 # Source Synchronizer Changelog
 
 ## [Unreleased]
+### Fixed
+- upload issues when using SFTP from local Windows to remote Linux
 
 ### Changed
 

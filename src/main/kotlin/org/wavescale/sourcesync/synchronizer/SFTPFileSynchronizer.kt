@@ -89,46 +89,40 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
 
     override fun disconnect() {
         if (session != null) {
-            session!!.disconnect()
+            session.disconnect()
             isConnected = false
         }
     }
 
     override fun syncFile(sourcePath: String, uploadLocation: Path) {
         val preserveTimestamp = connectionInfo.isPreserveTime
-        val remotePath = Paths.get(connectionInfo.projectBasePath).resolve(uploadLocation)
         val channelSftp: ChannelSftp
         try {
-            channelSftp = session!!.openChannel("sftp") as ChannelSftp
+            channelSftp = session.openChannel("sftp") as ChannelSftp
             channelSftp.connect()
         } catch (e: JSchException) {
             EventDataLogger.logError(e.toString(), project)
             return
         }
 
-        // first try to create the path where this must be uploaded
-        try {
-            channelSftp.cd(remotePath.root.toString())
-        } catch (e: SftpException) {
-            EventDataLogger.logError("On remote we could not change directory into root: " + remotePath.root, project)
+        if (!channelSftp.absoluteDirExists(connectionInfo.projectBasePath)) {
+            EventDataLogger.logError("Remote project base path ${connectionInfo.projectBasePath} does not exist or is not a directory. Please make sure the value is a valid absolute directory path", project)
+            return
         }
-        if (remotePath.parent != null) {
-            for (current in remotePath.parent) {
-                val location = current.toString()
-                try {
-                    channelSftp.mkdir(location)
-                } catch (e: SftpException) {
-                    // this dir probably exist so just ignore
-                }
-                try {
-                    channelSftp.cd(location)
-                } catch (e: SftpException) {
-                    // probably it doesn't exist or maybe no permission
-                    EventDataLogger.logError("Remote dir <b>" + remotePath +
-                            "</b> might not exist or you don't have permission on this path!", project)
-                    return
-                }
+
+        channelSftp.cd(connectionInfo.projectBasePath)
+
+        if (!channelSftp.localDirExistsOnRemote(uploadLocation.toString())) {
+            EventDataLogger.logInfo("Upload path $uploadLocation does not exist or is not a directory. Going to create it.", project)
+            val exists = channelSftp.mkLocalDirsOnRemote(uploadLocation.toString())
+            if (!exists) {
+                EventDataLogger.logError("Upload path $uploadLocation could not be created.", project)
+                return
             }
+        }
+        if (!channelSftp.cdLocalDirsOnRemote(uploadLocation.toString())) {
+            EventDataLogger.logError("Could not change directory to $uploadLocation", project)
+            return
         }
 
         // upload file

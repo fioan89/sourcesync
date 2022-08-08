@@ -1,11 +1,12 @@
 package org.wavescale.sourcesync.api;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
 import com.intellij.openapi.components.impl.stores.IProjectStore;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * ****************************************************************************
@@ -18,8 +19,7 @@ import com.intellij.openapi.vfs.VirtualFile;
  * For any issues or questions send an email at: fioan89@gmail.com              *
  * *****************************************************************************
  */
-public class Utils
-{
+public class Utils {
 
     /**
      * Checks if a given filename can be uploaded or not.
@@ -30,15 +30,12 @@ public class Utils
      *                           extension MUST contain the dot character - ex: ".crt .iml .etc"
      * @return <code>true</code> if file extension is not on the extensionsToFilter, <code>False</code> otherwise.
      */
-    public static boolean canBeUploaded(String fileName, String extensionsToFilter)
-    {
+    public static boolean canBeUploaded(String fileName, String extensionsToFilter) {
         String extension = ".";
 
-        if (fileName != null)
-        {
+        if (fileName != null) {
             int i = fileName.lastIndexOf('.');
-            if (i >= 0)
-            {
+            if (i >= 0) {
                 extension += fileName.substring(i + 1);
                 return !extensionsToFilter.contains(extension);
             }
@@ -52,22 +49,18 @@ public class Utils
      *
      * @param projectName module or project name.
      */
-    public static void showNoConnectionSpecifiedError(String projectName)
-    {
-        StringBuilder message = new StringBuilder();
-        message.append("There is no connection type associated to <b>")
-            .append(projectName)
-            .append("</b> module.\nPlease right click on module name and then select <b>Module Connection Configuration</b> to select connection type!");
-        Messages.showErrorDialog(message.toString(), "No connection specified for project " + projectName);
+    public static void showNoConnectionSpecifiedError(String projectName) {
+        String message = "There is no connection type associated to <b>" +
+                projectName +
+                "</b> module.\nPlease right click on module name and then select <b>Module Connection Configuration</b> to select connection type!";
+        Messages.showErrorDialog(message, "No connection specified for project " + projectName);
     }
 
     /**
-     * Extracts an ordered list of directories from project
-     * root path to the file
+     * Extracts an ordered list of all parent directories from project base path (including the project) for the file
      */
-    public static Path dirsToFileFromProjectRoot(VirtualFile virtualFile, IProjectStore projectStore)
-    {
-        return projectStore.getProjectBasePath().relativize(virtualFile.toNioPath());
+    public static Path relativeLocalUploadDirs(VirtualFile virtualFile, IProjectStore projectStore) {
+        return projectStore.getProjectBasePath().getParent().relativize(virtualFile.toNioPath().getParent());
     }
 
     /**
@@ -78,11 +71,9 @@ public class Utils
      * be that the file already exists
      * @throws IOException if an I/O error occurred
      */
-    public static boolean createFile(String path) throws IOException
-    {
+    public static boolean createFile(String path) throws IOException {
         File fileToCreate = new File(path);
-        if (fileToCreate.exists())
-        {
+        if (fileToCreate.exists()) {
             return false;
         }
         // the file doesn't exist so try create it
