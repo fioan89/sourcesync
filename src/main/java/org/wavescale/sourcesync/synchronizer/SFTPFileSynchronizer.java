@@ -2,7 +2,13 @@ package org.wavescale.sourcesync.synchronizer;
 
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpATTRS;
+import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.SftpProgressMonitor;
 import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.FileSynchronizer;
 import org.wavescale.sourcesync.api.Utils;
@@ -101,7 +107,7 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
     @Override
     public void syncFile(String sourcePath, Path uploadLocation) {
         boolean preserveTimestamp = this.getConnectionInfo().isPreserveTime();
-        Path remotePath = Paths.get(this.getConnectionInfo().getRootPath()).resolve(uploadLocation);
+        Path remotePath = Paths.get(this.getConnectionInfo().getProjectBasePath()).resolve(uploadLocation);
 
         ChannelSftp channelSftp;
         try {
@@ -147,7 +153,7 @@ public class SFTPFileSynchronizer extends FileSynchronizer {
                 int lastAcc = sftpATTRS.getATime();
                 // this is a messed method: if lastModified is greater than Integer.MAX_VALUE
                 // then timestamp will not be ok.
-                sftpATTRS.setACMODTIME(lastAcc, new Long(toUpload.lastModified() / 1000).intValue());
+                sftpATTRS.setACMODTIME(lastAcc, Long.valueOf(toUpload.lastModified() / 1000).intValue());
                 channelSftp.setStat(toUpload.getName(), sftpATTRS);
             }
         } catch (SftpException e) {

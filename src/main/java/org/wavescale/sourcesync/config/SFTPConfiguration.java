@@ -26,7 +26,7 @@ public class SFTPConfiguration extends ConnectionConfiguration implements Passwo
         super(connectionName);
         this.connectionType = ConnectionConstants.CONN_TYPE_SFTP;
         this.port = 22;
-        this.rootPath = "";
+        this.projectBasePath = "";
         this.host = "sftp://";
         this.userName = "";
         this.userPassword = "";
