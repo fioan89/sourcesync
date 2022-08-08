@@ -237,7 +237,7 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
                     add(JLabel(SourcesyncBundle.message("portLabel")), GridConstraints().apply { row = 1; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
                     add(tfPort, GridConstraints().apply { row = 1; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
 
-                    add(JLabel(SourcesyncBundle.message("rootPathLabel")), GridConstraints().apply { row = 2; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
+                    add(JLabel(SourcesyncBundle.message("workspaceDirectoyLabel")), GridConstraints().apply { row = 2; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
                     add(tfRootPath, GridConstraints().apply { row = 2; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
                     // empty row
                     add(JPanel(), GridConstraints().apply { row = 3; column = 0; colSpan = 2; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })

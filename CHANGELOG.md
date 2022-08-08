@@ -3,6 +3,8 @@
 # Source Synchronizer Changelog
 
 ## [Unreleased]
+### Changed
+- project's base location label from "Root path" to "Project base path"
 
 ## [2.0.0]
 ### Added
