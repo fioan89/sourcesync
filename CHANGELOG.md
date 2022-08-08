@@ -5,6 +5,7 @@
 ## [Unreleased]
 ### Fixed
 - upload issues when using SFTP from local Windows to remote Linux
+- behavior for SSH keys component, now they properly enable or disable if users want to authenticate with SSH keys
 
 ### Changed
 

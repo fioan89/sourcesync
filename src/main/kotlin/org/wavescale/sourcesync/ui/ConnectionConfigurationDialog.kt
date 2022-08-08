@@ -109,9 +109,9 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
             }
         }
 
-        cbUseSSHKeys.addItemListener(updateConnectionAuthFormsCallback())
-        cbSSHPassphrase.addItemListener(updateConnectionAuthFormsCallback())
-
+        cbUseSSHKeys.addItemListener(sshKeysCallback())
+        cbSSHPassphrase.addItemListener(sshKeysPassphraseCallback())
+        enableCertificateWidgets(false)
         configurationsList.selectionModel.addListSelectionListener(highlightConnectionConfigurationCallback())
 
         val connectionFactory = ConfigConnectionFactory.getInstance()
@@ -122,14 +122,24 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
         tfCertFile.isEnabled = isEnabled
         btnBrowse.isEnabled = isEnabled
         cbSSHPassphrase.isEnabled = isEnabled
-        pfUserPassword.isEnabled = isEnabled
+        pfUserPassword.isEnabled = !isEnabled
     }
 
-    private fun updateConnectionAuthFormsCallback(): (e: ItemEvent) -> Unit = {
+    private fun sshKeysCallback(): (e: ItemEvent) -> Unit = {
         val source = it.source as JCheckBox
-        enableCertificateWidgets(source.isEnabled)
-        // the password field can be enabled only when ssh with password is configured
-        if (cbUseSSHKeys.isSelected && cbSSHPassphrase.isSelected) lbPassword.text = SourcesyncBundle.message("passphraseLabel") else lbPassword.text = SourcesyncBundle.message("passwordLabel")
+        enableCertificateWidgets(source.isSelected)
+        if (!cbUseSSHKeys.isSelected) {
+            cbSSHPassphrase.isSelected = false
+        }
+    }
+
+    private fun sshKeysPassphraseCallback(): (e: ItemEvent) -> Unit = {
+        if (cbUseSSHKeys.isSelected && cbSSHPassphrase.isSelected) {
+            lbPassword.text = SourcesyncBundle.message("passphraseLabel")
+        } else {
+            lbPassword.text = SourcesyncBundle.message("passwordLabel")
+        }
+        pfUserPassword.isEnabled = (cbUseSSHKeys.isSelected && cbSSHPassphrase.isSelected) || (!cbUseSSHKeys.isSelected && !cbSSHPassphrase.isSelected)
     }
 
     private fun highlightConnectionConfigurationCallback(): (event: ListSelectionEvent) -> Unit = {
