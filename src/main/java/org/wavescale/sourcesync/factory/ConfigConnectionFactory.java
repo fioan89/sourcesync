@@ -14,7 +14,12 @@ package org.wavescale.sourcesync.factory;
 
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -73,12 +78,8 @@ public class ConfigConnectionFactory {
     private void initComponent() {
         // try to load the persistence data.
         if (new File(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE)).exists()) {
-            try {
-                FileInputStream inputStream = new FileInputStream(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE));
-                ObjectInputStream in = new ObjectInputStream(inputStream);
+            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE)))) {
                 connectionConfigurationMap = (Map<String, ConnectionConfiguration>) in.readObject();
-                in.close();
-                inputStream.close();
             } catch (IOException i) {
                 i.printStackTrace();
             } catch (ClassNotFoundException c) {
@@ -89,12 +90,8 @@ public class ConfigConnectionFactory {
 
     public void saveConnections() {
         // try to write the persistence data
-        try {
-            FileOutputStream outputStream = new FileOutputStream(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE));
-            ObjectOutputStream out = new ObjectOutputStream(outputStream);
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE)))) {
             out.writeObject(connectionConfigurationMap);
-            out.close();
-            outputStream.close();
         } catch (IOException i) {
             i.printStackTrace();
         }
