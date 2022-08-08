@@ -78,7 +78,7 @@ public class FTPFileSynchronizer extends FileSynchronizer {
         boolean preserveTimestamp = true;
         Path sourcePathLocation = Paths.get(sourceLocation);
         String sourceFileName = sourcePathLocation.getFileName().toString();
-        Path remotePath = Paths.get(this.getConnectionInfo().getRootPath()).resolve(uploadLocation);
+        Path remotePath = Paths.get(this.getConnectionInfo().getProjectBasePath()).resolve(uploadLocation);
 
         // first try to create the path where this must be uploaded
         try {

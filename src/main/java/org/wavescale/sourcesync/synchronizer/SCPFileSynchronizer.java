@@ -2,7 +2,11 @@ package org.wavescale.sourcesync.synchronizer;
 
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.FileSynchronizer;
 import org.wavescale.sourcesync.api.Utils;
@@ -10,7 +14,11 @@ import org.wavescale.sourcesync.config.SCPConfiguration;
 import org.wavescale.sourcesync.logger.BalloonLogger;
 import org.wavescale.sourcesync.logger.EventDataLogger;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -27,7 +35,7 @@ import java.nio.file.Paths;
  */
 public class SCPFileSynchronizer extends FileSynchronizer {
     public static final String SSH_KNOWN_HOSTS = Paths.get(System.getProperty("user.home"), ".ssh", "known_hosts").toString();
-    private JSch jsch;
+    private final JSch jsch;
     private Session session;
 
 
@@ -90,15 +98,15 @@ public class SCPFileSynchronizer extends FileSynchronizer {
     /**
      * Uploads the given file to the remote target.
      *
-     * @param sourcePath      a <code>String</code> representing a file path to be uploaded. This is a relative path
-     *                        to project base path.
+     * @param sourcePath     a <code>String</code> representing a file path to be uploaded. This is a relative path
+     *                       to project base path.
      * @param uploadLocation a <code>String</code> representing a location path on the remote target
-     *                        where the source will be uploaded.
+     *                       where the source will be uploaded.
      */
     @Override
     public void syncFile(String sourcePath, Path uploadLocation) {
         boolean preserveTimestamp = this.getConnectionInfo().isPreserveTime();
-        Path remotePath = Paths.get(this.getConnectionInfo().getRootPath()).resolve(uploadLocation);
+        Path remotePath = Paths.get(this.getConnectionInfo().getProjectBasePath()).resolve(uploadLocation);
 
         try {
             String command = "scp " + (preserveTimestamp ? "-p" : "") + " -t -C " + remotePath;

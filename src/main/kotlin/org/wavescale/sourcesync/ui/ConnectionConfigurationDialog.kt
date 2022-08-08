@@ -66,7 +66,7 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
     private val lbConnType = JLabel("------")
     private val tfHost = JTextField()
     private val tfPort = JTextField("21").apply { horizontalAlignment = SwingConstants.CENTER }
-    private val tfRootPath = JTextField("/").apply { horizontalAlignment = SwingConstants.LEFT }
+    private val tfProjectBasePath = JTextField("/").apply { horizontalAlignment = SwingConstants.LEFT }
     private val cbUseSSHKeys = JCheckBox(SourcesyncBundle.message("useSSHKeyCheckBox"), false)
     private val tfCertFile = JTextField()
     private val btnBrowse = JButton(SourcesyncBundle.message("browseButton"))
@@ -102,7 +102,7 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
         btnBrowse.apply {
             addActionListener {
                 val descriptor = FileChooserDescriptor(true, false, false, false, false, false)
-                    .withTitle(SourcesyncBundle.message("certificateFileChooserDialogTitle"))
+                        .withTitle(SourcesyncBundle.message("certificateFileChooserDialogTitle"))
                 var result: VirtualFile? = null
                 FileChooser.chooseFile(descriptor, project, null) { result = it }
                 tfCertFile.text = result?.canonicalPath
@@ -167,38 +167,38 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
                 border = JBUI.Borders.empty()
             })
             add(
-                ToolbarDecorator.createDecorator(configurationsList)
-                    .disableUpDownActions()
-                    .setAddAction {
-                        val parentWindow = SwingUtilities.windowForComponent(configurationsList)
-                        val targetConfig = TargetLocation(parentWindow)
-                        val name = targetConfig.targetName
-                        val type = targetConfig.targetType
-                        listModel.add(name)
-                        configurationsList.selectedIndex = listModel.getElementIndex(name)
-                        createConnection(name, type)
-                    }
-                    .setAddIcon(AllIcons.General.Add)
-                    .setRemoveAction {
-                        val target: String = configurationsList.selectedValue
-                        val index = listModel.getElementIndex(target)
-                        if (index >= 0) {
-                            listModel.remove(target)
-                            // remove from config
-                            val configConnectionFactory = ConfigConnectionFactory.getInstance()
-                            configConnectionFactory.removeConnectionConfiguration(target)
-                            // select the bottom index
-                            if (index > 0) {
-                                configurationsList.selectedIndex = index - 1
+                    ToolbarDecorator.createDecorator(configurationsList)
+                            .disableUpDownActions()
+                            .setAddAction {
+                                val parentWindow = SwingUtilities.windowForComponent(configurationsList)
+                                val targetConfig = TargetLocation(parentWindow)
+                                val name = targetConfig.targetName
+                                val type = targetConfig.targetType
+                                listModel.add(name)
+                                configurationsList.selectedIndex = listModel.getElementIndex(name)
+                                createConnection(name, type)
                             }
-                        }
-                        if (listModel.size == 0) {
-                            ConnectionConfig.getInstance().apply {
-                                removeAssociations()
-                                saveModuleAssociatedConn()
-                            }
-                        }
-                    }.createPanel()
+                            .setAddIcon(AllIcons.General.Add)
+                            .setRemoveAction {
+                                val target: String = configurationsList.selectedValue
+                                val index = listModel.getElementIndex(target)
+                                if (index >= 0) {
+                                    listModel.remove(target)
+                                    // remove from config
+                                    val configConnectionFactory = ConfigConnectionFactory.getInstance()
+                                    configConnectionFactory.removeConnectionConfiguration(target)
+                                    // select the bottom index
+                                    if (index > 0) {
+                                        configurationsList.selectedIndex = index - 1
+                                    }
+                                }
+                                if (listModel.size == 0) {
+                                    ConnectionConfig.getInstance().apply {
+                                        removeAssociations()
+                                        saveModuleAssociatedConn()
+                                    }
+                                }
+                            }.createPanel()
             )
         }
     }
@@ -237,8 +237,8 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
                     add(JLabel(SourcesyncBundle.message("portLabel")), GridConstraints().apply { row = 1; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
                     add(tfPort, GridConstraints().apply { row = 1; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
 
-                    add(JLabel(SourcesyncBundle.message("rootPathLabel")), GridConstraints().apply { row = 2; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
-                    add(tfRootPath, GridConstraints().apply { row = 2; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
+                    add(JLabel(SourcesyncBundle.message("workspaceDirectoyLabel")), GridConstraints().apply { row = 2; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
+                    add(tfProjectBasePath, GridConstraints().apply { row = 2; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
                     // empty row
                     add(JPanel(), GridConstraints().apply { row = 3; column = 0; colSpan = 2; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
 
@@ -338,16 +338,16 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
      * @return a `String` representing a path on the remote target.
      */
     private fun getRootPath(): String? {
-        return tfRootPath.text
+        return tfProjectBasePath.text
     }
 
     /**
      * Sets the target root path. This is the root where we will sync files.
      *
-     * @param rootPath a `String` representing a path on the remote target.
+     * @param projectBasePath a `String` representing a path on the remote target.
      */
-    private fun setRootPath(rootPath: String?) {
-        tfRootPath.text = rootPath
+    private fun setProjectBasePath(projectBasePath: String?) {
+        tfProjectBasePath.text = projectBasePath
     }
 
     private fun getUserName(): String? {
@@ -525,7 +525,7 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
     private fun downloadConfigurationToPersistence(connectionConfiguration: ConnectionConfiguration?) {
         if (connectionConfiguration != null) {
             connectionConfiguration.host = getHost()
-            connectionConfiguration.rootPath = getRootPath()
+            connectionConfiguration.projectBasePath = getRootPath()
             connectionConfiguration.port = getPort()
             connectionConfiguration.userName = getUserName()
             connectionConfiguration.userPassword = getUserPassword()
@@ -556,7 +556,7 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
         if (connectionConfiguration != null) {
             setConnectionType(connectionConfiguration.connectionType)
             setHost(connectionConfiguration.host)
-            setRootPath(connectionConfiguration.rootPath)
+            setProjectBasePath(connectionConfiguration.projectBasePath)
             setPort(connectionConfiguration.port)
             setUserName(connectionConfiguration.userName)
             setUserPassword(connectionConfiguration.userPassword)

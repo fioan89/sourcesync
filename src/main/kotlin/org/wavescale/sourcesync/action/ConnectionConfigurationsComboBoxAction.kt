@@ -43,15 +43,26 @@ class ConnectionConfigurationsComboBoxAction : ComboBoxAction() {
     private fun performWhenButton(src: Component, place: String) {
         val manager = ActionManager.getInstance()
         manager.tryToExecute(
-            manager.getAction("actionSourceSyncMenu"),
-            MouseEvent(src, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), 0, 0, 0, 0, false, 0),
-            src, place, true
+                manager.getAction("actionSourceSyncMenu"),
+                MouseEvent(src, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), 0, 0, 0, 0, false, 0),
+                src, place, true
         )
     }
 
     override fun update(e: AnActionEvent) {
         val projectName = e.getData(CommonDataKeys.PROJECT)?.name
         val associationFor = ConnectionConfig.getInstance().getAssociationFor(projectName)
+        if (!associationFor.isNullOrBlank() && ConfigConnectionFactory.getInstance().getConnectionConfiguration(associationFor) == null) {
+            ConnectionConfig.getInstance().apply {
+                removeAssociationFor(projectName)
+                saveModuleAssociatedConn()
+                e.presentation.apply {
+                    isEnabled = true
+                    text = SourcesyncBundle.message("sourcesyncAddConfigurations")
+                    icon = null
+                }
+            }
+        }
         if (associationFor.isNullOrBlank()) {
             e.presentation.apply {
                 isEnabled = true
