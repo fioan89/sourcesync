@@ -28,7 +28,7 @@ dependencies {
     implementation("com.jcraft:jsch:0.1.53")
     implementation("commons-net:commons-net:3.3")
 
-    testImplementation("org.mockito:mockito-core:4.5.1")
+    testImplementation("org.mockito:mockito-core:4.7.0")
     testImplementation("com.tngtech.java:junit-dataprovider:1.13.1")
 }
 
