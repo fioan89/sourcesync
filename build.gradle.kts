@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.jcraft:jsch:0.1.53")
+    implementation("com.jcraft:jsch:0.1.55")
     implementation("commons-net:commons-net:3.3")
 
     testImplementation("org.mockito:mockito-core:4.7.0")
