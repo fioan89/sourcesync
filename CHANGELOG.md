@@ -7,6 +7,7 @@
 ### Added
 
 - support for latest OpenSSH private key format
+- support for latest IntelliJ 2022.3
 
 ## [2.0.1]
 

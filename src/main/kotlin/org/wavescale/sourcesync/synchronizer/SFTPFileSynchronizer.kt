@@ -40,7 +40,8 @@ import java.nio.file.Paths
  * metadata like name, absoulte path, etc...
  * @param indicator      used to report progress on upload process.
  */
-class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, indicator: ProgressIndicator) : FileSynchronizer(connectionInfo, project, indicator) {
+class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, indicator: ProgressIndicator) :
+    FileSynchronizer(connectionInfo, project, indicator) {
     private val jsch: JSch = JSch()
     private lateinit var session: Session
 
@@ -65,15 +66,20 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
     @Throws(JSchException::class)
     private fun initSession() {
         val configuration = connectionInfo as SFTPConfiguration
-        session = jsch.getSession(connectionInfo.userName, connectionInfo.host,
-                connectionInfo.port)
+        session = jsch.getSession(
+            connectionInfo.userName, connectionInfo.host,
+            connectionInfo.port
+        )
         session.setConfig("StrictHostKeyChecking", "no")
         if (configuration.isPasswordlessSSHSelected) {
             session.setConfig("PreferredAuthentications", "publickey")
             try {
                 Utils.createFile(SSH_KNOWN_HOSTS)
             } catch (e: IOException) {
-                EventDataLogger.logError("Could not identify nor create the ssh known hosts file at " + SSH_KNOWN_HOSTS + ". The returned error is:" + e.message, project)
+                EventDataLogger.logError(
+                    "Could not identify nor create the ssh known hosts file at " + SSH_KNOWN_HOSTS + ". The returned error is:" + e.message,
+                    project
+                )
             }
             jsch.setKnownHosts(SSH_KNOWN_HOSTS)
             // add private key and passphrase if exists
@@ -88,10 +94,8 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
     }
 
     override fun disconnect() {
-        if (session != null) {
-            session.disconnect()
-            isConnected = false
-        }
+        session.disconnect()
+        isConnected = false
     }
 
     override fun syncFile(sourcePath: String, uploadLocation: Path) {
@@ -106,14 +110,20 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
         }
 
         if (!channelSftp.absoluteDirExists(connectionInfo.workspaceBasePath)) {
-            EventDataLogger.logError("Remote project base path ${connectionInfo.workspaceBasePath} does not exist or is not a directory. Please make sure the value is a valid absolute directory path", project)
+            EventDataLogger.logError(
+                "Remote project base path ${connectionInfo.workspaceBasePath} does not exist or is not a directory. Please make sure the value is a valid absolute directory path",
+                project
+            )
             return
         }
 
         channelSftp.cd(connectionInfo.workspaceBasePath)
 
         if (!channelSftp.localDirExistsOnRemote(uploadLocation.toString())) {
-            EventDataLogger.logInfo("Upload path $uploadLocation does not exist or is not a directory. Going to create it.", project)
+            EventDataLogger.logInfo(
+                "Upload path $uploadLocation does not exist or is not a directory. Going to create it.",
+                project
+            )
             val exists = channelSftp.mkLocalDirsOnRemote(uploadLocation.toString())
             if (!exists) {
                 EventDataLogger.logError("Upload path $uploadLocation could not be created.", project)
