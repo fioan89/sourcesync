@@ -4,13 +4,20 @@
 
 ## [Unreleased]
 
+### Added
+
+- support for latest OpenSSH private key format
+
 ## [2.0.1]
+
 ### Fixed
+
 - upload issues when using SFTP from local Windows to remote Linux
 - behavior for SSH keys component, now they properly enable or disable if users want to authenticate with SSH keys
 - plugin icon shown in marketplace
 
 ### Changed
+
 - project's base location label from "Root path" to "Workspace base path". This is a breaking change, users
   will have to reconfigure the connections again.
 

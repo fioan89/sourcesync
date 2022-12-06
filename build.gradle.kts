@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.jcraft:jsch:0.1.55")
+    implementation("com.github.mwiede:jsch:0.2.4")
     implementation("commons-net:commons-net:3.9.0")
 
     testImplementation("org.mockito:mockito-core:4.9.0")
@@ -71,6 +71,10 @@ tasks {
 
     wrapper {
         gradleVersion = properties("gradleVersion")
+    }
+
+    buildSearchableOptions {
+        isEnabled = false
     }
 
     patchPluginXml {
