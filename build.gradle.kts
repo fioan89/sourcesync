@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.mwiede:jsch:0.2.4")
+    implementation("com.github.mwiede:jsch:0.2.5")
     implementation("commons-net:commons-net:3.9.0")
 
     testImplementation("org.mockito:mockito-core:4.9.0")
