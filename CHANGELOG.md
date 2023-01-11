@@ -2,27 +2,27 @@
 
 # Source Synchronizer Changelog
 
-## [Unreleased]
+## Unreleased
+
+## 2.0.2 - 2022-12-07
 
 ### Added
-
 - support for latest OpenSSH private key format
 - support for latest IntelliJ 2022.3
 
-## [2.0.1]
+## 2.0.1
 
 ### Fixed
-
 - upload issues when using SFTP from local Windows to remote Linux
 - behavior for SSH keys component, now they properly enable or disable if users want to authenticate with SSH keys
 - plugin icon shown in marketplace
 
 ### Changed
-
 - project's base location label from "Root path" to "Workspace base path". This is a breaking change, users
   will have to reconfigure the connections again.
 
-## [2.0.0]
+## 2.0.0
+
 ### Added
 - support for semver
 - build with Kotlin&Gradle
@@ -45,7 +45,8 @@
 - fixed issues with resource location due to trailing "/"
 - remove all project associations when there is no Sourcesync connection available
 
-## [1.9.0]
+## 1.9.0
+
 ### Added
 - support for OS X 10.11
 - support for passphrase keys for sftp connections
@@ -62,7 +63,8 @@
 - issue with private key file chooser forcing you to select the public key instead of the private one
 - issues with configuration and target window not getting on top of the IDE
 
-## [1.8.0]
+## 1.8.0
+
 ### Added
 - support for IntelliJ IDEA 15.x
 - support for PyCharm 5.x
@@ -73,7 +75,8 @@
 ### Fixed
 - upload of files over FTPS connections using explicit TLS security
 
-## [1.5.0]
+## 1.5.0
+
 ### Added
 - support for shortcuts
 
@@ -81,7 +84,8 @@
 - NPE when no default file was selected.
 - exception due to context switching when using shortcuts.
 
-## [1.4.0]
+## 1.4.0
+
 ### Added
 - a file sync manager, which forces `Sourcesync` to reuse existing opened connections during the command.
 
@@ -91,7 +95,8 @@
 ### Fixed
 - Sync selected jobs no longer has problems with "Allow simultaneous sync jobs" option.
 
-## [1.3.0]
+## 1.3.0
+
 ### Added
 - sync selected and changed files into the Changes View Popup-Menu
 
@@ -99,7 +104,8 @@
 - force OK button to save connection preferences
 - a few visual bugs (the `Allow ... number of connections` was not visible until resize)
 
-## [1.2.0]
+## 1.2.0
+
 ### Added
 - option to limit the number of upload threads
 
