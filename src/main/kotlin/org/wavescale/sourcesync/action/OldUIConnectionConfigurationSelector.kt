@@ -15,13 +15,12 @@ import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory
 import org.wavescale.sourcesync.factory.ConnectionConfig
 import org.wavescale.sourcesync.ui.ConnectionConfigurationDialog
-import java.awt.Component
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JComponent
 import javax.swing.SwingUtilities
 
-class ConnectionConfigurationsComboBoxAction : ComboBoxAction() {
+class OldUIConnectionConfigurationSelector : ComboBoxAction() {
     override fun createPopupActionGroup(button: JComponent?): DefaultActionGroup {
         val allActionsGroup = DefaultActionGroup()
         allActionsGroup.add(getEditConnectionConfigurationsAction())
@@ -40,19 +39,12 @@ class ConnectionConfigurationsComboBoxAction : ComboBoxAction() {
         return ActionManager.getInstance().getAction("actionSourceSyncMenu")
     }
 
-    private fun performWhenButton(src: Component, place: String) {
-        val manager = ActionManager.getInstance()
-        manager.tryToExecute(
-                manager.getAction("actionSourceSyncMenu"),
-                MouseEvent(src, MouseEvent.MOUSE_PRESSED, System.currentTimeMillis(), 0, 0, 0, 0, false, 0),
-                src, place, true
-        )
-    }
-
     override fun update(e: AnActionEvent) {
         val projectName = e.getData(CommonDataKeys.PROJECT)?.name
         val associationFor = ConnectionConfig.getInstance().getAssociationFor(projectName)
-        if (!associationFor.isNullOrBlank() && ConfigConnectionFactory.getInstance().getConnectionConfiguration(associationFor) == null) {
+        if (!associationFor.isNullOrBlank() && ConfigConnectionFactory.getInstance()
+                .getConnectionConfiguration(associationFor) == null
+        ) {
             ConnectionConfig.getInstance().apply {
                 removeAssociationFor(projectName)
                 saveModuleAssociatedConn()

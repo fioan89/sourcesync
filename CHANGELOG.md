@@ -4,9 +4,14 @@
 
 ## Unreleased
 
+### Added
+
+- support for experimental new UI
+
 ## 2.0.2 - 2022-12-07
 
 ### Added
+
 - support for latest OpenSSH private key format
 - support for latest IntelliJ 2022.3
 
