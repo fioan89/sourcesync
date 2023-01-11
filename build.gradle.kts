@@ -7,9 +7,9 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    kotlin("jvm") version "1.7.22"
+    kotlin("jvm") version "1.8.0"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.10.0"
+    id("org.jetbrains.intellij") version "1.11.0"
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.0.0"
     // Gradle Qodana Plugin
@@ -25,10 +25,10 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.mwiede:jsch:0.2.4")
+    implementation("com.github.mwiede:jsch:0.2.5")
     implementation("commons-net:commons-net:3.9.0")
 
-    testImplementation("org.mockito:mockito-core:4.9.0")
+    testImplementation("org.mockito:mockito-core:4.11.0")
     testImplementation("com.tngtech.java:junit-dataprovider:1.13.1")
 }
 
