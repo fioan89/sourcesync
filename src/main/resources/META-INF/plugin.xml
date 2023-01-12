@@ -69,10 +69,6 @@
                 icon="/sourcesync.svg">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after"
                           relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote"/>
-            <add-to-group group-id="EditorPopupMenu" anchor="after"
-                          relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote"/>
-            <add-to-group group-id="EditorTabPopupMenu" anchor="after"
-                          relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote"/>
             <add-to-group group-id="ChangesViewPopupMenu" anchor="after" relative-to-action="ChangesView.Diff"/>
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F3"/>
         </action>
