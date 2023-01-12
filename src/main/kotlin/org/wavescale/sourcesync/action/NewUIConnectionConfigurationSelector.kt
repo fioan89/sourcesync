@@ -4,7 +4,6 @@ import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.PlatformDataKeys
@@ -47,7 +46,7 @@ class NewUIConnectionConfigurationSelector : ConnectionTogglePopupAction(), Cust
     }
 
     override fun update(e: AnActionEvent) {
-        val projectName = e.getData(CommonDataKeys.PROJECT)?.name
+        val projectName = e.project?.name
         val associationFor = ConnectionConfig.getInstance().getAssociationFor(projectName)
         if (!associationFor.isNullOrBlank() && ConfigConnectionFactory.getInstance()
                 .getConnectionConfiguration(associationFor) == null
