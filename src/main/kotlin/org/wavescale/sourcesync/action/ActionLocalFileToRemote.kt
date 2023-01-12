@@ -7,6 +7,8 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.project.stateStore
+import com.intellij.ui.ExperimentalUI
+import org.wavescale.sourcesync.SourceSyncIcons
 import org.wavescale.sourcesync.api.ConnectionConstants
 import org.wavescale.sourcesync.api.FileSynchronizer
 import org.wavescale.sourcesync.api.Utils
@@ -82,4 +84,20 @@ class ActionLocalFileToRemote : AnAction() {
             EventDataLogger.logWarning("File <b>" + virtualFile.name + "</b> is filtered out!", e.project)
         }
     }
+
+    override fun update(e: AnActionEvent) {
+        super.update(e)
+        if (ExperimentalUI.isNewUI()) {
+            this.templatePresentation.icon = SourceSyncIcons.ExpUI.SourceSync
+        }
+
+        val project = e.project ?: return
+        val associationName = ConnectionConfig.getInstance().getAssociationFor(project.name)
+        if (associationName != null) {
+            templatePresentation.text = "Sync this file to $associationName"
+        } else {
+            templatePresentation.text = "Sync this file to Remote target"
+        }
+    }
+
 }
