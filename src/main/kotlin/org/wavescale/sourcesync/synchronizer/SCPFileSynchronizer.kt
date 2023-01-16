@@ -29,7 +29,8 @@ import java.io.InputStream
 import java.nio.file.Path
 import java.nio.file.Paths
 
-class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, indicator: ProgressIndicator) : FileSynchronizer(connectionInfo, project, indicator) {
+class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, indicator: ProgressIndicator) :
+    FileSynchronizer(connectionInfo, project, indicator) {
     private val jsch: JSch = JSch()
     private lateinit var session: Session
 
@@ -54,15 +55,20 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
     @Throws(JSchException::class)
     private fun initSession() {
         val configuration = connectionInfo as SCPConfiguration
-        session = jsch.getSession(connectionInfo.userName, connectionInfo.host,
-                connectionInfo.port)
+        session = jsch.getSession(
+            connectionInfo.userName, connectionInfo.host,
+            connectionInfo.port
+        )
         session.setConfig("StrictHostKeyChecking", "no")
         if (configuration.isPasswordlessSSHSelected) {
             session.setConfig("PreferredAuthentications", "publickey")
             try {
                 Utils.createFile(SSH_KNOWN_HOSTS)
             } catch (e: IOException) {
-                EventDataLogger.logError("Could not identify nor create the ssh known hosts file at " + SSH_KNOWN_HOSTS + ". The returned error is:" + e.message, project)
+                EventDataLogger.logError(
+                    "Could not identify nor create the ssh known hosts file at " + SSH_KNOWN_HOSTS + ". The returned error is:" + e.message,
+                    project
+                )
             }
             jsch.setKnownHosts(SSH_KNOWN_HOSTS)
             // add private key and passphrase if exists
@@ -92,6 +98,7 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
     override fun syncFile(sourcePath: String, uploadLocation: Path) {
         val preserveTimestamp = connectionInfo.isPreserveTime
         val remotePath = Paths.get(connectionInfo.workspaceBasePath).resolve(uploadLocation)
+            .pathStringLike(connectionInfo.workspaceBasePath)
         try {
             var command = "scp " + (if (preserveTimestamp) "-p" else "") + " -t -C " + remotePath
             val channel = session.openChannel("exec")
