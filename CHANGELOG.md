@@ -8,6 +8,10 @@
 
 - support for experimental new UI
 
+### Fixed
+
+- path location issues when uploading files with scp from Windows to Unix
+
 ## 2.0.2 - 2022-12-07
 
 ### Added
