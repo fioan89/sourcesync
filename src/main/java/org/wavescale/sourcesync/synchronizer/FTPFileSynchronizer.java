@@ -1,5 +1,6 @@
 package org.wavescale.sourcesync.synchronizer;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.net.ftp.FTP;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.FileSynchronizer;
 import org.wavescale.sourcesync.config.FTPConfiguration;
 import org.wavescale.sourcesync.logger.EventDataLogger;
+import org.wavescale.sourcesync.services.SyncStatusService;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,7 +31,7 @@ import java.nio.file.Paths;
  * *****************************************************************************
  */
 public class FTPFileSynchronizer extends FileSynchronizer {
-
+    private final SyncStatusService syncStatusService = ApplicationManager.getApplication().getService(SyncStatusService.class);
     private final FTPClient ftp;
 
     public FTPFileSynchronizer(@NotNull FTPConfiguration connectionInfo, @NotNull Project project, @NotNull ProgressIndicator indicator) {
@@ -42,6 +44,7 @@ public class FTPFileSynchronizer extends FileSynchronizer {
     public boolean connect() {
         if (!isConnected()) {
             try {
+                syncStatusService.addRunningSync(getConnectionInfo().getConnectionName());
                 this.ftp.connect(this.getConnectionInfo().getHost(), this.getConnectionInfo().getPort());
                 this.ftp.login(this.getConnectionInfo().getUserName(), this.getConnectionInfo().getUserPassword());
                 // use passive mode to bypass firewall conflicts
@@ -68,12 +71,15 @@ public class FTPFileSynchronizer extends FileSynchronizer {
                 this.setConnected(false);
             } catch (IOException e) {
                 EventDataLogger.logWarning(e.toString(), this.getProject());
+            } finally {
+                syncStatusService.removeRunningSync(getConnectionInfo().getConnectionName());
             }
         }
     }
 
     @Override
     public void syncFile(String sourceLocation, Path uploadLocation) {
+        syncStatusService.addRunningSync(getConnectionInfo().getConnectionName());
         // preserve timestamp for now
         boolean preserveTimestamp = true;
         Path sourcePathLocation = Paths.get(sourceLocation);
@@ -134,6 +140,5 @@ public class FTPFileSynchronizer extends FileSynchronizer {
         } catch (IOException e) {
             EventDataLogger.logError(e.toString(), getProject());
         }
-
     }
 }

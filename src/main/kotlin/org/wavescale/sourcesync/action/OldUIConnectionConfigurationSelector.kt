@@ -9,18 +9,23 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.Presentation
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.ui.IconManager
+import org.wavescale.sourcesync.SourceSyncIcons
 import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory
 import org.wavescale.sourcesync.factory.ConnectionConfig
+import org.wavescale.sourcesync.services.SyncStatusService
 import org.wavescale.sourcesync.ui.ConnectionConfigurationDialog
+import java.awt.Graphics
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JComponent
 import javax.swing.SwingUtilities
 
 class OldUIConnectionConfigurationSelector : ComboBoxAction() {
+    private val syncStatusService = service<SyncStatusService>()
     override fun createPopupActionGroup(button: JComponent?): DefaultActionGroup {
         val allActionsGroup = DefaultActionGroup()
         allActionsGroup.add(getEditConnectionConfigurationsAction())
@@ -84,6 +89,15 @@ class OldUIConnectionConfigurationSelector : ComboBoxAction() {
                     }
                 }
             })
+        }
+
+        override fun paint(g: Graphics) {
+            super.paint(g)
+            presentation.icon = if (syncStatusService.isAnySyncJobRunning()) {
+                SourceSyncIcons.ExpUI.SOURCESYNC_RUNNING
+            } else {
+                SourceSyncIcons.ExpUI.SOURCESYNC
+            }
         }
 
         // TODO remove the listener and override doShiftClick when is no longer experimental

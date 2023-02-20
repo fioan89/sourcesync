@@ -11,6 +11,7 @@
  */
 package org.wavescale.sourcesync.synchronizer
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.jcraft.jsch.ChannelSftp
@@ -23,6 +24,7 @@ import org.wavescale.sourcesync.api.FileSynchronizer
 import org.wavescale.sourcesync.api.Utils
 import org.wavescale.sourcesync.config.SFTPConfiguration
 import org.wavescale.sourcesync.logger.EventDataLogger
+import org.wavescale.sourcesync.services.SyncStatusService
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -42,6 +44,7 @@ import java.nio.file.Paths
  */
 class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, indicator: ProgressIndicator) :
     FileSynchronizer(connectionInfo, project, indicator) {
+    private val syncStatusService = service<SyncStatusService>()
     private val jsch: JSch = JSch()
     private lateinit var session: Session
 
@@ -66,6 +69,7 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
     @Throws(JSchException::class)
     private fun initSession() {
         val configuration = connectionInfo as SFTPConfiguration
+        syncStatusService.addRunningSync(configuration.connectionName)
         session = jsch.getSession(
             connectionInfo.userName, connectionInfo.host,
             connectionInfo.port
@@ -96,6 +100,7 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
     override fun disconnect() {
         session.disconnect()
         isConnected = false
+        syncStatusService.removeRunningSync(connectionInfo.connectionName)
     }
 
     override fun syncFile(sourcePath: String, uploadLocation: Path) {

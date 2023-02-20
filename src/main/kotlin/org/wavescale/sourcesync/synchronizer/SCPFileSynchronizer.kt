@@ -11,6 +11,7 @@
  */
 package org.wavescale.sourcesync.synchronizer
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.jcraft.jsch.ChannelExec
@@ -22,6 +23,7 @@ import org.wavescale.sourcesync.api.Utils
 import org.wavescale.sourcesync.config.SCPConfiguration
 import org.wavescale.sourcesync.logger.BalloonLogger
 import org.wavescale.sourcesync.logger.EventDataLogger
+import org.wavescale.sourcesync.services.SyncStatusService
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -31,6 +33,7 @@ import java.nio.file.Paths
 
 class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, indicator: ProgressIndicator) :
     FileSynchronizer(connectionInfo, project, indicator) {
+    private val syncStatusService = service<SyncStatusService>()
     private val jsch: JSch = JSch()
     private lateinit var session: Session
 
@@ -55,6 +58,7 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
     @Throws(JSchException::class)
     private fun initSession() {
         val configuration = connectionInfo as SCPConfiguration
+        syncStatusService.addRunningSync(configuration.connectionName)
         session = jsch.getSession(
             connectionInfo.userName, connectionInfo.host,
             connectionInfo.port
@@ -85,6 +89,7 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
     override fun disconnect() {
         session.disconnect()
         isConnected = false
+        syncStatusService.removeRunningSync(connectionInfo.connectionName)
     }
 
     /**

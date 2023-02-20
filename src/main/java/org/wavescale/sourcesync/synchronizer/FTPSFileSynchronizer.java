@@ -1,5 +1,6 @@
 package org.wavescale.sourcesync.synchronizer;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.net.ftp.FTP;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.FileSynchronizer;
 import org.wavescale.sourcesync.config.FTPSConfiguration;
 import org.wavescale.sourcesync.logger.EventDataLogger;
+import org.wavescale.sourcesync.services.SyncStatusService;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,6 +31,7 @@ import java.nio.file.Paths;
  * *****************************************************************************
  */
 public class FTPSFileSynchronizer extends FileSynchronizer {
+    private final SyncStatusService syncStatusService = ApplicationManager.getApplication().getService(SyncStatusService.class);
     private final FTPSClient ftps;
 
     public FTPSFileSynchronizer(@NotNull FTPSConfiguration connectionInfo, @NotNull Project project, @NotNull ProgressIndicator indicator) {
@@ -41,6 +44,7 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
     public boolean connect() {
         if (!isConnected()) {
             try {
+                syncStatusService.addRunningSync(getConnectionInfo().getConnectionName());
                 this.ftps.connect(this.getConnectionInfo().getHost(), this.getConnectionInfo().getPort());
                 this.ftps.login(this.getConnectionInfo().getUserName(), this.getConnectionInfo().getUserPassword());
                 // use passive mode to bypass firewall conflicts
@@ -70,6 +74,8 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
                 this.setConnected(false);
             } catch (IOException e) {
                 EventDataLogger.logWarning(e.toString(), this.getProject());
+            } finally {
+                syncStatusService.removeRunningSync(getConnectionInfo().getConnectionName());
             }
         }
     }
@@ -136,6 +142,5 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
         } catch (IOException e) {
             EventDataLogger.logError(e.toString(), getProject());
         }
-
     }
 }

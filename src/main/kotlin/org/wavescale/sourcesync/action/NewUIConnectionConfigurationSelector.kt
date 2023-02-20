@@ -13,6 +13,7 @@ import com.intellij.openapi.actionSystem.ToggleAction
 import com.intellij.openapi.actionSystem.Toggleable
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction
 import com.intellij.openapi.actionSystem.impl.ActionButtonWithText
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.ui.popup.ListPopup
 import com.intellij.openapi.ui.popup.PopupStep
@@ -27,6 +28,8 @@ import org.wavescale.sourcesync.SourceSyncIcons
 import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory
 import org.wavescale.sourcesync.factory.ConnectionConfig
+import org.wavescale.sourcesync.services.SyncStatusService
+import java.awt.Graphics
 import java.awt.Insets
 import javax.swing.JComponent
 import javax.swing.SwingConstants
@@ -34,12 +37,22 @@ import javax.swing.SwingConstants
 internal const val MINIMAL_POPUP_WIDTH = 270
 
 class NewUIConnectionConfigurationSelector : ConnectionTogglePopupAction(), CustomComponentAction, DumbAware {
+    private val syncStatusService = service<SyncStatusService>()
     override fun displayTextInToolbar() = true
     override fun createCustomComponent(presentation: Presentation, place: String): JComponent {
         return object : ActionButtonWithText(this, presentation, place, JBUI.size(90, 30)) {
             override fun getMargins(): Insets = JBInsets.create(0, 10)
             override fun iconTextSpace(): Int = JBUI.scale(10)
             override fun shallPaintDownArrow() = true
+
+            override fun paint(g: Graphics) {
+                super.paint(g)
+                presentation.icon = if (syncStatusService.isAnySyncJobRunning()) {
+                    SourceSyncIcons.ExpUI.SOURCESYNC_RUNNING
+                } else {
+                    SourceSyncIcons.ExpUI.SOURCESYNC
+                }
+            }
         }.also {
             it.setHorizontalTextAlignment(SwingConstants.LEFT)
         }
@@ -71,7 +84,7 @@ class NewUIConnectionConfigurationSelector : ConnectionTogglePopupAction(), Cust
             e.presentation.apply {
                 isEnabled = true
                 text = ConnectionConfig.getInstance().getAssociationFor(projectName)
-                icon = SourceSyncIcons.ExpUI.SourceSync
+                icon = SourceSyncIcons.ExpUI.SOURCESYNC
             }
         }
     }
@@ -155,7 +168,7 @@ class SourceSyncConfigAction(private val configuration: String) : AnAction() {
     init {
         val presentation = templatePresentation
         presentation.setText(configuration, false)
-        presentation.icon = SourceSyncIcons.ExpUI.SourceSync
+        presentation.icon = SourceSyncIcons.ExpUI.SOURCESYNC
     }
 
     override fun actionPerformed(e: AnActionEvent) {

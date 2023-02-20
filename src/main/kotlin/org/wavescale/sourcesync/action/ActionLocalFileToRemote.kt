@@ -8,6 +8,7 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.project.stateStore
 import com.intellij.ui.ExperimentalUI
+import com.intellij.ui.GotItTooltip
 import org.wavescale.sourcesync.SourceSyncIcons
 import org.wavescale.sourcesync.api.ConnectionConstants
 import org.wavescale.sourcesync.api.FileSynchronizer
@@ -24,6 +25,7 @@ import org.wavescale.sourcesync.synchronizer.FTPFileSynchronizer
 import org.wavescale.sourcesync.synchronizer.FTPSFileSynchronizer
 import org.wavescale.sourcesync.synchronizer.SCPFileSynchronizer
 import org.wavescale.sourcesync.synchronizer.SFTPFileSynchronizer
+import java.net.URL
 
 class ActionLocalFileToRemote : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
@@ -65,6 +67,9 @@ class ActionLocalFileToRemote : AnAction() {
                             (connectionConfiguration as FTPConfiguration),
                             project, indicator
                         )
+                        GotItTooltip("sourcesync.ftp.sync", "FTP is deprecated", project)
+                            .withBrowserLink("Github Discussion", URL("https://github.com"))
+//                            .show(e.presentation, GotItTooltip.BOTTOM_LEFT)
                     } else if (ConnectionConstants.CONN_TYPE_FTPS == connectionConfiguration.connectionType) {
                         fileSynchronizer = FTPSFileSynchronizer(
                             (connectionConfiguration as FTPSConfiguration),
@@ -88,7 +93,7 @@ class ActionLocalFileToRemote : AnAction() {
     override fun update(e: AnActionEvent) {
         super.update(e)
         if (ExperimentalUI.isNewUI()) {
-            this.templatePresentation.icon = SourceSyncIcons.ExpUI.SourceSync
+            this.templatePresentation.icon = SourceSyncIcons.ExpUI.SOURCESYNC
         }
 
         val project = e.project ?: return

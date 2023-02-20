@@ -93,7 +93,7 @@ class ActionSelectedFilesToRemote : AnAction() {
     override fun update(e: AnActionEvent) {
         super.update(e)
         if (ExperimentalUI.isNewUI()) {
-            this.templatePresentation.icon = SourceSyncIcons.ExpUI.SourceSync
+            this.templatePresentation.icon = SourceSyncIcons.ExpUI.SOURCESYNC
         }
 
         val project = e.project ?: return
