@@ -12,22 +12,22 @@
 package org.wavescale.sourcesync.synchronizer
 
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.jcraft.jsch.ChannelSftp
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.JSchException
 import com.jcraft.jsch.Session
-import com.jcraft.jsch.SftpException
 import com.jcraft.jsch.SftpProgressMonitor
+import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.api.FileSynchronizer
 import org.wavescale.sourcesync.api.Utils
 import org.wavescale.sourcesync.config.SFTPConfiguration
-import org.wavescale.sourcesync.logger.EventDataLogger
+import org.wavescale.sourcesync.notifications.Notifier
 import org.wavescale.sourcesync.services.SyncStatusService
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -60,7 +60,11 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
                 isConnected = true
                 true
             } catch (e: JSchException) {
-                EventDataLogger.logWarning(e.toString(), project)
+                Notifier.notifyError(
+                    project,
+                    SourcesyncBundle.message("ssh.upload.fail.text"),
+                    "Can't open SSH connection to ${connectionInfo.host}. Reason: ${e.message}",
+                )
                 false
             }
         } else true
@@ -80,9 +84,10 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
             try {
                 Utils.createFile(SSH_KNOWN_HOSTS)
             } catch (e: IOException) {
-                EventDataLogger.logError(
-                    "Could not identify nor create the ssh known hosts file at " + SSH_KNOWN_HOSTS + ". The returned error is:" + e.message,
-                    project
+                Notifier.notifyError(
+                    project,
+                    SourcesyncBundle.message("ssh.upload.fail.text"),
+                    "Could not identify nor create the SSH known hosts file at ${SCPFileSynchronizer.SSH_KNOWN_HOSTS}. Reason: ${e.message}",
                 )
             }
             jsch.setKnownHosts(SSH_KNOWN_HOSTS)
@@ -110,14 +115,19 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
             channelSftp = session.openChannel("sftp") as ChannelSftp
             channelSftp.connect()
         } catch (e: JSchException) {
-            EventDataLogger.logError(e.toString(), project)
+            Notifier.notifyError(
+                project,
+                SourcesyncBundle.message("ssh.upload.fail.text"),
+                "An error was encountered while trying to open a SSH connection to ${connectionInfo.host}. Reason: ${e.message}",
+            )
             return
         }
 
         if (!channelSftp.absoluteDirExists(connectionInfo.workspaceBasePath)) {
-            EventDataLogger.logError(
-                "Remote project base path ${connectionInfo.workspaceBasePath} does not exist or is not a directory. Please make sure the value is a valid absolute directory path",
-                project
+            Notifier.notifyError(
+                project,
+                SourcesyncBundle.message("ssh.upload.fail.text"),
+                "Remote project base path ${connectionInfo.workspaceBasePath} does not exist or is not a directory. Please make sure the value is a valid absolute directory path on ${connectionInfo.host}",
             )
             return
         }
@@ -125,18 +135,23 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
         channelSftp.cd(connectionInfo.workspaceBasePath)
 
         if (!channelSftp.localDirExistsOnRemote(uploadLocation.toString())) {
-            EventDataLogger.logInfo(
-                "Upload path $uploadLocation does not exist or is not a directory. Going to create it.",
-                project
-            )
+            logger.info("Upload path $uploadLocation does not exist or is not a directory. Going to create it.")
             val exists = channelSftp.mkLocalDirsOnRemote(uploadLocation.toString())
             if (!exists) {
-                EventDataLogger.logError("Upload path $uploadLocation could not be created.", project)
+                Notifier.notifyError(
+                    project,
+                    SourcesyncBundle.message("ssh.upload.fail.text"),
+                    "Upload path $uploadLocation could not be created on ${connectionInfo.host}"
+                )
                 return
             }
         }
         if (!channelSftp.cdLocalDirsOnRemote(uploadLocation.toString())) {
-            EventDataLogger.logError("Could not change directory to $uploadLocation", project)
+            Notifier.notifyError(
+                project,
+                SourcesyncBundle.message("ssh.upload.fail.text"),
+                "Could not change directory to $uploadLocation"
+            )
             return
         }
 
@@ -153,10 +168,12 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
                 sftpATTRS.setACMODTIME(lastAcc, java.lang.Long.valueOf(toUpload.lastModified() / 1000).toInt())
                 channelSftp.setStat(toUpload.name, sftpATTRS)
             }
-        } catch (e: SftpException) {
-            EventDataLogger.logWarning(e.toString(), project)
-        } catch (e: FileNotFoundException) {
-            EventDataLogger.logWarning(e.toString(), project)
+        } catch (e: Exception) {
+            Notifier.notifyError(
+                project,
+                SourcesyncBundle.message("ssh.upload.fail.text"),
+                "Upload to ${connectionInfo.host} failed. Reason: ${e.message}"
+            )
         }
         channelSftp.disconnect()
     }
@@ -192,5 +209,7 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
 
     companion object {
         val SSH_KNOWN_HOSTS = Paths.get(System.getProperty("user.home"), ".ssh", "known_hosts").toString()
+
+        private val logger = logger<SFTPFileSynchronizer>()
     }
 }

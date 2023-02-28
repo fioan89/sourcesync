@@ -3,19 +3,20 @@ package org.wavescale.sourcesync.action
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.project.stateStore
 import com.intellij.ui.ExperimentalUI
 import org.wavescale.sourcesync.SourceSyncIcons
+import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.api.FileSynchronizer
 import org.wavescale.sourcesync.api.SynchronizationQueue
 import org.wavescale.sourcesync.api.Utils
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory
 import org.wavescale.sourcesync.factory.ConnectionConfig
-import org.wavescale.sourcesync.logger.BalloonLogger
-import org.wavescale.sourcesync.logger.EventDataLogger
+import org.wavescale.sourcesync.notifications.Notifier
 import java.io.File
 import java.util.concurrent.Semaphore
 
@@ -34,10 +35,10 @@ class ActionSelectedFilesToRemote : AnAction() {
         // get a list of selected virtual files
         val virtualFiles = PlatformDataKeys.VIRTUAL_FILE_ARRAY.getData(e.dataContext)!!
         if (virtualFiles.isEmpty()) {
-            val builder = StringBuilder("Project <b>")
-            builder.append(e.project!!.name).append("</b>! does not have files selected!")
-            BalloonLogger.logBalloonInfo(builder.toString(), e.project)
-            EventDataLogger.logInfo(builder.toString(), e.project)
+            Notifier.notifyInfo(
+                e.project!!,
+                SourcesyncBundle.message("no.files.selected.to.sync")
+            )
             return
         }
 
@@ -60,12 +61,9 @@ class ActionSelectedFilesToRemote : AnAction() {
                                 semaphores.acquire()
                                 fileSynchronizer = queue.take()
                                 fileSynchronizer!!.indicator = indicator
-                                if (fileSynchronizer != null) {
-                                    fileSynchronizer.connect()
-                                    // so final destination will look like this:
-                                    // root_home/ + project_relative_path_to_file/
+                                if (fileSynchronizer != null && fileSynchronizer.connect()) {
+                                    fileSynchronizer.syncFile(virtualFile.path, uploadLocation)
                                 }
-                                fileSynchronizer.syncFile(virtualFile.path, uploadLocation)
                                 queue.put(fileSynchronizer)
                                 synchronizationQueue.count()
                             } catch (e1: InterruptedException) {
@@ -77,13 +75,13 @@ class ActionSelectedFilesToRemote : AnAction() {
                     })
                 } else {
                     if (virtualFile != null) {
-                        EventDataLogger.logWarning("File <b>" + virtualFile.name + "</b> is filtered out!", e.project)
+                        logger.info("Skipping upload of ${virtualFile.name} because it matches the exclusion file pattern")
                         synchronizationQueue.count()
                     }
                 }
             } else {
                 if (virtualFile != null) {
-                    EventDataLogger.logWarning("File <b>" + virtualFile.name + "</b> is a directory!", e.project)
+                    logger.info("Skipping upload of ${virtualFile.name} because it's a directory")
                     synchronizationQueue.count()
                 }
             }
@@ -103,5 +101,9 @@ class ActionSelectedFilesToRemote : AnAction() {
         } else {
             templatePresentation.text = "Sync selected files to Remote target"
         }
+    }
+
+    companion object {
+        val logger = Logger.getInstance(ActionSelectedFilesToRemote.javaClass.simpleName)
     }
 }

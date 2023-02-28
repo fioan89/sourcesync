@@ -7,13 +7,13 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.jetbrains.annotations.NotNull;
+import org.wavescale.sourcesync.SourcesyncBundle;
 import org.wavescale.sourcesync.api.FileSynchronizer;
 import org.wavescale.sourcesync.config.FTPConfiguration;
-import org.wavescale.sourcesync.logger.EventDataLogger;
+import org.wavescale.sourcesync.notifications.Notifier;
 import org.wavescale.sourcesync.services.SyncStatusService;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
@@ -50,12 +50,16 @@ public class FTPFileSynchronizer extends FileSynchronizer {
                 // use passive mode to bypass firewall conflicts
                 this.ftp.enterLocalPassiveMode();
             } catch (IOException e) {
-                EventDataLogger.logWarning(e.toString(), this.getProject());
+                Notifier.notifyError(getProject(),
+                        SourcesyncBundle.message("ftp.upload.fail.text"),
+                        "Can't open FTP connection to " + getConnectionInfo().getHost() + ". Reason: " + e.getMessage());
                 return false;
             }
             // check if successful connection
             if (!FTPReply.isPositiveCompletion(this.ftp.getReplyCode())) {
-                EventDataLogger.logWarning("Connection to <b>" + this.getConnectionInfo().getHost() + "</b> failed!", this.getProject());
+                Notifier.notifyError(getProject(),
+                        SourcesyncBundle.message("ftp.upload.fail.text"),
+                        "FTP connection to " + getConnectionInfo().getHost() + " could not be successfully completed.");
                 return false;
             }
             this.setConnected(true);
@@ -70,7 +74,9 @@ public class FTPFileSynchronizer extends FileSynchronizer {
                 ftp.disconnect();
                 this.setConnected(false);
             } catch (IOException e) {
-                EventDataLogger.logWarning(e.toString(), this.getProject());
+                Notifier.notifyError(getProject(),
+                        SourcesyncBundle.message("ftp.upload.fail.text"),
+                        "Can't close FTP connection to " + getConnectionInfo().getHost() + ". Reason: " + e.getMessage());
             } finally {
                 syncStatusService.removeRunningSync(getConnectionInfo().getConnectionName());
             }
@@ -90,7 +96,9 @@ public class FTPFileSynchronizer extends FileSynchronizer {
         try {
             this.ftp.changeWorkingDirectory(remotePath.getRoot().toString());
         } catch (IOException e) {
-            EventDataLogger.logError("On remote we could not change directory into root: " + remotePath.getRoot(), this.getProject());
+            Notifier.notifyError(getProject(),
+                    SourcesyncBundle.message("ftp.upload.fail.text"),
+                    "We could not change directory into root path: " + remotePath.getRoot() + " on remote " + getConnectionInfo().getHost() + ". Reason: " + e.getMessage());
         }
         for (Path current : remotePath) {
             String location = current.toString();
@@ -103,9 +111,9 @@ public class FTPFileSynchronizer extends FileSynchronizer {
             try {
                 this.ftp.changeWorkingDirectory(location);
             } catch (IOException e) {
-                // probably it doesn't exist or maybe no permission
-                EventDataLogger.logError("Remote dir <b>" + remotePath +
-                        "</b> might not exist or you don't have permission on this path!", this.getProject());
+                Notifier.notifyError(getProject(),
+                        SourcesyncBundle.message("ftp.upload.fail.text"),
+                        "We could not change current working directory to: " + remotePath + " on remote " + getConnectionInfo().getHost() + ". This directory might not exist or you don't have permission on this path. Reason: " + e.getMessage());
                 return;
             }
         }
@@ -135,10 +143,10 @@ public class FTPFileSynchronizer extends FileSynchronizer {
             }
             in.close();
             outputStream.close();
-        } catch (FileNotFoundException e) {
-            EventDataLogger.logWarning(e.toString(), getProject());
         } catch (IOException e) {
-            EventDataLogger.logError(e.toString(), getProject());
+            Notifier.notifyError(getProject(),
+                    SourcesyncBundle.message("ftp.upload.fail.text"),
+                    "FTP upload to  remote " + getConnectionInfo().getHost() + " failed. Reason: " + e.getMessage());
         }
     }
 }

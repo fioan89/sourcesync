@@ -1,6 +1,7 @@
 package org.wavescale.sourcesync.api;
 
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
@@ -9,7 +10,6 @@ import org.wavescale.sourcesync.config.FTPConfiguration;
 import org.wavescale.sourcesync.config.FTPSConfiguration;
 import org.wavescale.sourcesync.config.SCPConfiguration;
 import org.wavescale.sourcesync.config.SFTPConfiguration;
-import org.wavescale.sourcesync.logger.EventDataLogger;
 import org.wavescale.sourcesync.synchronizer.FTPFileSynchronizer;
 import org.wavescale.sourcesync.synchronizer.FTPSFileSynchronizer;
 import org.wavescale.sourcesync.synchronizer.SCPFileSynchronizer;
@@ -38,9 +38,10 @@ import java.util.concurrent.BlockingQueue;
  * and cleans the pool after a certain threshold value is reached.
  */
 public class SynchronizationQueue {
+    private final Logger logger = Logger.getInstance(SynchronizationQueue.class.getSimpleName());
     private final Project project;
     private final ConnectionConfiguration connectionType;
-    private int allowed_sessions;
+    private final int allowed_sessions;
     private BlockingQueue<FileSynchronizer> syncQueue;
 
     private int countTo = 0;
@@ -74,8 +75,8 @@ public class SynchronizationQueue {
 
             try {
                 queue.put(fileSynchronizer);
-            } catch (InterruptedException e1) {
-                EventDataLogger.logError(e1.toString(), project);
+            } catch (InterruptedException e) {
+                logger.error("An error was encountered while trying to initialize the synchronizers. Reason:", e.toString());
             }
         }
         return queue;

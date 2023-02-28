@@ -2,6 +2,7 @@ package org.wavescale.sourcesync.action
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -11,13 +12,13 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.project.stateStore
 import com.intellij.ui.ExperimentalUI
 import org.wavescale.sourcesync.SourceSyncIcons
+import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.api.FileSynchronizer
 import org.wavescale.sourcesync.api.SynchronizationQueue
 import org.wavescale.sourcesync.api.Utils
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory
 import org.wavescale.sourcesync.factory.ConnectionConfig
-import org.wavescale.sourcesync.logger.BalloonLogger
-import org.wavescale.sourcesync.logger.EventDataLogger
+import org.wavescale.sourcesync.notifications.Notifier
 import java.util.concurrent.Semaphore
 
 class ActionChangedFilesToRemote : AnAction() {
@@ -35,11 +36,10 @@ class ActionChangedFilesToRemote : AnAction() {
         // there's this possibility that the project might not be versioned, therefore no changes can be detected.
         val changeLists = ChangeListManager.getInstance(e.project!!).changeLists
         if (!hasModifiedFiles(changeLists)) {
-            val builder = StringBuilder("Could not find any changes on project <b>")
-            builder.append(e.project!!.name).append("</b>! You might want to check if this project is imported in any")
-                .append(" version control system that is supported by IDEA!")
-            BalloonLogger.logBalloonInfo(builder.toString(), e.project)
-            EventDataLogger.logInfo(builder.toString(), e.project)
+            Notifier.notifyInfo(
+                e.project!!,
+                SourcesyncBundle.message("no.vcs.changes.to.sync"),
+            )
             return
         }
 
@@ -73,10 +73,7 @@ class ActionChangedFilesToRemote : AnAction() {
                             semaphores.acquire()
                             fileSynchronizer = queue.take()
                             fileSynchronizer!!.indicator = indicator
-                            if (fileSynchronizer != null) {
-                                fileSynchronizer.connect()
-                                // so final destination will look like this:
-                                // root_home/ + project_relative_path_to_file/
+                            if (fileSynchronizer != null && fileSynchronizer.connect()) {
                                 fileSynchronizer.syncFile(virtualFile.path, uploadLocation)
                             }
                             queue.put(fileSynchronizer)
@@ -90,7 +87,7 @@ class ActionChangedFilesToRemote : AnAction() {
                 })
             } else {
                 if (virtualFile != null) {
-                    EventDataLogger.logWarning("File <b>" + virtualFile.name + "</b> is filtered out!", e.project)
+                    logger.info("Skipping upload of ${virtualFile.name} because it matches the exclusion file pattern")
                     synchronizationQueue.count()
                 }
             }
@@ -122,5 +119,9 @@ class ActionChangedFilesToRemote : AnAction() {
         } else {
             templatePresentation.text = "Sync changed files to Remote target"
         }
+    }
+
+    companion object {
+        private val logger = logger<ActionChangedFilesToRemote>()
     }
 }

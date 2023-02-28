@@ -75,6 +75,9 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
+        <notificationGroup id="Sourcesync"
+                           displayType="BALLOON"
+                           bundle="messages.SourcesyncBundle"
+                           key="notification.group.sourcesync"/>
     </extensions>
 </idea-plugin>

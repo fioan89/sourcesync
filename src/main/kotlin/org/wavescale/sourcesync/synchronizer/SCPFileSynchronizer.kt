@@ -18,11 +18,11 @@ import com.jcraft.jsch.ChannelExec
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.JSchException
 import com.jcraft.jsch.Session
+import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.api.FileSynchronizer
 import org.wavescale.sourcesync.api.Utils
 import org.wavescale.sourcesync.config.SCPConfiguration
-import org.wavescale.sourcesync.logger.BalloonLogger
-import org.wavescale.sourcesync.logger.EventDataLogger
+import org.wavescale.sourcesync.notifications.Notifier
 import org.wavescale.sourcesync.services.SyncStatusService
 import java.io.File
 import java.io.FileInputStream
@@ -49,7 +49,11 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
                 isConnected = true
                 true
             } catch (e: JSchException) {
-                EventDataLogger.logWarning(e.toString(), project)
+                Notifier.notifyError(
+                    project,
+                    SourcesyncBundle.message("scp.upload.fail.text"),
+                    "Can't open SCP connection to ${connectionInfo.host}. Reason: ${e.message}",
+                )
                 false
             }
         } else true
@@ -69,9 +73,10 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
             try {
                 Utils.createFile(SSH_KNOWN_HOSTS)
             } catch (e: IOException) {
-                EventDataLogger.logError(
-                    "Could not identify nor create the ssh known hosts file at " + SSH_KNOWN_HOSTS + ". The returned error is:" + e.message,
-                    project
+                Notifier.notifyError(
+                    project,
+                    SourcesyncBundle.message("scp.upload.fail.text"),
+                    "Could not identify nor create the SSH known hosts file at $SSH_KNOWN_HOSTS. Reason: ${e.message}",
                 )
             }
             jsch.setKnownHosts(SSH_KNOWN_HOSTS)
@@ -111,9 +116,9 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
 
             // get I/O streams for remote scp
             val out = channel.getOutputStream()
-            val `in` = channel.getInputStream()
+            val inputStream = channel.getInputStream()
             channel.connect()
-            if (checkAck(`in`) != 0) {
+            if (checkAck(inputStream) != 0) {
                 return
             }
             val _lfile = File(sourcePath)
@@ -126,7 +131,7 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
                 command += " " + (_lfile.lastModified() / 1000) + " 0\n"
                 out.write(command.toByteArray())
                 out.flush()
-                if (checkAck(`in`) != 0) {
+                if (checkAck(inputStream) != 0) {
                     return
                 }
             }
@@ -137,7 +142,7 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
             command += "\n"
             out.write(command.toByteArray())
             out.flush()
-            if (checkAck(`in`) != 0) {
+            if (checkAck(inputStream) != 0) {
                 return
             }
 
@@ -157,21 +162,23 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
             buf[0] = 0
             out.write(buf, 0, 1)
             out.flush()
-            if (checkAck(`in`) != 0) {
+            if (checkAck(inputStream) != 0) {
                 return
             }
             out.close()
             channel.disconnect()
-        } catch (e: IOException) {
-            EventDataLogger.logWarning(e.toString(), project)
-        } catch (e: JSchException) {
-            EventDataLogger.logWarning(e.toString(), project)
+        } catch (e: Exception) {
+            Notifier.notifyError(
+                project,
+                SourcesyncBundle.message("scp.upload.fail.text"),
+                "Upload to ${connectionInfo.host} failed. Reason: ${e.message}",
+            )
         }
     }
 
     @Throws(IOException::class)
-    private fun checkAck(`in`: InputStream): Int {
-        val b = `in`.read()
+    private fun checkAck(inStream: InputStream): Int {
+        val b = inStream.read()
         // b may be 0 for success,
         // 1 for error,
         // 2 for fatal error,
@@ -182,16 +189,22 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
             val sb = StringBuilder()
             var c: Int
             do {
-                c = `in`.read()
+                c = inStream.read()
                 sb.append(c.toChar())
             } while (c != '\n'.code)
             if (b == 1) { // error
-                BalloonLogger.logBalloonError(sb.toString(), project)
-                EventDataLogger.logError(sb.toString(), project)
+                Notifier.notifyError(
+                    project,
+                    SourcesyncBundle.message("scp.upload.fail.text"),
+                    "Could not initiate SCP connection to ${connectionInfo.host} because of an error."
+                )
             }
             if (b == 2) { // fatal error
-                BalloonLogger.logBalloonError(sb.toString(), project)
-                EventDataLogger.logError(sb.toString(), project)
+                Notifier.notifyError(
+                    project,
+                    SourcesyncBundle.message("scp.upload.fail.text"),
+                    "Could not initiate SCP connection to ${connectionInfo.host} because of a fatal error."
+                )
             }
         }
         return b
