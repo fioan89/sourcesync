@@ -27,10 +27,6 @@ class ActionSelectedFilesToRemote : AnAction() {
         val project = e.project ?: return
         val projectName = project.name
         val associationName = ConnectionConfig.getInstance().getAssociationFor(projectName)
-        if (associationName == null) {
-            Utils.showNoConnectionSpecifiedError(projectName)
-            return
-        }
 
         // get a list of selected virtual files
         val virtualFiles = PlatformDataKeys.VIRTUAL_FILE_ARRAY.getData(e.dataContext)!!
@@ -91,15 +87,21 @@ class ActionSelectedFilesToRemote : AnAction() {
     override fun update(e: AnActionEvent) {
         super.update(e)
         if (ExperimentalUI.isNewUI()) {
-            this.templatePresentation.icon = SourceSyncIcons.ExpUI.SOURCESYNC
+            e.presentation.icon = SourceSyncIcons.ExpUI.SOURCESYNC
         }
 
         val project = e.project ?: return
         val associationName = ConnectionConfig.getInstance().getAssociationFor(project.name)
         if (associationName != null) {
-            templatePresentation.text = "Sync selected files to $associationName"
+            e.presentation.apply {
+                text = "Sync selected files to $associationName"
+                isEnabled = true
+            }
         } else {
-            templatePresentation.text = "Sync selected files to Remote target"
+            e.presentation.apply {
+                text = "Sync selected files to Remote target"
+                isEnabled = false
+            }
         }
     }
 

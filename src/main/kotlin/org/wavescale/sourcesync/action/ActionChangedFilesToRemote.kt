@@ -28,10 +28,6 @@ class ActionChangedFilesToRemote : AnAction() {
         val project = e.project ?: return
         val projectName = project.name
         val associationName = ConnectionConfig.getInstance().getAssociationFor(projectName)
-        if (associationName == null) {
-            Utils.showNoConnectionSpecifiedError(projectName)
-            return
-        }
 
         // there's this possibility that the project might not be versioned, therefore no changes can be detected.
         val changeLists = ChangeListManager.getInstance(e.project!!).changeLists
@@ -109,15 +105,21 @@ class ActionChangedFilesToRemote : AnAction() {
     override fun update(e: AnActionEvent) {
         super.update(e)
         if (ExperimentalUI.isNewUI()) {
-            this.templatePresentation.icon = SourceSyncIcons.ExpUI.SOURCESYNC
+            e.presentation.icon = SourceSyncIcons.ExpUI.SOURCESYNC
         }
 
         val project = e.project ?: return
         val associationName = ConnectionConfig.getInstance().getAssociationFor(project.name)
         if (associationName != null) {
-            templatePresentation.text = "Sync changed files to $associationName"
+            e.presentation.apply {
+                text = "Sync changed files to $associationName"
+                isEnabled = true
+            }
         } else {
-            templatePresentation.text = "Sync changed files to Remote target"
+            e.presentation.apply {
+                text = "Sync changed files to Remote target"
+                isEnabled = false
+            }
         }
     }
 

@@ -15,6 +15,7 @@
 ### Fixed
 
 - path location issues when uploading files with scp from Windows to Unix
+- sync menus are now disabled when no remote target is selected
 
 ## 2.0.2 - 2022-12-07
 

@@ -1,7 +1,6 @@
 package org.wavescale.sourcesync.api;
 
 import com.intellij.openapi.components.impl.stores.IProjectStore;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import java.io.File;
@@ -45,18 +44,6 @@ public class Utils {
     }
 
     /**
-     * Logs an error message about no connection specified.
-     *
-     * @param projectName module or project name.
-     */
-    public static void showNoConnectionSpecifiedError(String projectName) {
-        String message = "There is no connection type associated to <b>" +
-                projectName +
-                "</b> module.\nPlease right click on module name and then select <b>Module Connection Configuration</b> to select connection type!";
-        Messages.showErrorDialog(message, "No connection specified for project " + projectName);
-    }
-
-    /**
      * Extracts an ordered list of all parent directories from project base path (including the project) for the file
      */
     public static Path relativeLocalUploadDirs(VirtualFile virtualFile, IProjectStore projectStore) {
@@ -76,11 +63,11 @@ public class Utils {
         if (fileToCreate.exists()) {
             return false;
         }
-        // the file doesn't exist so try create it
+        // the file doesn't exist so try to create it
         String dirPath = fileToCreate.getParent();
-        // try create the path
+        // try to  create the path
         new File(dirPath).mkdirs();
-        // try create the file
+        // try to create the file
         return fileToCreate.createNewFile();
     }
 

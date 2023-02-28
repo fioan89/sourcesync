@@ -27,16 +27,13 @@ import org.wavescale.sourcesync.synchronizer.SCPFileSynchronizer
 import org.wavescale.sourcesync.synchronizer.SFTPFileSynchronizer
 
 class ActionLocalFileToRemote : AnAction() {
+
     override fun actionPerformed(e: AnActionEvent) {
         // first check if there's a connection type associated to this module.
         // If not alert the user and get out
         val project = e.project ?: return
         val projectName = project.name
         val associationName = ConnectionConfig.getInstance().getAssociationFor(projectName)
-        if (associationName == null) {
-            Utils.showNoConnectionSpecifiedError(projectName)
-            return
-        }
         val virtualFile = PlatformDataKeys.VIRTUAL_FILE.getData(e.dataContext)
         if (virtualFile == null || virtualFile.isDirectory) {
             Notifier.notifyInfo(
@@ -87,15 +84,21 @@ class ActionLocalFileToRemote : AnAction() {
     override fun update(e: AnActionEvent) {
         super.update(e)
         if (ExperimentalUI.isNewUI()) {
-            this.templatePresentation.icon = SourceSyncIcons.ExpUI.SOURCESYNC
+            e.presentation.icon = SourceSyncIcons.ExpUI.SOURCESYNC
         }
 
         val project = e.project ?: return
         val associationName = ConnectionConfig.getInstance().getAssociationFor(project.name)
         if (associationName != null) {
-            templatePresentation.text = "Sync this file to $associationName"
+            e.presentation.apply {
+                text = "Sync this file to $associationName"
+                isEnabled = true
+            }
         } else {
-            templatePresentation.text = "Sync this file to Remote target"
+            e.presentation.apply {
+                text = "Sync this file to Remote target"
+                isEnabled = false
+            }
         }
     }
 
