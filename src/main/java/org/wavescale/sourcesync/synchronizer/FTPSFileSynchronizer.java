@@ -42,6 +42,7 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
 
     @Override
     public boolean connect() {
+        Notifier.notifyDeprecation(getProject(), SourcesyncBundle.message("ftp.deprecate.message"), "https://github.com/fioan89/sourcesync/issues/116");
         if (!isConnected()) {
             try {
                 syncStatusService.addRunningSync(getConnectionInfo().getConnectionName());
