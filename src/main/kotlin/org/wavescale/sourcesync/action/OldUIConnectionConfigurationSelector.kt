@@ -11,7 +11,6 @@ import com.intellij.openapi.actionSystem.Presentation
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAwareAction
-import com.intellij.ui.IconManager
 import org.wavescale.sourcesync.SourceSyncIcons
 import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory
@@ -70,7 +69,7 @@ class OldUIConnectionConfigurationSelector : ComboBoxAction() {
             e.presentation.apply {
                 isEnabled = true
                 text = ConnectionConfig.getInstance().getAssociationFor(projectName)
-                icon = IconManager.getInstance().getIcon("sourcesync.svg", ConnectionConfigurationsComboBox::class.java)
+                icon = SourceSyncIcons.SOURCESYNC
             }
         }
     }
@@ -94,9 +93,9 @@ class OldUIConnectionConfigurationSelector : ComboBoxAction() {
         override fun paint(g: Graphics) {
             super.paint(g)
             presentation.icon = if (syncStatusService.isAnySyncJobRunning()) {
-                SourceSyncIcons.ExpUI.SOURCESYNC_RUNNING
+                SourceSyncIcons.SOURCESYNC_RUNNING
             } else {
-                SourceSyncIcons.ExpUI.SOURCESYNC
+                SourceSyncIcons.SOURCESYNC
             }
         }
 
@@ -115,7 +114,7 @@ class OldUIConnectionConfigurationSelector : ComboBoxAction() {
         init {
             val presentation = templatePresentation
             presentation.setText(configuration, false)
-            presentation.icon = IconManager.getInstance().getIcon("sourcesync.svg", SourceSyncConfigAction::class.java)
+            presentation.icon = SourceSyncIcons.SOURCESYNC
         }
 
         override fun actionPerformed(e: AnActionEvent) {
