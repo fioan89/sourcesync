@@ -52,6 +52,7 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
                 this.ftps.execPROT("P"); // Set data channel protection to private
                 this.ftps.enterLocalPassiveMode();
             } catch (IOException e) {
+                syncStatusService.removeRunningSync(getConnectionInfo().getConnectionName());
                 Notifier.notifyError(getProject(),
                         SourcesyncBundle.message("ftps.upload.fail.text"),
                         "Can't open Secure FTP connection to " + getConnectionInfo().getHost() + ". Reason: " + e.getMessage());
@@ -59,6 +60,7 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
             }
             // check if successful connection
             if (!FTPReply.isPositiveCompletion(this.ftps.getReplyCode())) {
+                syncStatusService.removeRunningSync(getConnectionInfo().getConnectionName());
                 Notifier.notifyError(getProject(),
                         SourcesyncBundle.message("ftp.upload.fail.text"),
                         "Secure FTP connection to " + getConnectionInfo().getHost() + " could not be successfully completed.");
@@ -98,9 +100,11 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
         try {
             this.ftps.changeWorkingDirectory(remotePath.getRoot().toString());
         } catch (IOException e) {
+            syncStatusService.removeRunningSync(getConnectionInfo().getConnectionName());
             Notifier.notifyError(getProject(),
                     SourcesyncBundle.message("ftps.upload.fail.text"),
                     "Could not change current working directory to: " + remotePath + " on remote " + getConnectionInfo().getHost() + ". This directory might not exist or you don't have permission on this path. Reason: " + e.getMessage());
+            return;
         }
         for (Path current : remotePath) {
             String location = current.toString();
@@ -113,6 +117,7 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
             try {
                 this.ftps.changeWorkingDirectory(location);
             } catch (IOException e) {
+                syncStatusService.removeRunningSync(getConnectionInfo().getConnectionName());
                 Notifier.notifyError(getProject(),
                         SourcesyncBundle.message("ftps.upload.fail.text"),
                         "We could not change current working directory to: " + remotePath + " on remote " + getConnectionInfo().getHost() + ". This directory might not exist or you don't have permission on this path. Reason: " + e.getMessage());
@@ -146,6 +151,7 @@ public class FTPSFileSynchronizer extends FileSynchronizer {
             in.close();
             outputStream.close();
         } catch (IOException e) {
+            syncStatusService.removeRunningSync(getConnectionInfo().getConnectionName());
             Notifier.notifyError(getProject(),
                     SourcesyncBundle.message("ftps.upload.fail.text"),
                     "Secure FTP upload to remote " + getConnectionInfo().getHost() + " failed. Reason: " + e.getMessage());

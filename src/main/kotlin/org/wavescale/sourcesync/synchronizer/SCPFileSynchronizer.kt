@@ -49,6 +49,7 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
                 isConnected = true
                 true
             } catch (e: JSchException) {
+                syncStatusService.removeRunningSync(connectionInfo.connectionName)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("scp.upload.fail.text"),
@@ -73,11 +74,13 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
             try {
                 Utils.createFile(SSH_KNOWN_HOSTS)
             } catch (e: IOException) {
+                syncStatusService.removeRunningSync(connectionInfo.connectionName)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("scp.upload.fail.text"),
                     "Could not identify nor create the SSH known hosts file at $SSH_KNOWN_HOSTS. Reason: ${e.message}",
                 )
+                return
             }
             jsch.setKnownHosts(SSH_KNOWN_HOSTS)
             // add private key and passphrase if exists
@@ -168,6 +171,7 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
             out.close()
             channel.disconnect()
         } catch (e: Exception) {
+            syncStatusService.removeRunningSync(connectionInfo.connectionName)
             Notifier.notifyError(
                 project,
                 SourcesyncBundle.message("scp.upload.fail.text"),
@@ -192,14 +196,18 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
                 c = inStream.read()
                 sb.append(c.toChar())
             } while (c != '\n'.code)
-            if (b == 1) { // error
+            if (b == 1) {
+                // error
+                syncStatusService.removeRunningSync(connectionInfo.connectionName)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("scp.upload.fail.text"),
                     "Could not initiate SCP connection to ${connectionInfo.host} because of an error."
                 )
             }
-            if (b == 2) { // fatal error
+            if (b == 2) {
+                // fatal error
+                syncStatusService.removeRunningSync(connectionInfo.connectionName)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("scp.upload.fail.text"),

@@ -50,6 +50,7 @@ public class FTPFileSynchronizer extends FileSynchronizer {
                 // use passive mode to bypass firewall conflicts
                 this.ftp.enterLocalPassiveMode();
             } catch (IOException e) {
+                syncStatusService.removeRunningSync(getConnectionInfo().getConnectionName());
                 Notifier.notifyError(getProject(),
                         SourcesyncBundle.message("ftp.upload.fail.text"),
                         "Can't open FTP connection to " + getConnectionInfo().getHost() + ". Reason: " + e.getMessage());
@@ -57,6 +58,7 @@ public class FTPFileSynchronizer extends FileSynchronizer {
             }
             // check if successful connection
             if (!FTPReply.isPositiveCompletion(this.ftp.getReplyCode())) {
+                syncStatusService.removeRunningSync(getConnectionInfo().getConnectionName());
                 Notifier.notifyError(getProject(),
                         SourcesyncBundle.message("ftp.upload.fail.text"),
                         "FTP connection to " + getConnectionInfo().getHost() + " could not be successfully completed.");
@@ -96,9 +98,11 @@ public class FTPFileSynchronizer extends FileSynchronizer {
         try {
             this.ftp.changeWorkingDirectory(remotePath.getRoot().toString());
         } catch (IOException e) {
+            syncStatusService.removeRunningSync(getConnectionInfo().getConnectionName());
             Notifier.notifyError(getProject(),
                     SourcesyncBundle.message("ftp.upload.fail.text"),
                     "We could not change directory into root path: " + remotePath.getRoot() + " on remote " + getConnectionInfo().getHost() + ". Reason: " + e.getMessage());
+            return;
         }
         for (Path current : remotePath) {
             String location = current.toString();
@@ -111,6 +115,7 @@ public class FTPFileSynchronizer extends FileSynchronizer {
             try {
                 this.ftp.changeWorkingDirectory(location);
             } catch (IOException e) {
+                syncStatusService.removeRunningSync(getConnectionInfo().getConnectionName());
                 Notifier.notifyError(getProject(),
                         SourcesyncBundle.message("ftp.upload.fail.text"),
                         "We could not change current working directory to: " + remotePath + " on remote " + getConnectionInfo().getHost() + ". This directory might not exist or you don't have permission on this path. Reason: " + e.getMessage());
@@ -144,6 +149,7 @@ public class FTPFileSynchronizer extends FileSynchronizer {
             in.close();
             outputStream.close();
         } catch (IOException e) {
+            syncStatusService.removeRunningSync(getConnectionInfo().getConnectionName());
             Notifier.notifyError(getProject(),
                     SourcesyncBundle.message("ftp.upload.fail.text"),
                     "FTP upload to  remote " + getConnectionInfo().getHost() + " failed. Reason: " + e.getMessage());

@@ -60,6 +60,7 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
                 isConnected = true
                 true
             } catch (e: JSchException) {
+                syncStatusService.removeRunningSync(connectionInfo.connectionName)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("ssh.upload.fail.text"),
@@ -84,11 +85,13 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
             try {
                 Utils.createFile(SSH_KNOWN_HOSTS)
             } catch (e: IOException) {
+                syncStatusService.removeRunningSync(connectionInfo.connectionName)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("ssh.upload.fail.text"),
                     "Could not identify nor create the SSH known hosts file at ${SCPFileSynchronizer.SSH_KNOWN_HOSTS}. Reason: ${e.message}",
                 )
+                return
             }
             jsch.setKnownHosts(SSH_KNOWN_HOSTS)
             // add private key and passphrase if exists
@@ -115,6 +118,7 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
             channelSftp = session.openChannel("sftp") as ChannelSftp
             channelSftp.connect()
         } catch (e: JSchException) {
+            syncStatusService.removeRunningSync(connectionInfo.connectionName)
             Notifier.notifyError(
                 project,
                 SourcesyncBundle.message("ssh.upload.fail.text"),
@@ -124,6 +128,7 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
         }
 
         if (!channelSftp.absoluteDirExists(connectionInfo.workspaceBasePath)) {
+            syncStatusService.removeRunningSync(connectionInfo.connectionName)
             Notifier.notifyError(
                 project,
                 SourcesyncBundle.message("ssh.upload.fail.text"),
@@ -138,6 +143,7 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
             logger.info("Upload path $uploadLocation does not exist or is not a directory. Going to create it.")
             val exists = channelSftp.mkLocalDirsOnRemote(uploadLocation.toString())
             if (!exists) {
+                syncStatusService.removeRunningSync(connectionInfo.connectionName)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("ssh.upload.fail.text"),
@@ -147,6 +153,7 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
             }
         }
         if (!channelSftp.cdLocalDirsOnRemote(uploadLocation.toString())) {
+            syncStatusService.removeRunningSync(connectionInfo.connectionName)
             Notifier.notifyError(
                 project,
                 SourcesyncBundle.message("ssh.upload.fail.text"),
@@ -169,6 +176,7 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
                 channelSftp.setStat(toUpload.name, sftpATTRS)
             }
         } catch (e: Exception) {
+            syncStatusService.removeRunningSync(connectionInfo.connectionName)
             Notifier.notifyError(
                 project,
                 SourcesyncBundle.message("ssh.upload.fail.text"),
