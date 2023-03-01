@@ -25,6 +25,7 @@ import org.wavescale.sourcesync.api.FileSynchronizer
 import org.wavescale.sourcesync.api.Utils
 import org.wavescale.sourcesync.config.SFTPConfiguration
 import org.wavescale.sourcesync.notifications.Notifier
+import org.wavescale.sourcesync.services.StatsService
 import org.wavescale.sourcesync.services.SyncStatusService
 import java.io.File
 import java.io.FileInputStream
@@ -45,6 +46,8 @@ import java.nio.file.Paths
 class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, indicator: ProgressIndicator) :
     FileSynchronizer(connectionInfo, project, indicator) {
     private val syncStatusService = service<SyncStatusService>()
+    private val statsService = service<StatsService>()
+
     private val jsch: JSch = JSch()
     private lateinit var session: Session
 
@@ -212,6 +215,10 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
 
         override fun end() {
             indicator.fraction = 1.0
+            statsService.registerSuccessfulUpload()
+            if (statsService.eligibleForDonations()) {
+                Notifier.notifyDonation(project)
+            }
         }
     }
 

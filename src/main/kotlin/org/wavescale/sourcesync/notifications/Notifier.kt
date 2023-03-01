@@ -11,6 +11,7 @@ import org.wavescale.sourcesync.SourcesyncBundle
 private val notificationGroup = NotificationGroupManager.getInstance().getNotificationGroup("Sourcesync")
 
 private const val PROPERTY_IGNORE_SOURCESYNC_FTP_DEPRECATION = "ignore.sourcesync.ftp.deprecation"
+private const val PROPERTY_IGNORE_SOURCESYNC_DONATION = "ignore.sourcesync.donation"
 
 class Notifier {
     companion object {
@@ -28,6 +29,7 @@ class Notifier {
             if (ignored) return
 
             val notification = notificationGroup.createNotification(
+                SourcesyncBundle.message("ftp.deprecate.title"),
                 message,
                 NotificationType.WARNING
             )
@@ -41,6 +43,32 @@ class Notifier {
                 })
 
                 setDisplayId(SourcesyncBundle.message("notification.group.sourcesync.ftp.deprecation"))
+                isImportant = true
+                isSuggestionType = true
+            }.notify(project)
+        }
+
+        @JvmStatic
+        fun notifyDonation(project: Project) {
+
+            val ignored = PropertiesComponent.getInstance().isValueSet(PROPERTY_IGNORE_SOURCESYNC_DONATION)
+            if (ignored) return
+
+            val notification = notificationGroup.createNotification(
+                SourcesyncBundle.message("donation.title"),
+                SourcesyncBundle.message("donation.message"),
+                NotificationType.INFORMATION
+            )
+
+            notification.apply {
+                addAction(NotificationAction.createSimpleExpiring(SourcesyncBundle.message("dont.show.again.action")) {
+                    PropertiesComponent.getInstance().setValue(PROPERTY_IGNORE_SOURCESYNC_DONATION, "true")
+                })
+                addAction(NotificationAction.createSimple(SourcesyncBundle.message("buy.me.a.coffee")) {
+                    BrowserUtil.browse("https://www.buymeacoffee.com/fioan89")
+                })
+
+                setDisplayId(SourcesyncBundle.message("notification.group.sourcesync.donation"))
                 isImportant = true
                 isSuggestionType = true
             }.notify(project)

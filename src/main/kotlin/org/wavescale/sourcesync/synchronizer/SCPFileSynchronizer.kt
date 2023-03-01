@@ -23,6 +23,7 @@ import org.wavescale.sourcesync.api.FileSynchronizer
 import org.wavescale.sourcesync.api.Utils
 import org.wavescale.sourcesync.config.SCPConfiguration
 import org.wavescale.sourcesync.notifications.Notifier
+import org.wavescale.sourcesync.services.StatsService
 import org.wavescale.sourcesync.services.SyncStatusService
 import java.io.File
 import java.io.FileInputStream
@@ -34,6 +35,7 @@ import java.nio.file.Paths
 class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, indicator: ProgressIndicator) :
     FileSynchronizer(connectionInfo, project, indicator) {
     private val syncStatusService = service<SyncStatusService>()
+    private val statsService = service<StatsService>()
     private val jsch: JSch = JSch()
     private lateinit var session: Session
 
@@ -170,6 +172,10 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
             }
             out.close()
             channel.disconnect()
+            statsService.registerSuccessfulUpload()
+            if (statsService.eligibleForDonations()) {
+                Notifier.notifyDonation(project)
+            }
         } catch (e: Exception) {
             syncStatusService.removeRunningSync(connectionInfo.connectionName)
             Notifier.notifyError(
