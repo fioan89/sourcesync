@@ -28,7 +28,7 @@ dependencies {
     implementation("com.github.mwiede:jsch:0.2.7")
     implementation("commons-net:commons-net:3.9.0")
 
-    testImplementation("org.mockito:mockito-core:5.1.1")
+    testImplementation("org.mockito:mockito-core:5.2.0")
     testImplementation("com.tngtech.java:junit-dataprovider:1.13.1")
 }
 
