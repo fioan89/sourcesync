@@ -126,14 +126,14 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
             if (checkAck(inputStream) != 0) {
                 return
             }
-            val _lfile = File(sourcePath)
+            val localFile = File(sourcePath)
             indicator.isIndeterminate = false
-            indicator.text = "Uploading...[" + _lfile.name + "]"
+            indicator.text = "Uploading...[" + localFile.name + "]"
             if (preserveTimestamp) {
-                command = "T " + _lfile.lastModified() / 1000 + " 0"
+                command = "T " + localFile.lastModified() / 1000 + " 0"
                 // The access time should be sent here,
                 // but it is not accessible with JavaAPI ;-<
-                command += " " + (_lfile.lastModified() / 1000) + " 0\n"
+                command += " " + (localFile.lastModified() / 1000) + " 0\n"
                 out.write(command.toByteArray())
                 out.flush()
                 if (checkAck(inputStream) != 0) {
@@ -141,7 +141,7 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
                 }
             }
             // send "C0644 filesize filename", where filename should not include '/'
-            val filesize = _lfile.length()
+            val filesize = localFile.length()
             command = "C0644 $filesize "
             command += Paths.get(sourcePath).fileName.toString()
             command += "\n"

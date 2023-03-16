@@ -30,8 +30,6 @@ import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.api.ConnectionConfiguration
 import org.wavescale.sourcesync.api.ConnectionConstants
 import org.wavescale.sourcesync.api.PasswordlessSSH
-import org.wavescale.sourcesync.config.FTPConfiguration
-import org.wavescale.sourcesync.config.FTPSConfiguration
 import org.wavescale.sourcesync.config.SCPConfiguration
 import org.wavescale.sourcesync.config.SFTPConfiguration
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory
@@ -102,7 +100,7 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
         btnBrowse.apply {
             addActionListener {
                 val descriptor = FileChooserDescriptor(true, false, false, false, false, false)
-                        .withTitle(SourcesyncBundle.message("certificateFileChooserDialogTitle"))
+                    .withTitle(SourcesyncBundle.message("certificateFileChooserDialogTitle"))
                 var result: VirtualFile? = null
                 FileChooser.chooseFile(descriptor, project, null) { result = it }
                 tfCertFile.text = result?.canonicalPath
@@ -139,7 +137,8 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
         } else {
             lbPassword.text = SourcesyncBundle.message("passwordLabel")
         }
-        pfUserPassword.isEnabled = (cbUseSSHKeys.isSelected && cbSSHPassphrase.isSelected) || (!cbUseSSHKeys.isSelected && !cbSSHPassphrase.isSelected)
+        pfUserPassword.isEnabled =
+            (cbUseSSHKeys.isSelected && cbSSHPassphrase.isSelected) || (!cbUseSSHKeys.isSelected && !cbSSHPassphrase.isSelected)
     }
 
     private fun highlightConnectionConfigurationCallback(): (event: ListSelectionEvent) -> Unit = {
@@ -169,46 +168,50 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
 
     private fun leftSidePanel(): JComponent {
         return JPanel(BorderLayout()).apply {
-            add(JBScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED).apply {
-                add(JBViewport().apply {
-                    add(configurationsList)
-                    minimumSize = Dimension(300, -1)
-                })
-                border = JBUI.Borders.empty()
-            })
             add(
-                    ToolbarDecorator.createDecorator(configurationsList)
-                            .disableUpDownActions()
-                            .setAddAction {
-                                val parentWindow = SwingUtilities.windowForComponent(configurationsList)
-                                val targetConfig = TargetLocation(parentWindow)
-                                val name = targetConfig.targetName
-                                val type = targetConfig.targetType
-                                listModel.add(name)
-                                configurationsList.selectedIndex = listModel.getElementIndex(name)
-                                createConnection(name, type)
+                JBScrollPane(
+                    ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
+                ).apply {
+                    add(JBViewport().apply {
+                        add(configurationsList)
+                        minimumSize = Dimension(300, -1)
+                    })
+                    border = JBUI.Borders.empty()
+                })
+            add(
+                ToolbarDecorator.createDecorator(configurationsList)
+                    .disableUpDownActions()
+                    .setAddAction {
+                        val parentWindow = SwingUtilities.windowForComponent(configurationsList)
+                        val targetConfig = TargetLocation(parentWindow)
+                        val name = targetConfig.targetName
+                        val type = targetConfig.targetType
+                        listModel.add(name)
+                        configurationsList.selectedIndex = listModel.getElementIndex(name)
+                        createConnection(name, type)
+                    }
+                    .setAddIcon(AllIcons.General.Add)
+                    .setRemoveAction {
+                        val target: String = configurationsList.selectedValue
+                        val index = listModel.getElementIndex(target)
+                        if (index >= 0) {
+                            listModel.remove(target)
+                            // remove from config
+                            val configConnectionFactory = ConfigConnectionFactory.getInstance()
+                            configConnectionFactory.removeConnectionConfiguration(target)
+                            // select the bottom index
+                            if (index > 0) {
+                                configurationsList.selectedIndex = index - 1
                             }
-                            .setAddIcon(AllIcons.General.Add)
-                            .setRemoveAction {
-                                val target: String = configurationsList.selectedValue
-                                val index = listModel.getElementIndex(target)
-                                if (index >= 0) {
-                                    listModel.remove(target)
-                                    // remove from config
-                                    val configConnectionFactory = ConfigConnectionFactory.getInstance()
-                                    configConnectionFactory.removeConnectionConfiguration(target)
-                                    // select the bottom index
-                                    if (index > 0) {
-                                        configurationsList.selectedIndex = index - 1
-                                    }
-                                }
-                                if (listModel.size == 0) {
-                                    ConnectionConfig.getInstance().apply {
-                                        removeAssociations()
-                                        saveModuleAssociatedConn()
-                                    }
-                                }
-                            }.createPanel()
+                        }
+                        if (listModel.size == 0) {
+                            ConnectionConfig.getInstance().apply {
+                                removeAssociations()
+                                saveModuleAssociatedConn()
+                            }
+                        }
+                    }.createPanel()
             )
         }
     }
@@ -235,52 +238,190 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
             border = JBUI.Borders.empty(15, 5, 0, 15)
             add(JPanel(GridLayoutManager(2, 2)).apply {
 
-                add(JPanel(GridLayoutManager(1, 2)).apply {
-                    add(JLabel(SourcesyncBundle.message("typeLabel")), GridConstraints().apply { row = 0; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
-                    add(lbConnType, GridConstraints().apply { row = 0; column = 1; anchor = ALIGN_CENTER; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW })
-                }, GridConstraints().apply { row = 0; column = 0; colSpan = 2; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW })
+                add(
+                    JPanel(GridLayoutManager(1, 2)).apply {
+                        add(
+                            JLabel(SourcesyncBundle.message("typeLabel")),
+                            GridConstraints().apply {
+                                row = 0; column = 0; anchor = ANCHOR_WEST; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK
+                            })
+                        add(
+                            lbConnType,
+                            GridConstraints().apply {
+                                row = 0; column = 1; anchor = ALIGN_CENTER; fill = FILL_HORIZONTAL; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW
+                            })
+                    },
+                    GridConstraints().apply {
+                        row = 0; column = 0; colSpan = 2; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy =
+                        SIZEPOLICY_CAN_GROW
+                    })
 
-                add(JPanel(GridLayoutManager(12, 2)).apply {
-                    add(JLabel(SourcesyncBundle.message("hostLabel")), GridConstraints().apply { row = 0; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
-                    add(tfHost, GridConstraints().apply { row = 0; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
+                add(
+                    JPanel(GridLayoutManager(12, 2)).apply {
+                        add(
+                            JLabel(SourcesyncBundle.message("hostLabel")),
+                            GridConstraints().apply {
+                                row = 0; column = 0; anchor = ANCHOR_WEST; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK
+                            })
+                        add(
+                            tfHost,
+                            GridConstraints().apply {
+                                row = 0; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW
+                            })
 
-                    add(JLabel(SourcesyncBundle.message("portLabel")), GridConstraints().apply { row = 1; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
-                    add(tfPort, GridConstraints().apply { row = 1; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
+                        add(
+                            JLabel(SourcesyncBundle.message("portLabel")),
+                            GridConstraints().apply {
+                                row = 1; column = 0; anchor = ANCHOR_WEST; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK
+                            })
+                        add(
+                            tfPort,
+                            GridConstraints().apply {
+                                row = 1; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW
+                            })
 
-                    add(JLabel(SourcesyncBundle.message("workspaceDirectoyLabel")), GridConstraints().apply { row = 2; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
-                    add(tfWorkspaceBasePath, GridConstraints().apply { row = 2; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
-                    // empty row
-                    add(JPanel(), GridConstraints().apply { row = 3; column = 0; colSpan = 2; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
+                        add(
+                            JLabel(SourcesyncBundle.message("workspaceDirectoyLabel")),
+                            GridConstraints().apply {
+                                row = 2; column = 0; anchor = ANCHOR_WEST; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK
+                            })
+                        add(
+                            tfWorkspaceBasePath,
+                            GridConstraints().apply {
+                                row = 2; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW
+                            })
+                        // empty row
+                        add(
+                            JPanel(),
+                            GridConstraints().apply {
+                                row = 3; column = 0; colSpan = 2; anchor = ANCHOR_WEST; fill =
+                                FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW
+                            })
 
-                    add(cbUseSSHKeys, GridConstraints().apply { row = 4; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
-                    add(JPanel((GridLayoutManager(1, 2))).apply {
-                        add(tfCertFile, GridConstraints().apply { row = 0; column = 0; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW; minimumSize = Dimension(300, -1) })
-                        add(btnBrowse, GridConstraints().apply { row = 0; column = 1; anchor = ANCHOR_EAST; })
-                    }, GridConstraints().apply { row = 4; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
+                        add(
+                            cbUseSSHKeys,
+                            GridConstraints().apply {
+                                row = 4; column = 0; anchor = ANCHOR_WEST; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK
+                            })
+                        add(
+                            JPanel((GridLayoutManager(1, 2))).apply {
+                                add(
+                                    tfCertFile,
+                                    GridConstraints().apply {
+                                        row = 0; column = 0; fill = FILL_HORIZONTAL; hSizePolicy =
+                                        SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW; minimumSize = Dimension(300, -1)
+                                    })
+                                add(btnBrowse, GridConstraints().apply { row = 0; column = 1; anchor = ANCHOR_EAST; })
+                            },
+                            GridConstraints().apply {
+                                row = 4; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW
+                            })
 
-                    add(JPanel(), GridConstraints().apply { row = 5; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW })
-                    add(cbSSHPassphrase, GridConstraints().apply { row = 5; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
+                        add(
+                            JPanel(),
+                            GridConstraints().apply {
+                                row = 5; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW
+                            })
+                        add(
+                            cbSSHPassphrase,
+                            GridConstraints().apply {
+                                row = 5; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW
+                            })
 
-                    add(JLabel(SourcesyncBundle.message("usernameLabel")), GridConstraints().apply { row = 6; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
-                    add(tfUserName, GridConstraints().apply { row = 6; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
+                        add(
+                            JLabel(SourcesyncBundle.message("usernameLabel")),
+                            GridConstraints().apply {
+                                row = 6; column = 0; anchor = ANCHOR_WEST; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK
+                            })
+                        add(
+                            tfUserName,
+                            GridConstraints().apply {
+                                row = 6; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW
+                            })
 
-                    add(lbPassword, GridConstraints().apply { row = 7; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
-                    add(pfUserPassword, GridConstraints().apply { row = 7; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
+                        add(
+                            lbPassword,
+                            GridConstraints().apply {
+                                row = 7; column = 0; anchor = ANCHOR_WEST; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK
+                            })
+                        add(
+                            pfUserPassword,
+                            GridConstraints().apply {
+                                row = 7; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW
+                            })
 
-                    add(rbExplicit, GridConstraints().apply { row = 8; column = 0; anchor = ANCHOR_EAST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
-                    add(JLabel(SourcesyncBundle.message("excludeFilesLabel")), GridConstraints().apply { row = 8; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
+                        add(
+                            rbExplicit,
+                            GridConstraints().apply {
+                                row = 8; column = 0; anchor = ANCHOR_EAST; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK
+                            })
+                        add(
+                            JLabel(SourcesyncBundle.message("excludeFilesLabel")),
+                            GridConstraints().apply {
+                                row = 8; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW
+                            })
 
-                    add(rbImplicit, GridConstraints().apply { row = 9; column = 0; anchor = ANCHOR_EAST; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK })
-                    add(crtImlJTextField, GridConstraints().apply { row = 9; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
+                        add(
+                            rbImplicit,
+                            GridConstraints().apply {
+                                row = 9; column = 0; anchor = ANCHOR_EAST; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_CAN_SHRINK
+                            })
+                        add(
+                            crtImlJTextField,
+                            GridConstraints().apply {
+                                row = 9; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW
+                            })
 
-                    add(preserveTimestamp, GridConstraints().apply { row = 10; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
+                        add(
+                            preserveTimestamp,
+                            GridConstraints().apply {
+                                row = 10; column = 1; anchor = ANCHOR_WEST; fill = FILL_HORIZONTAL; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW
+                            })
 
-                    add(JPanel((GridLayoutManager(1, 2))).apply {
-                        add(JLabel(SourcesyncBundle.message("syncJobsLabel")), GridConstraints().apply { row = 0; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW })
-                        add(simultaneousJobs, GridConstraints().apply { row = 0; column = 1; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW })
-                    }, GridConstraints().apply { row = 11; column = 0; colSpan = 2; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW })
+                        add(
+                            JPanel((GridLayoutManager(1, 2))).apply {
+                                add(
+                                    JLabel(SourcesyncBundle.message("syncJobsLabel")),
+                                    GridConstraints().apply {
+                                        row = 0; column = 0; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW
+                                    })
+                                add(
+                                    simultaneousJobs,
+                                    GridConstraints().apply {
+                                        row = 0; column = 1; anchor = ANCHOR_WEST; hSizePolicy = SIZEPOLICY_CAN_GROW
+                                    })
+                            },
+                            GridConstraints().apply {
+                                row = 11; column = 0; colSpan = 2; anchor = ANCHOR_WEST; hSizePolicy =
+                                SIZEPOLICY_CAN_GROW
+                            })
 
-                }, GridConstraints().apply { row = 1; column = 0; colSpan = 2; anchor = ANCHOR_WEST; fill = FILL_BOTH; hSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW; vSizePolicy = SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW })
+                    },
+                    GridConstraints().apply {
+                        row = 1; column = 0; colSpan = 2; anchor = ANCHOR_WEST; fill = FILL_BOTH; hSizePolicy =
+                        SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW; vSizePolicy =
+                        SIZEPOLICY_CAN_GROW or SIZEPOLICY_WANT_GROW
+                    })
 
 
             }, BorderLayout.CENTER)
@@ -374,18 +515,6 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
 
     private fun setUserPassword(userPassword: String?) {
         pfUserPassword.text = userPassword
-    }
-
-    private fun isImplicit(): Boolean {
-        return rbImplicit.isSelected
-    }
-
-    private fun setImplicit(implicit: Boolean) {
-        rbImplicit.isSelected = implicit
-    }
-
-    private fun setExplicit(explicit: Boolean) {
-        rbExplicit.isSelected = explicit
     }
 
     private fun getSimultaneousJobs(): Int {
@@ -510,13 +639,9 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
      */
     private fun createConnection(connectionName: String, connectionType: String) {
         val connectionFactory = ConfigConnectionFactory.getInstance()
-        var connectionConfiguration = connectionFactory.getConnectionConfiguration(connectionName)
+        var connectionConfiguration: ConnectionConfiguration = connectionFactory.getConnectionConfiguration(connectionName)
         if (connectionConfiguration == null) {
-            connectionConfiguration = if (ConnectionConstants.CONN_TYPE_FTP == connectionType) {
-                FTPConfiguration(connectionName)
-            } else if (ConnectionConstants.CONN_TYPE_FTPS == connectionType) {
-                FTPSConfiguration(connectionName)
-            } else if (ConnectionConstants.CONN_TYPE_SFTP == connectionType) {
+            connectionConfiguration = if (ConnectionConstants.CONN_TYPE_SFTP == connectionType) {
                 SFTPConfiguration(connectionName)
             } else {
                 SCPConfiguration(connectionName)
@@ -542,17 +667,11 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
             connectionConfiguration.setExcludedFiles(getExludedFiles())
             connectionConfiguration.isPreserveTime = isTimestampPreserved()
             connectionConfiguration.simultaneousJobs = getSimultaneousJobs()
-            if (ConnectionConstants.CONN_TYPE_FTPS == connectionConfiguration.connectionType) {
-                val value: Boolean = isImplicit()
-                (connectionConfiguration as FTPSConfiguration).isRequireImplicitTLS = value
-                connectionConfiguration.isRequireExplicitTLS = !value
-                connectionConfiguration.setPreserveTime(false)
-            } else if (ConnectionConstants.CONN_TYPE_FTP == connectionConfiguration.connectionType) {
-                connectionConfiguration.isPreserveTime = false
-            } else if (ConnectionConstants.CONN_TYPE_SFTP == connectionConfiguration.connectionType || ConnectionConstants.CONN_TYPE_SCP == connectionConfiguration.connectionType) {
+            if (ConnectionConstants.CONN_TYPE_SFTP == connectionConfiguration.connectionType || ConnectionConstants.CONN_TYPE_SCP == connectionConfiguration.connectionType) {
                 (connectionConfiguration as PasswordlessSSH).isPasswordlessSSHSelected = shouldUsePasswordlessSSH()
                 (connectionConfiguration as PasswordlessSSH).certificatePath = getSSHCertificatePath()
-                (connectionConfiguration as PasswordlessSSH).isPasswordlessWithPassphrase = shouldUsePasswordlessWithPassphrase()
+                (connectionConfiguration as PasswordlessSSH).isPasswordlessWithPassphrase =
+                    shouldUsePasswordlessWithPassphrase()
             }
         }
     }
@@ -577,17 +696,10 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
             setConnectionMethodVisible(false)
             setPreserveTimestampVisible(true)
             setSSHKeysVisible(false)
-            if (ConnectionConstants.CONN_TYPE_FTPS == connectionConfiguration.connectionType) {
-                val value = (connectionConfiguration as FTPSConfiguration).isRequireImplicitTLS
-                setImplicit(value)
-                setExplicit(!value)
-                setConnectionMethodVisible(true)
-                setPreserveTimestampVisible(false)
-            } else if (ConnectionConstants.CONN_TYPE_FTP == connectionConfiguration.connectionType) {
-                setPreserveTimestampVisible(false)
-            } else if (ConnectionConstants.CONN_TYPE_SFTP == connectionConfiguration.connectionType || ConnectionConstants.CONN_TYPE_SCP == connectionConfiguration.connectionType) {
+            if (ConnectionConstants.CONN_TYPE_SFTP == connectionConfiguration.connectionType || ConnectionConstants.CONN_TYPE_SCP == connectionConfiguration.connectionType) {
                 val shouldUseSSHKeys = (connectionConfiguration as PasswordlessSSH).isPasswordlessSSHSelected
-                val shouldUseSSHKeysWithPassphrase = (connectionConfiguration as PasswordlessSSH).isPasswordlessWithPassphrase
+                val shouldUseSSHKeysWithPassphrase =
+                    (connectionConfiguration as PasswordlessSSH).isPasswordlessWithPassphrase
                 val certFile = (connectionConfiguration as PasswordlessSSH).certificatePath
                 setSSHKeysVisible(true)
                 usePasswordlessSSH(shouldUseSSHKeys)

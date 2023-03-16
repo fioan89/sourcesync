@@ -12,10 +12,6 @@ package org.wavescale.sourcesync.api;
  * *****************************************************************************
  */
 public class ConnectionConstants {
-    // ftp connection
-    public static final String CONN_TYPE_FTP = "FTP";
-    // ftp secured connection
-    public static final String CONN_TYPE_FTPS = "FTPS";
     // ssh ftp connection
     public static final String CONN_TYPE_SFTP = "SFTP";
     // ssh scp connection

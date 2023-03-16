@@ -4,6 +4,9 @@
 
 ## Unreleased
 
+### Removed
+- support for FTP/FTPS configurations. Please migrate to SSH/SCP
+
 ## 2.0.3 - 2023-03-01
 
 ### Added

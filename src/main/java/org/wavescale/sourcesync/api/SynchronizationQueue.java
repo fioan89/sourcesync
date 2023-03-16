@@ -6,12 +6,8 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.wavescale.sourcesync.config.FTPConfiguration;
-import org.wavescale.sourcesync.config.FTPSConfiguration;
 import org.wavescale.sourcesync.config.SCPConfiguration;
 import org.wavescale.sourcesync.config.SFTPConfiguration;
-import org.wavescale.sourcesync.synchronizer.FTPFileSynchronizer;
-import org.wavescale.sourcesync.synchronizer.FTPSFileSynchronizer;
 import org.wavescale.sourcesync.synchronizer.SCPFileSynchronizer;
 import org.wavescale.sourcesync.synchronizer.SFTPFileSynchronizer;
 
@@ -54,8 +50,8 @@ public class SynchronizationQueue {
         this.syncQueue = initSyncQueue();
     }
 
-    private BlockingQueue initSyncQueue() {
-        BlockingQueue<FileSynchronizer> queue = new ArrayBlockingQueue<FileSynchronizer>(this.allowed_sessions);
+    private BlockingQueue<FileSynchronizer> initSyncQueue() {
+        BlockingQueue<FileSynchronizer> queue = new ArrayBlockingQueue<>(this.allowed_sessions);
         DummyProgressIndicator indicator = new DummyProgressIndicator();
         for (int i = 0; i < allowed_sessions; i++) {
             FileSynchronizer fileSynchronizer = null;
@@ -64,12 +60,6 @@ public class SynchronizationQueue {
                         project, indicator);
             } else if (ConnectionConstants.CONN_TYPE_SFTP.equals(connectionType.getConnectionType())) {
                 fileSynchronizer = new SFTPFileSynchronizer((SFTPConfiguration) connectionType,
-                        project, indicator);
-            } else if (ConnectionConstants.CONN_TYPE_FTP.equals(connectionType.getConnectionType())) {
-                fileSynchronizer = new FTPFileSynchronizer((FTPConfiguration) connectionType,
-                        project, indicator);
-            } else if (ConnectionConstants.CONN_TYPE_FTPS.equals(connectionType.getConnectionType())) {
-                fileSynchronizer = new FTPSFileSynchronizer((FTPSConfiguration) connectionType,
                         project, indicator);
             }
 
@@ -91,15 +81,11 @@ public class SynchronizationQueue {
         return syncQueue;
     }
 
-    public void setSyncQueue(BlockingQueue<FileSynchronizer> syncQueue) {
-        this.syncQueue = syncQueue;
-    }
-
     /**
      * Empties the internal queue while at the same time closes any remnant connection.
      */
     public synchronized void cleanSyncQueue() {
-        Collection<FileSynchronizer> drainedSyncs = new ArrayList<FileSynchronizer>();
+        Collection<FileSynchronizer> drainedSyncs = new ArrayList<>();
         this.syncQueue.drainTo(drainedSyncs);
         for (FileSynchronizer fileSynchronizer : drainedSyncs) {
             fileSynchronizer.disconnect();

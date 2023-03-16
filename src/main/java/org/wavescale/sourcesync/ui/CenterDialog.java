@@ -20,7 +20,7 @@ public class CenterDialog extends JDialog {
      * Centers dialog in the middle of the parent. Make sure {@link Window#pack()} is called first.
      */
     public void centerOnParent() {
-        boolean useChildsOwner = this.getOwner() != null ? ((this.getOwner() instanceof JFrame) || (this.getOwner() instanceof JDialog)) : false;
+        boolean useChildsOwner = this.getOwner() != null && ((this.getOwner() instanceof JFrame) || (this.getOwner() instanceof JDialog));
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         final Dimension parentSize = useChildsOwner ? this.getOwner().getSize() : screenSize;
         final Point parentLocationOnScreen = useChildsOwner ? this.getOwner().getLocationOnScreen() : new Point(0, 0);

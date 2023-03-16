@@ -90,8 +90,7 @@ class NewUIConnectionConfigurationSelector : ConnectionTogglePopupAction(), Cust
     }
 }
 
-abstract class ConnectionTogglePopupAction : ToggleAction {
-    constructor()
+abstract class ConnectionTogglePopupAction() : ToggleAction() {
 
     override fun isSelected(e: AnActionEvent): Boolean {
         return Toggleable.isSelected(e.presentation)

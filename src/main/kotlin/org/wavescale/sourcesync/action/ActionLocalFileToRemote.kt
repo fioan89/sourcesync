@@ -14,15 +14,11 @@ import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.api.ConnectionConstants
 import org.wavescale.sourcesync.api.FileSynchronizer
 import org.wavescale.sourcesync.api.Utils
-import org.wavescale.sourcesync.config.FTPConfiguration
-import org.wavescale.sourcesync.config.FTPSConfiguration
 import org.wavescale.sourcesync.config.SCPConfiguration
 import org.wavescale.sourcesync.config.SFTPConfiguration
 import org.wavescale.sourcesync.factory.ConfigConnectionFactory
 import org.wavescale.sourcesync.factory.ConnectionConfig
 import org.wavescale.sourcesync.notifications.Notifier
-import org.wavescale.sourcesync.synchronizer.FTPFileSynchronizer
-import org.wavescale.sourcesync.synchronizer.FTPSFileSynchronizer
 import org.wavescale.sourcesync.synchronizer.SCPFileSynchronizer
 import org.wavescale.sourcesync.synchronizer.SFTPFileSynchronizer
 
@@ -56,16 +52,6 @@ class ActionLocalFileToRemote : AnAction() {
                     } else if (ConnectionConstants.CONN_TYPE_SFTP == connectionConfiguration.connectionType) {
                         fileSynchronizer = SFTPFileSynchronizer(
                             (connectionConfiguration as SFTPConfiguration),
-                            project, indicator
-                        )
-                    } else if (ConnectionConstants.CONN_TYPE_FTP == connectionConfiguration.connectionType) {
-                        fileSynchronizer = FTPFileSynchronizer(
-                            (connectionConfiguration as FTPConfiguration),
-                            project, indicator
-                        )
-                    } else if (ConnectionConstants.CONN_TYPE_FTPS == connectionConfiguration.connectionType) {
-                        fileSynchronizer = FTPSFileSynchronizer(
-                            (connectionConfiguration as FTPSConfiguration),
                             project, indicator
                         )
                     }

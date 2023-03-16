@@ -50,9 +50,9 @@ class ActionChangedFilesToRemote : AnAction() {
         // start sync
         val connectionConfiguration = ConfigConnectionFactory.getInstance().getConnectionConfiguration(associationName)
         val semaphores = Semaphore(connectionConfiguration.simultaneousJobs)
-        val allowed_sessions =
+        val allowedSessions =
             if (changedFiles.size <= connectionConfiguration.simultaneousJobs) changedFiles.size else connectionConfiguration.simultaneousJobs
-        val synchronizationQueue = SynchronizationQueue(e.project, connectionConfiguration, allowed_sessions)
+        val synchronizationQueue = SynchronizationQueue(e.project, connectionConfiguration, allowedSessions)
         synchronizationQueue.startCountingTo(changedFiles.size)
         val queue = synchronizationQueue.syncQueue
         for (virtualFile in changedFiles) {
@@ -64,7 +64,7 @@ class ActionChangedFilesToRemote : AnAction() {
                 val uploadLocation = Utils.relativeLocalUploadDirs(virtualFile, project.stateStore)
                 ProgressManager.getInstance().run(object : Task.Backgroundable(e.project, "Uploading", false) {
                     override fun run(indicator: ProgressIndicator) {
-                        var fileSynchronizer: FileSynchronizer?
+                        val fileSynchronizer: FileSynchronizer?
                         try {
                             semaphores.acquire()
                             fileSynchronizer = queue.take()

@@ -81,10 +81,8 @@ public class ConnectionConfig {
                 projectToConnection = (Map<String, String>) in.readObject();
                 in.close();
                 inputStream.close();
-            } catch (IOException i) {
+            } catch (IOException | ClassNotFoundException i) {
                 i.printStackTrace();
-            } catch (ClassNotFoundException c) {
-                c.printStackTrace();
             }
         }
     }

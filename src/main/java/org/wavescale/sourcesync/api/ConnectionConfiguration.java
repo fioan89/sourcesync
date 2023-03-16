@@ -45,10 +45,6 @@ public abstract class ConnectionConfiguration implements Serializable {
         return connectionName;
     }
 
-    public void setConnectionName(String connectionName) {
-        this.connectionName = connectionName;
-    }
-
 
     /**
      * Gets a list of file types to be excluded from the sync.
@@ -72,10 +68,6 @@ public abstract class ConnectionConfiguration implements Serializable {
 
     public String getConnectionType() {
         return connectionType;
-    }
-
-    public void setConnectionType(String connectionType) {
-        this.connectionType = connectionType;
     }
 
     public String getHost() {

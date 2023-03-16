@@ -52,7 +52,7 @@ class ActionSelectedFilesToRemote : AnAction() {
                     val uploadLocation = Utils.relativeLocalUploadDirs(virtualFile, project.stateStore)
                     ProgressManager.getInstance().run(object : Task.Backgroundable(e.project, "Uploading", false) {
                         override fun run(indicator: ProgressIndicator) {
-                            var fileSynchronizer: FileSynchronizer?
+                            val fileSynchronizer: FileSynchronizer?
                             try {
                                 semaphores.acquire()
                                 fileSynchronizer = queue.take()
