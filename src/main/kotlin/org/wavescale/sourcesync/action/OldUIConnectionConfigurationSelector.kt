@@ -1,13 +1,7 @@
 package org.wavescale.sourcesync.action
 
 import com.intellij.ide.DataManager
-import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.actionSystem.Presentation
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAwareAction
@@ -25,7 +19,8 @@ import javax.swing.SwingUtilities
 
 class OldUIConnectionConfigurationSelector : ComboBoxAction() {
     private val syncStatusService = service<SyncStatusService>()
-    override fun createPopupActionGroup(button: JComponent?): DefaultActionGroup {
+
+    override fun createPopupActionGroup(button: JComponent, dataContext: DataContext): DefaultActionGroup {
         val allActionsGroup = DefaultActionGroup()
         allActionsGroup.add(getEditConnectionConfigurationsAction())
         allActionsGroup.addSeparator(SourcesyncBundle.message("sourcesyncConfigurations"))

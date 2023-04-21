@@ -4,6 +4,9 @@
 
 ## Unreleased
 
+## Changed
+- removed deprecated API usages
+
 ## 2.0.3 - 2023-03-01
 
 ### Added
