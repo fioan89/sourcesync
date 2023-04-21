@@ -25,6 +25,16 @@ sealed class BaseSyncConfigurationState(name: String, host: String, port: String
 
     @get:Transient
     var password: String? by string()
+
+    @get:Attribute("remote_workspace_path")
+    var workspaceBasePath by string("/home")
+
+    @get:Attribute("excluded_files")
+    var excludedFiles by string(".crt;.iml")
+
+    @get:Attribute("preserve_timestamps")
+    var preserveTimestamps by property(false)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -36,7 +46,10 @@ sealed class BaseSyncConfigurationState(name: String, host: String, port: String
         if (type != other.type) return false
         if (hostname != other.hostname) return false
         if (port != other.port) return false
-        return username == other.username
+        if (username != other.username) return false
+        if (workspaceBasePath != other.workspaceBasePath) return false
+        if (excludedFiles != other.excludedFiles) return false
+        return preserveTimestamps == other.preserveTimestamps
     }
 
     override fun hashCode(): Int {
@@ -46,7 +59,11 @@ sealed class BaseSyncConfigurationState(name: String, host: String, port: String
         result = 31 * result + (hostname?.hashCode() ?: 0)
         result = 31 * result + (port?.hashCode() ?: 0)
         result = 31 * result + (username?.hashCode() ?: 0)
+        result = 31 * result + (workspaceBasePath?.hashCode() ?: 0)
+        result = 31 * result + (excludedFiles?.hashCode() ?: 0)
+        result = 31 * result + preserveTimestamps.hashCode()
         return result
     }
+
 
 }
