@@ -1,9 +1,11 @@
 package org.wavescale.sourcesync.configurations
 
 import com.intellij.util.xmlb.annotations.Attribute
+import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.util.xmlb.annotations.Transient
 
 sealed class SyncConfigurationWithPublicKeyAuthenticationState(name: String, host: String, port: String, username: String) : BaseSyncConfigurationState(name, host, port, username) {
+
     @get:Attribute("passwordless")
     var isPasswordless by property(false)
 
@@ -15,6 +17,7 @@ sealed class SyncConfigurationWithPublicKeyAuthenticationState(name: String, hos
 
     @get:Transient
     var passphrase: String? by string()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -36,6 +39,8 @@ sealed class SyncConfigurationWithPublicKeyAuthenticationState(name: String, hos
     }
 }
 
+@Tag("ssh_configuration")
 class SshSyncConfigurationState(name: String, host: String, port: String, username: String) : SyncConfigurationWithPublicKeyAuthenticationState(name, host, port, username)
 
+@Tag("scp_configuration")
 class ScpSyncConfigurationState(name: String, host: String, port: String, username: String) : SyncConfigurationWithPublicKeyAuthenticationState(name, host, port, username)

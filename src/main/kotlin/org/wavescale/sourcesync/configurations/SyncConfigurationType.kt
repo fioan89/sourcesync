@@ -1,5 +1,5 @@
 package org.wavescale.sourcesync.configurations
 
-enum class SyncConfigurationType(prettyName: String) {
+enum class SyncConfigurationType(val prettyName: String) {
     SFTP("SSH"), SCP("SCP")
 }
