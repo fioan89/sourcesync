@@ -2,26 +2,32 @@ package org.wavescale.sourcesync.configurations
 
 import com.intellij.openapi.components.BaseState
 import com.intellij.util.xmlb.annotations.Attribute
-import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.util.xmlb.annotations.Transient
 
 
-@Tag("configuration")
-sealed class BaseSyncConfigurationState(name: String, host: String, port: String, username: String) : BaseState() {
-    @get:Attribute
-    var name by string(name)
+sealed class BaseSyncConfigurationState() : BaseState() {
+
+    constructor(name: String, host: String, port: String, username: String) : this() {
+        this.name = name
+        this.hostname = host
+        this.port = port
+        this.username = username
+    }
 
     @get:Attribute
-    var type by enum<SyncConfigurationType>()
+    var name by string()
 
     @get:Attribute
-    var hostname by string(host)
+    var type by enum(SyncConfigurationType.SFTP)
 
     @get:Attribute
-    var port by string(port)
+    var hostname by string()
 
     @get:Attribute
-    var username by string(username)
+    var port by string()
+
+    @get:Attribute
+    var username by string()
 
     @get:Transient
     var password: String? by string()
@@ -64,6 +70,4 @@ sealed class BaseSyncConfigurationState(name: String, host: String, port: String
         result = 31 * result + preserveTimestamps.hashCode()
         return result
     }
-
-
 }
