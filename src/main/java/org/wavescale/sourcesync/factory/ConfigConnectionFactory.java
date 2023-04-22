@@ -44,7 +44,7 @@ public class ConfigConnectionFactory
     private String userHome;
     private Map<String, ConnectionConfiguration> connectionConfigurationMap;
 
-    private SyncRemoteConfigurationsService remoteSyncConfigurationsService = ProjectManager.getInstance().getDefaultProject().getService(SyncRemoteConfigurationsService.class);
+    private SyncRemoteConfigurationsService remoteSyncConfigurationsService = ProjectManager.getInstance().getOpenProjects()[0].getService(SyncRemoteConfigurationsService.class);
 
     private ConfigConnectionFactory()
     {

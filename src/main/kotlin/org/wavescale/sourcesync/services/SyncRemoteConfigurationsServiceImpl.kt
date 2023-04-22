@@ -20,8 +20,14 @@ class SyncRemoteConfigurationsServiceImpl(val project: Project) : PersistentStat
     override fun hasNoConfiguration() = myState.connections.size == 0
 
     override fun add(connection: BaseSyncConfigurationState) {
-        myState.add(connection)
+        myState.connections.add(connection)
         logger.info("Added ${connection.type.prettyName} remote connection configuration with name ${connection.name}")
+    }
+
+    override fun hasNoMainConnectionConfigured(): Boolean = myState.mainConnection.isNullOrEmpty()
+
+    override fun setMainConnection(connectionName: String) {
+        myState.mainConnection = connectionName
     }
 
     override fun loadState(state: SyncConfigurationsState) {
