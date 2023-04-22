@@ -1,9 +1,12 @@
 package org.wavescale.sourcesync.configurations
 
+import com.intellij.credentialStore.CredentialAttributes
+import com.intellij.credentialStore.Credentials
+import com.intellij.credentialStore.generateServiceName
+import com.intellij.ide.passwordSafe.PasswordSafe
 import com.intellij.openapi.components.BaseState
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Transient
-
 
 sealed class BaseSyncConfigurationState() : BaseState() {
 
@@ -30,7 +33,9 @@ sealed class BaseSyncConfigurationState() : BaseState() {
     var username by string()
 
     @get:Transient
-    var password: String? by string()
+    var password: String?
+        get() = PasswordSafe.instance.getPassword(credentialsAttributesFor(username!!, hostname!!, port!!))
+        set(pass) = PasswordSafe.instance.set(credentialsAttributesFor(username!!, hostname!!, port!!), Credentials(username, pass))
 
     @get:Attribute("remote_workspace_path")
     var workspaceBasePath by string("/home")
@@ -70,4 +75,9 @@ sealed class BaseSyncConfigurationState() : BaseState() {
         result = 31 * result + preserveTimestamps.hashCode()
         return result
     }
+
+    private fun credentialsAttributesFor(username: String, hostname: String, port: String) = CredentialAttributes(
+        generateServiceName("SourceSync - Password", "${hostname}:${port}"),
+        username
+    )
 }

@@ -1,5 +1,9 @@
 package org.wavescale.sourcesync.configurations
 
+import com.intellij.credentialStore.CredentialAttributes
+import com.intellij.credentialStore.Credentials
+import com.intellij.credentialStore.generateServiceName
+import com.intellij.ide.passwordSafe.PasswordSafe
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.util.xmlb.annotations.Transient
@@ -16,7 +20,9 @@ sealed class SyncConfigurationWithPublicKeyAuthenticationState(name: String, hos
     var isCertificateProtectedByPassphrase by property(false)
 
     @get:Transient
-    var passphrase: String? by string()
+    var passphrase: String?
+        get() = PasswordSafe.instance.getPassword(credentialsAttributesFor(username!!, hostname!!, port!!))
+        set(passPhrase) = PasswordSafe.instance.set(credentialsAttributesFor(username!!, hostname!!, port!!), Credentials(username, passPhrase))
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -37,6 +43,11 @@ sealed class SyncConfigurationWithPublicKeyAuthenticationState(name: String, hos
         result = 31 * result + isCertificateProtectedByPassphrase.hashCode()
         return result
     }
+
+    private fun credentialsAttributesFor(username: String, hostname: String, port: String) = CredentialAttributes(
+        generateServiceName("SourceSync - Passphrase", "${hostname}:${port}"),
+        username
+    )
 }
 
 @Tag("ssh_configuration")
