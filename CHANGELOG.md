@@ -8,7 +8,7 @@
 
 - context menu takes a long time to open when using the New UI
 
-## Changed
+### Changed
 
 - removed deprecated API usages
 
