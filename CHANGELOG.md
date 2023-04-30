@@ -4,18 +4,17 @@
 
 ## Unreleased
 
-### Fixed
+## 2.0.4 - 2023-04-30
 
+### Fixed
 - context menu takes a long time to open when using the New UI
 
 ### Changed
-
 - removed deprecated API usages
 
 ## 2.0.3 - 2023-03-01
 
 ### Added
-
 - support for experimental new UI
 
 ### Changed
