@@ -8,7 +8,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class BaseSyncConfiguration {
+sealed class BaseSyncConfiguration : Cloneable {
     var name = "Unnamed"
     abstract val protocol: SyncConfigurationType
     var hostname = "localhost"
@@ -60,4 +60,6 @@ sealed class BaseSyncConfiguration {
         result = 31 * result + preserveTimestamps.hashCode()
         return result
     }
+
+    public abstract override fun clone(): BaseSyncConfiguration
 }

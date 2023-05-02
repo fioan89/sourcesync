@@ -55,10 +55,40 @@ sealed class SyncConfigurationWithPublicKeyAuthentication : BaseSyncConfiguratio
 @SerialName("ssh_configuration")
 class SshSyncConfiguration : SyncConfigurationWithPublicKeyAuthentication() {
     override val protocol = SyncConfigurationType.SFTP
+
+    override fun clone() = SshSyncConfiguration().apply {
+        name = this@SshSyncConfiguration.name
+        hostname = this@SshSyncConfiguration.hostname
+        port = this@SshSyncConfiguration.port
+        username = this@SshSyncConfiguration.username
+        password = this@SshSyncConfiguration.password
+        workspaceBasePath = this@SshSyncConfiguration.workspaceBasePath
+        excludedFiles = this@SshSyncConfiguration.excludedFiles
+        preserveTimestamps = this@SshSyncConfiguration.preserveTimestamps
+        isPasswordless = this@SshSyncConfiguration.isPasswordless
+        certificatePath = this@SshSyncConfiguration.certificatePath
+        isCertificateProtectedByPassphrase = this@SshSyncConfiguration.isCertificateProtectedByPassphrase
+        passphrase = this@SshSyncConfiguration.passphrase
+    }
 }
 
 @Serializable
 @SerialName("scp_configuration")
 class ScpSyncConfiguration : SyncConfigurationWithPublicKeyAuthentication() {
     override val protocol = SyncConfigurationType.SCP
+
+    override fun clone() = ScpSyncConfiguration().apply {
+        name = this@ScpSyncConfiguration.name
+        hostname = this@ScpSyncConfiguration.hostname
+        port = this@ScpSyncConfiguration.port
+        username = this@ScpSyncConfiguration.username
+        password = this@ScpSyncConfiguration.password
+        workspaceBasePath = this@ScpSyncConfiguration.workspaceBasePath
+        excludedFiles = this@ScpSyncConfiguration.excludedFiles
+        preserveTimestamps = this@ScpSyncConfiguration.preserveTimestamps
+        isPasswordless = this@ScpSyncConfiguration.isPasswordless
+        certificatePath = this@ScpSyncConfiguration.certificatePath
+        isCertificateProtectedByPassphrase = this@ScpSyncConfiguration.isCertificateProtectedByPassphrase
+        passphrase = this@ScpSyncConfiguration.passphrase
+    }
 }
