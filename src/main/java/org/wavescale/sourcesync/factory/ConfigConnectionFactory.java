@@ -25,8 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 import org.wavescale.sourcesync.api.ConnectionConstants;
 import org.wavescale.sourcesync.api.PasswordlessSSH;
-import org.wavescale.sourcesync.configurations.ScpSyncConfigurationState;
-import org.wavescale.sourcesync.configurations.SshSyncConfigurationState;
+import org.wavescale.sourcesync.configurations.ScpSyncConfiguration;
+import org.wavescale.sourcesync.configurations.SshSyncConfiguration;
 import org.wavescale.sourcesync.services.SyncRemoteConfigurationsService;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.ProjectManager;
@@ -122,44 +122,44 @@ public class ConfigConnectionFactory
     }
 
     @NotNull
-    private static ScpSyncConfigurationState toScpSyncConfigurationState(ConnectionConfiguration configuration)
+    private static ScpSyncConfiguration toScpSyncConfigurationState(ConnectionConfiguration configuration)
     {
-        ScpSyncConfigurationState c = new ScpSyncConfigurationState(
-            configuration.getConnectionName(),
-            configuration.getHost(),
-            String.valueOf(configuration.getPort()),
-            configuration.getUserName()
-        );
+        ScpSyncConfiguration c = new ScpSyncConfiguration();
+        c.setName(configuration.getConnectionName());
+        c.setHostname(configuration.getHost());
+        c.setPort(String.valueOf(configuration.getPort()));
 
+        c.setUsername(configuration.getUserName());
         c.setPassword(configuration.getUserPassword());
-        c.setExcludedFiles(configuration.getExcludedFiles());
-        c.setPreserveTimestamps(configuration.isPreserveTime());
 
         c.setPasswordless(((PasswordlessSSH) configuration).isPasswordlessSSHSelected());
         c.setCertificatePath(((PasswordlessSSH) configuration).getCertificatePath());
         c.setCertificateProtectedByPassphrase(((PasswordlessSSH) configuration).isPasswordlessWithPassphrase());
         c.setPassphrase(configuration.getUserPassword());
+
+        c.setExcludedFiles(configuration.getExcludedFiles());
+        c.setPreserveTimestamps(configuration.isPreserveTime());
         return c;
     }
 
     @NotNull
-    private static SshSyncConfigurationState toSshSyncConfigurationState(ConnectionConfiguration configuration)
+    private static SshSyncConfiguration toSshSyncConfigurationState(ConnectionConfiguration configuration)
     {
-        SshSyncConfigurationState c = new SshSyncConfigurationState(
-            configuration.getConnectionName(),
-            configuration.getHost(),
-            String.valueOf(configuration.getPort()),
-            configuration.getUserName()
-        );
+        SshSyncConfiguration c = new SshSyncConfiguration();
+        c.setName(configuration.getConnectionName());
+        c.setHostname(configuration.getHost());
+        c.setPort(String.valueOf(configuration.getPort()));
 
+        c.setUsername(configuration.getUserName());
         c.setPassword(configuration.getUserPassword());
-        c.setExcludedFiles(configuration.getExcludedFiles());
-        c.setPreserveTimestamps(configuration.isPreserveTime());
 
         c.setPasswordless(((PasswordlessSSH) configuration).isPasswordlessSSHSelected());
         c.setCertificatePath(((PasswordlessSSH) configuration).getCertificatePath());
         c.setCertificateProtectedByPassphrase(((PasswordlessSSH) configuration).isPasswordlessWithPassphrase());
         c.setPassphrase(configuration.getUserPassword());
+
+        c.setExcludedFiles(configuration.getExcludedFiles());
+        c.setPreserveTimestamps(configuration.isPreserveTime());
         return c;
     }
 

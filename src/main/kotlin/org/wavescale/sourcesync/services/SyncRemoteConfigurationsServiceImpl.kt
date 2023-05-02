@@ -1,37 +1,31 @@
 package org.wavescale.sourcesync.services
 
-import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.State
-import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.*
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
-import org.wavescale.sourcesync.configurations.BaseSyncConfigurationState
-import org.wavescale.sourcesync.configurations.SyncConfigurationsState
+import org.wavescale.sourcesync.configurations.BaseSyncConfiguration
+import org.wavescale.sourcesync.configurations.SyncConfigurations
 
+@Suppress("UnstableApiUsage")
 @Service(Service.Level.PROJECT)
 @State(name = "SourceSyncRemoteConfigurationsService", storages = [Storage(value = "sourcesync.xml")])
-class SyncRemoteConfigurationsServiceImpl(val project: Project) : PersistentStateComponent<SyncConfigurationsState>, SyncRemoteConfigurationsService {
+class SyncRemoteConfigurationsServiceImpl(val project: Project) : SerializablePersistentStateComponent<SyncConfigurations>(SyncConfigurations()), SyncRemoteConfigurationsService {
+    override fun hasNoConfiguration() = state.connections.isEmpty()
 
-    private var myState = SyncConfigurationsState()
-
-    override fun getState() = myState
-
-    override fun hasNoConfiguration() = myState.connections.size == 0
-
-    override fun add(connection: BaseSyncConfigurationState) {
-        myState.connections.add(connection)
-        logger.info("Added ${connection.type.prettyName} remote connection configuration with name ${connection.name}")
+    override fun add(connection: BaseSyncConfiguration) {
+        updateState { oldState ->
+            logger.info("Added ${connection.protocol.prettyName} remote connection configuration with name ${connection.name}")
+            SyncConfigurations(oldState.connections union setOf(connection), oldState.mainConnection)
+        }
     }
 
-    override fun hasNoMainConnectionConfigured(): Boolean = myState.mainConnection.isNullOrEmpty()
+    override fun hasNoMainConnectionConfigured(): Boolean = state.mainConnection.isNullOrEmpty()
 
     override fun setMainConnection(connectionName: String) {
-        myState.mainConnection = connectionName
-    }
-
-    override fun loadState(state: SyncConfigurationsState) {
-        myState = state
+        updateState { oldState ->
+            logger.info("Marked $connectionName as main remote sync connection for project ${project.name}")
+            SyncConfigurations(oldState.connections, connectionName)
+        }
     }
 
     override fun noStateLoaded() {

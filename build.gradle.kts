@@ -8,6 +8,7 @@ plugins {
     id("java")
     // Kotlin support
     kotlin("jvm") version "1.8.20"
+    kotlin("plugin.serialization") version "1.8.21"
     // Gradle IntelliJ Plugin
     id("org.jetbrains.intellij") version "1.13.3"
     // Gradle Changelog Plugin
@@ -27,6 +28,7 @@ repositories {
 dependencies {
     implementation("com.github.mwiede:jsch:0.2.8")
     implementation("commons-net:commons-net:3.9.0")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.0")
 
     testImplementation("org.mockito:mockito-core:5.2.0")
     testImplementation("com.tngtech.java:junit-dataprovider:1.13.1")
