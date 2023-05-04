@@ -4,6 +4,7 @@ import com.intellij.openapi.components.*
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import org.wavescale.sourcesync.configurations.BaseSyncConfiguration
+import org.wavescale.sourcesync.configurations.SyncConfigurationType
 import org.wavescale.sourcesync.configurations.SyncConfigurations
 
 @Suppress("UnstableApiUsage")
@@ -16,6 +17,24 @@ class SyncRemoteConfigurationsServiceImpl(val project: Project) : SerializablePe
         updateState { oldState ->
             logger.info("Added ${connection.protocol.prettyName} remote connection configuration with name ${connection.name}")
             SyncConfigurations(oldState.connections union setOf(connection), oldState.mainConnection)
+        }
+    }
+
+    override fun addAll(connections: Set<BaseSyncConfiguration>) {
+        updateState { oldState ->
+            connections.forEach {
+                logger.info("Added ${it.protocol.prettyName} remote connection configuration with name ${it.name}")
+            }
+            SyncConfigurations(oldState.connections union connections, oldState.mainConnection)
+        }
+    }
+
+    override fun findAllOfType(type: SyncConfigurationType) = state.connections.filter { type == it.protocol }.toSet()
+
+    override fun clear() {
+        logger.info("Removed all remote connection configurations")
+        updateState { oldState ->
+            SyncConfigurations(emptySet(), oldState.mainConnection)
         }
     }
 
