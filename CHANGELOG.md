@@ -5,15 +5,25 @@
 ## Unreleased
 
 ### Added
+
 - passwords and passphrases are now stored in the much safer IntelliJ Credential Store.
 
+### Changed
+
+- redesigned Sync Connection Configurations editor that provides a look and feel similar to Run Configurations editor
+
+### Removed
+
+- support for FTP&FTPS protocols
 
 ## 2.0.4 - 2023-04-30
 
 ### Fixed
+
 - context menu takes a long time to open when using the New UI
 
 ### Changed
+
 - removed deprecated API usages
 
 ## 2.0.3 - 2023-03-01
