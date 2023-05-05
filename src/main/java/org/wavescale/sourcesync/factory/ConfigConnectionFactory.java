@@ -130,12 +130,18 @@ public class ConfigConnectionFactory
         c.setPort(String.valueOf(configuration.getPort()));
 
         c.setUsername(configuration.getUserName());
-        c.setPassword(configuration.getUserPassword());
-
-        c.setPasswordless(((PasswordlessSSH) configuration).isPasswordlessSSHSelected());
-        c.setCertificatePath(((PasswordlessSSH) configuration).getCertificatePath());
-        c.setCertificateProtectedByPassphrase(((PasswordlessSSH) configuration).isPasswordlessWithPassphrase());
-        c.setPassphrase(configuration.getUserPassword());
+        if (((PasswordlessSSH) configuration).isPasswordlessSSHSelected())
+        {
+            c.setCertificatePath(((PasswordlessSSH) configuration).getCertificatePath());
+            if (((PasswordlessSSH) configuration).isPasswordlessWithPassphrase())
+            {
+                c.setPassphrase(configuration.getUserPassword());
+            }
+        }
+        else
+        {
+            c.setPassword(configuration.getUserPassword());
+        }
 
         c.setExcludedFiles(configuration.getExcludedFiles());
         c.setPreserveTimestamps(configuration.isPreserveTime());
@@ -151,12 +157,18 @@ public class ConfigConnectionFactory
         c.setPort(String.valueOf(configuration.getPort()));
 
         c.setUsername(configuration.getUserName());
-        c.setPassword(configuration.getUserPassword());
-
-        c.setPasswordless(((PasswordlessSSH) configuration).isPasswordlessSSHSelected());
-        c.setCertificatePath(((PasswordlessSSH) configuration).getCertificatePath());
-        c.setCertificateProtectedByPassphrase(((PasswordlessSSH) configuration).isPasswordlessWithPassphrase());
-        c.setPassphrase(configuration.getUserPassword());
+        if (((PasswordlessSSH) configuration).isPasswordlessSSHSelected())
+        {
+            c.setCertificatePath(((PasswordlessSSH) configuration).getCertificatePath());
+            if (((PasswordlessSSH) configuration).isPasswordlessWithPassphrase())
+            {
+                c.setPassphrase(configuration.getUserPassword());
+            }
+        }
+        else
+        {
+            c.setPassword(configuration.getUserPassword());
+        }
 
         c.setExcludedFiles(configuration.getExcludedFiles());
         c.setPreserveTimestamps(configuration.isPreserveTime());

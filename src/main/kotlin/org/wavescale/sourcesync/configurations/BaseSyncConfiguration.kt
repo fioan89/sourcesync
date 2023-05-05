@@ -13,11 +13,21 @@ sealed class BaseSyncConfiguration : Cloneable {
     abstract val protocol: SyncConfigurationType
     var hostname = "localhost"
     var port = "11"
+
     var username = "username"
 
+    @SerialName("authentication_type")
+    var authenticationType = AuthenticationType.PASSWORD
     var password: String?
-        get() = PasswordSafe.instance.getPassword(credentialsAttributesFor(username, hostname, port))
-        set(pass) = PasswordSafe.instance.set(credentialsAttributesFor(username, hostname, port), Credentials(username, pass))
+        get() = PasswordSafe.instance.getPassword(credentialsAttributesForPassword(username, hostname, port))
+        set(pass) = PasswordSafe.instance.set(credentialsAttributesForPassword(username, hostname, port), Credentials(username, pass))
+
+    @SerialName("certificate_path")
+    var certificatePath: String? = null
+    var passphrase: String?
+        get() = PasswordSafe.instance.getPassword(credentialsAttributesForPassphrase(username, hostname, port))
+        set(passPhrase) = PasswordSafe.instance.set(credentialsAttributesForPassphrase(username, hostname, port), Credentials(username, passPhrase))
+
 
     @SerialName("remote_workspace_path")
     var workspaceBasePath = "/home"
@@ -28,11 +38,17 @@ sealed class BaseSyncConfiguration : Cloneable {
     @SerialName("preserve_timestamps")
     var preserveTimestamps = false
 
-    private fun credentialsAttributesFor(username: String, hostname: String, port: String) = CredentialAttributes(
+    private fun credentialsAttributesForPassword(username: String, hostname: String, port: String) = CredentialAttributes(
         generateServiceName("SourceSync - Password", "${hostname}:${port}"),
         username
     )
 
+    private fun credentialsAttributesForPassphrase(username: String, hostname: String, port: String) = CredentialAttributes(
+        generateServiceName("SourceSync - Passphrase", "${hostname}:${port}"),
+        username
+    )
+
+    public abstract override fun clone(): BaseSyncConfiguration
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -44,6 +60,8 @@ sealed class BaseSyncConfiguration : Cloneable {
         if (hostname != other.hostname) return false
         if (port != other.port) return false
         if (username != other.username) return false
+        if (authenticationType != other.authenticationType) return false
+        if (certificatePath != other.certificatePath) return false
         if (workspaceBasePath != other.workspaceBasePath) return false
         if (excludedFiles != other.excludedFiles) return false
         return preserveTimestamps == other.preserveTimestamps
@@ -55,11 +73,11 @@ sealed class BaseSyncConfiguration : Cloneable {
         result = 31 * result + hostname.hashCode()
         result = 31 * result + port.hashCode()
         result = 31 * result + username.hashCode()
+        result = 31 * result + authenticationType.hashCode()
+        result = 31 * result + (certificatePath?.hashCode() ?: 0)
         result = 31 * result + workspaceBasePath.hashCode()
         result = 31 * result + excludedFiles.hashCode()
         result = 31 * result + preserveTimestamps.hashCode()
         return result
     }
-
-    public abstract override fun clone(): BaseSyncConfiguration
 }
