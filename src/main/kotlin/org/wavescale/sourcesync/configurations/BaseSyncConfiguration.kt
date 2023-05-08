@@ -22,8 +22,8 @@ sealed class BaseSyncConfiguration : Cloneable {
         get() = PasswordSafe.instance.getPassword(credentialsAttributesForPassword(username, hostname, port))
         set(pass) = PasswordSafe.instance.set(credentialsAttributesForPassword(username, hostname, port), Credentials(username, pass))
 
-    @SerialName("certificate_path")
-    var certificatePath: String? = null
+    @SerialName("private_key")
+    var privateKey: String? = null
     var passphrase: String?
         get() = PasswordSafe.instance.getPassword(credentialsAttributesForPassphrase(username, hostname, port))
         set(passPhrase) = PasswordSafe.instance.set(credentialsAttributesForPassphrase(username, hostname, port), Credentials(username, passPhrase))
@@ -61,7 +61,7 @@ sealed class BaseSyncConfiguration : Cloneable {
         if (port != other.port) return false
         if (username != other.username) return false
         if (authenticationType != other.authenticationType) return false
-        if (certificatePath != other.certificatePath) return false
+        if (privateKey != other.privateKey) return false
         if (workspaceBasePath != other.workspaceBasePath) return false
         if (excludedFiles != other.excludedFiles) return false
         return preserveTimestamps == other.preserveTimestamps
@@ -74,7 +74,7 @@ sealed class BaseSyncConfiguration : Cloneable {
         result = 31 * result + port.hashCode()
         result = 31 * result + username.hashCode()
         result = 31 * result + authenticationType.hashCode()
-        result = 31 * result + (certificatePath?.hashCode() ?: 0)
+        result = 31 * result + (privateKey?.hashCode() ?: 0)
         result = 31 * result + workspaceBasePath.hashCode()
         result = 31 * result + excludedFiles.hashCode()
         result = 31 * result + preserveTimestamps.hashCode()
