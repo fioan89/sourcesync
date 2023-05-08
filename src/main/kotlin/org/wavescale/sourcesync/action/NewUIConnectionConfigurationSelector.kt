@@ -57,7 +57,7 @@ class NewUIConnectionConfigurationSelector : ExpandableComboAction() {
 
     override fun update(e: AnActionEvent) {
         val projectName = e.project?.name
-        val associationFor = syncConfigurationsService.mainConnection()
+        val associationFor = syncConfigurationsService.mainConnectionName()
         if (!associationFor.isNullOrBlank() && syncConfigurationsService.findFirstWithName(associationFor) == null) {
             ConnectionConfig.getInstance().apply {
                 syncConfigurationsService.resetMainConnection()
@@ -77,7 +77,7 @@ class NewUIConnectionConfigurationSelector : ExpandableComboAction() {
         } else {
             e.presentation.apply {
                 isEnabled = true
-                text = syncConfigurationsService.mainConnection()
+                text = syncConfigurationsService.mainConnectionName()
                 icon = SourceSyncIcons.ExpUI.SOURCESYNC
             }
         }

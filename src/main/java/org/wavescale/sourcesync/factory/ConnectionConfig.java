@@ -47,31 +47,15 @@ public class ConnectionConfig
     }
 
     /**
-     * Links project with the given connection name.
-     *
-     * @param projectName    a string representing a project name.
-     * @param connectionName a string representing a connection config.
-     */
-    public void associateProjectWithConnection(String projectName, String connectionName)
-    {
-        projectToConnection.put(projectName, connectionName);
-    }
-
-    /**
      * Finds and returns a config connection name associated with a given project name.
      *
      * @param projectName a string representing a project name.
      * @return a string representing a config connection name associated with the given
      * project name, or <code>null</code> if no connection was associated.
      */
-    public String getAssociationFor(String projectName)
+    private String getAssociationFor(String projectName)
     {
         return projectToConnection.get(projectName);
-    }
-
-    public void removeAssociationFor(String projectName)
-    {
-        projectToConnection.remove(projectName);
     }
 
     @SuppressWarnings("unchecked")
@@ -95,13 +79,9 @@ public class ConnectionConfig
                 in.close();
                 inputStream.close();
             }
-            catch (IOException i)
+            catch (IOException | ClassNotFoundException i)
             {
                 i.printStackTrace();
-            }
-            catch (ClassNotFoundException c)
-            {
-                c.printStackTrace();
             }
         }
     }

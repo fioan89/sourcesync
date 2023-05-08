@@ -21,9 +21,9 @@ import com.jcraft.jsch.JSchException
 import com.jcraft.jsch.Session
 import com.jcraft.jsch.SftpProgressMonitor
 import org.wavescale.sourcesync.SourcesyncBundle
-import org.wavescale.sourcesync.api.FileSynchronizer
 import org.wavescale.sourcesync.api.Utils
-import org.wavescale.sourcesync.config.SFTPConfiguration
+import org.wavescale.sourcesync.configurations.AuthenticationType
+import org.wavescale.sourcesync.configurations.SshSyncConfiguration
 import org.wavescale.sourcesync.notifications.Notifier
 import org.wavescale.sourcesync.services.StatsService
 import org.wavescale.sourcesync.services.SyncStatusService
@@ -35,39 +35,29 @@ import java.nio.file.Paths
 
 
 /**
- * Build a file synchronizer from general info contained by **connectionInfo** param.
- *
- * @param connectionInfo a [org.wavescale.sourcesync.config.SFTPConfiguration] instance
- * containing session info like hostname, user, password, etc...
- * @param project        a [com.intellij.openapi.project.Project] instance used to gather project relative
- * metadata like name, absoulte path, etc...
- * @param indicator      used to report progress on upload process.
+ * Build a file synchronizer from general info contained by **configuration** param.
  */
-class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, indicator: ProgressIndicator) :
-    FileSynchronizer(connectionInfo, project, indicator) {
+class SFTPFileSynchronizer(private val configuration: SshSyncConfiguration, val project: Project) : Synchronizer {
     private val syncStatusService = service<SyncStatusService>()
     private val statsService = service<StatsService>()
 
     private val jsch: JSch = JSch()
-    private lateinit var session: Session
+    private var session: Session? = null
 
-    init {
-        this.indicator.isIndeterminate = true
-    }
-
+    private var isConnected: Boolean = false
     override fun connect(): Boolean {
         return if (!isConnected) {
             try {
                 initSession()
-                session.connect()
+                session!!.connect()
                 isConnected = true
                 true
             } catch (e: JSchException) {
-                syncStatusService.removeRunningSync(connectionInfo.connectionName)
+                syncStatusService.removeRunningSync(configuration.name)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("ssh.upload.fail.text"),
-                    "Can't open SSH connection to ${connectionInfo.host}. Reason: ${e.message}",
+                    "Can't open SSH connection to ${configuration.hostname}. Reason: ${e.message}",
                 )
                 false
             }
@@ -76,19 +66,15 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
 
     @Throws(JSchException::class)
     private fun initSession() {
-        val configuration = connectionInfo as SFTPConfiguration
-        syncStatusService.addRunningSync(configuration.connectionName)
-        session = jsch.getSession(
-            connectionInfo.userName, connectionInfo.host,
-            connectionInfo.port
-        )
-        session.setConfig("StrictHostKeyChecking", "no")
-        if (configuration.isPasswordlessSSHSelected) {
-            session.setConfig("PreferredAuthentications", "publickey")
+        syncStatusService.addRunningSync(configuration.name)
+        session = jsch.getSession(configuration.username, configuration.hostname, configuration.port.toInt())
+        session!!.setConfig("StrictHostKeyChecking", "no")
+        if (configuration.authenticationType == AuthenticationType.KEY_PAIR) {
+            session!!.setConfig("PreferredAuthentications", "publickey")
             try {
                 Utils.createFile(SSH_KNOWN_HOSTS)
             } catch (e: IOException) {
-                syncStatusService.removeRunningSync(connectionInfo.connectionName)
+                syncStatusService.removeRunningSync(configuration.name)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("ssh.upload.fail.text"),
@@ -98,65 +84,68 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
             }
             jsch.setKnownHosts(SSH_KNOWN_HOSTS)
             // add private key and passphrase if exists
-            if (configuration.isPasswordlessWithPassphrase) {
-                jsch.addIdentity(configuration.certificatePath, configuration.userPassword)
+            if (configuration.passphrase.isNullOrEmpty().not()) {
+                jsch.addIdentity(configuration.privateKey, configuration.passphrase)
             } else {
-                jsch.addIdentity(configuration.certificatePath)
+                jsch.addIdentity(configuration.privateKey)
             }
         } else {
-            session.setPassword(connectionInfo.userPassword)
+            session!!.setPassword(configuration.password)
         }
     }
 
     override fun disconnect() {
-        session.disconnect()
-        isConnected = false
-        syncStatusService.removeRunningSync(connectionInfo.connectionName)
+        try {
+            session?.disconnect()
+        } finally {
+            isConnected = false
+            syncStatusService.removeRunningSync(configuration.name)
+        }
     }
 
-    override fun syncFile(sourcePath: String, uploadLocation: Path) {
-        val preserveTimestamp = connectionInfo.isPreserveTime
+    override fun syncFile(sourcePath: String, uploadLocation: Path, indicator: ProgressIndicator) {
+        val preserveTimestamp = configuration.preserveTimestamps
         val channelSftp: ChannelSftp
         try {
-            channelSftp = session.openChannel("sftp") as ChannelSftp
+            channelSftp = session!!.openChannel("sftp") as ChannelSftp
             channelSftp.connect()
         } catch (e: JSchException) {
-            syncStatusService.removeRunningSync(connectionInfo.connectionName)
+            syncStatusService.removeRunningSync(configuration.name)
             Notifier.notifyError(
                 project,
                 SourcesyncBundle.message("ssh.upload.fail.text"),
-                "An error was encountered while trying to open a SSH connection to ${connectionInfo.host}. Reason: ${e.message}",
+                "An error was encountered while trying to open a SSH connection to ${configuration.hostname}. Reason: ${e.message}",
             )
             return
         }
 
-        if (!channelSftp.absoluteDirExists(connectionInfo.workspaceBasePath)) {
-            syncStatusService.removeRunningSync(connectionInfo.connectionName)
+        if (!channelSftp.absoluteDirExists(configuration.workspaceBasePath)) {
+            syncStatusService.removeRunningSync(configuration.name)
             Notifier.notifyError(
                 project,
                 SourcesyncBundle.message("ssh.upload.fail.text"),
-                "Remote project base path ${connectionInfo.workspaceBasePath} does not exist or is not a directory. Please make sure the value is a valid absolute directory path on ${connectionInfo.host}",
+                "Remote project base path ${configuration.workspaceBasePath} does not exist or is not a directory. Please make sure the value is a valid absolute directory path on ${configuration.hostname}",
             )
             return
         }
 
-        channelSftp.cd(connectionInfo.workspaceBasePath)
+        channelSftp.cd(configuration.workspaceBasePath)
 
         if (!channelSftp.localDirExistsOnRemote(uploadLocation.toString())) {
             logger.info("Upload path $uploadLocation does not exist or is not a directory. Going to create it.")
             val exists = channelSftp.mkLocalDirsOnRemote(uploadLocation.toString())
             if (!exists) {
-                syncStatusService.removeRunningSync(connectionInfo.connectionName)
+                syncStatusService.removeRunningSync(configuration.name)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("ssh.upload.fail.text"),
-                    "Upload path $uploadLocation could not be created on ${connectionInfo.host}"
+                    "Upload path $uploadLocation could not be created on ${configuration.hostname}"
                 )
                 return
             }
         }
         if (!channelSftp.cdLocalDirsOnRemote(uploadLocation.toString())) {
-            syncStatusService.removeRunningSync(connectionInfo.connectionName)
+            syncStatusService.removeRunningSync(configuration.name)
             Notifier.notifyError(
                 project,
                 SourcesyncBundle.message("ssh.upload.fail.text"),
@@ -167,7 +156,7 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
 
         // upload file
         val toUpload = File(sourcePath)
-        val progressMonitor: SftpProgressMonitor = SftpMonitor(toUpload.length())
+        val progressMonitor: SftpProgressMonitor = SftpMonitor(toUpload.length(), indicator)
         try {
             channelSftp.put(FileInputStream(toUpload), toUpload.name, progressMonitor, ChannelSftp.OVERWRITE)
             if (preserveTimestamp) {
@@ -179,17 +168,17 @@ class SFTPFileSynchronizer(connectionInfo: SFTPConfiguration, project: Project, 
                 channelSftp.setStat(toUpload.name, sftpATTRS)
             }
         } catch (e: Exception) {
-            syncStatusService.removeRunningSync(connectionInfo.connectionName)
+            syncStatusService.removeRunningSync(configuration.name)
             Notifier.notifyError(
                 project,
                 SourcesyncBundle.message("ssh.upload.fail.text"),
-                "Upload to ${connectionInfo.host} failed. Reason: ${e.message}"
+                "Upload to ${configuration.hostname} failed. Reason: ${e.message}"
             )
         }
         channelSftp.disconnect()
     }
 
-    private inner class SftpMonitor(totalLength: Long) : SftpProgressMonitor {
+    private inner class SftpMonitor(totalLength: Long, private val indicator: ProgressIndicator) : SftpProgressMonitor {
         val totalLength: Double
         var totalUploaded: Long
 

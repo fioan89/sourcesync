@@ -38,9 +38,17 @@ class SyncRemoteConfigurationsServiceImpl(val project: Project) : SerializablePe
         }
     }
 
+    override fun mainConnection(): BaseSyncConfiguration? {
+        if (mainConnectionName() != null) {
+            return findFirstWithName(mainConnectionName()!!)
+        }
+
+        return null
+    }
+
     override fun allConnectionNames() = state.connections.map { it.name }.toSet()
     override fun findFirstWithName(name: String) = state.connections.firstOrNull { it.name == name }
-    override fun mainConnection() = state.mainConnection
+    override fun mainConnectionName() = state.mainConnection
 
     override fun hasNoMainConnectionConfigured(): Boolean = state.mainConnection.isNullOrEmpty()
 

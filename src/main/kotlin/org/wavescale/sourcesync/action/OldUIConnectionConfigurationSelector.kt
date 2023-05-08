@@ -52,7 +52,7 @@ class OldUIConnectionConfigurationSelector : ComboBoxAction() {
 
     override fun update(e: AnActionEvent) {
         val projectName = e.getData(CommonDataKeys.PROJECT)?.name
-        val associationFor = syncConfigurationsService.mainConnection()
+        val associationFor = syncConfigurationsService.mainConnectionName()
         if (!associationFor.isNullOrBlank() && syncConfigurationsService.findFirstWithName(associationFor) == null) {
             ConnectionConfig.getInstance().apply {
                 syncConfigurationsService.resetMainConnection()
@@ -72,7 +72,7 @@ class OldUIConnectionConfigurationSelector : ComboBoxAction() {
         } else {
             e.presentation.apply {
                 isEnabled = true
-                text = syncConfigurationsService.mainConnection()
+                text = syncConfigurationsService.mainConnectionName()
                 icon = SourceSyncIcons.SOURCESYNC
             }
         }

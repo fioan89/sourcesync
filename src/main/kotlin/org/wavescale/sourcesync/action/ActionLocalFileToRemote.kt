@@ -1,39 +1,37 @@
 package org.wavescale.sourcesync.action
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.project.stateStore
 import com.intellij.ui.ExperimentalUI
 import org.wavescale.sourcesync.SourceSyncIcons
 import org.wavescale.sourcesync.SourcesyncBundle
-import org.wavescale.sourcesync.api.ConnectionConstants
-import org.wavescale.sourcesync.api.FileSynchronizer
 import org.wavescale.sourcesync.api.Utils
-import org.wavescale.sourcesync.config.FTPConfiguration
-import org.wavescale.sourcesync.config.FTPSConfiguration
-import org.wavescale.sourcesync.config.SCPConfiguration
-import org.wavescale.sourcesync.config.SFTPConfiguration
-import org.wavescale.sourcesync.factory.ConfigConnectionFactory
-import org.wavescale.sourcesync.factory.ConnectionConfig
+import org.wavescale.sourcesync.configurations.ScpSyncConfiguration
+import org.wavescale.sourcesync.configurations.SshSyncConfiguration
+import org.wavescale.sourcesync.configurations.SyncConfigurationType
 import org.wavescale.sourcesync.notifications.Notifier
-import org.wavescale.sourcesync.synchronizer.FTPFileSynchronizer
-import org.wavescale.sourcesync.synchronizer.FTPSFileSynchronizer
+import org.wavescale.sourcesync.services.SyncRemoteConfigurationsService
 import org.wavescale.sourcesync.synchronizer.SCPFileSynchronizer
 import org.wavescale.sourcesync.synchronizer.SFTPFileSynchronizer
+import org.wavescale.sourcesync.synchronizer.Synchronizer
 
 class ActionLocalFileToRemote : AnAction() {
+    private val syncConfigurationsService = ProjectManager.getInstance().openProjects[0].getService(SyncRemoteConfigurationsService::class.java)
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun actionPerformed(e: AnActionEvent) {
         // first check if there's a connection type associated to this module.
         // If not alert the user and get out
         val project = e.project ?: return
-        val projectName = project.name
-        val associationName = ConnectionConfig.getInstance().getAssociationFor(projectName)
+
         val virtualFile = PlatformDataKeys.VIRTUAL_FILE.getData(e.dataContext)
         if (virtualFile == null || virtualFile.isDirectory) {
             Notifier.notifyInfo(
@@ -42,42 +40,43 @@ class ActionLocalFileToRemote : AnAction() {
             )
             return
         }
-        val connectionConfiguration = ConfigConnectionFactory.getInstance().getConnectionConfiguration(associationName)
-        if (Utils.canBeUploaded(virtualFile.name, connectionConfiguration.getExcludedFiles())) {
-            val uploadLocation = Utils.relativeLocalUploadDirs(virtualFile, project.stateStore)
-            ProgressManager.getInstance().run(object : Task.Backgroundable(e.project, "Uploading", false) {
-                override fun run(indicator: ProgressIndicator) {
-                    var fileSynchronizer: FileSynchronizer? = null
-                    if (ConnectionConstants.CONN_TYPE_SCP == connectionConfiguration.connectionType) {
-                        fileSynchronizer = SCPFileSynchronizer(
-                            (connectionConfiguration as SCPConfiguration),
-                            project, indicator
-                        )
-                    } else if (ConnectionConstants.CONN_TYPE_SFTP == connectionConfiguration.connectionType) {
-                        fileSynchronizer = SFTPFileSynchronizer(
-                            (connectionConfiguration as SFTPConfiguration),
-                            project, indicator
-                        )
-                    } else if (ConnectionConstants.CONN_TYPE_FTP == connectionConfiguration.connectionType) {
-                        fileSynchronizer = FTPFileSynchronizer(
-                            (connectionConfiguration as FTPConfiguration),
-                            project, indicator
-                        )
-                    } else if (ConnectionConstants.CONN_TYPE_FTPS == connectionConfiguration.connectionType) {
-                        fileSynchronizer = FTPSFileSynchronizer(
-                            (connectionConfiguration as FTPSConfiguration),
-                            project, indicator
-                        )
-                    }
 
-                    if (fileSynchronizer != null && fileSynchronizer.connect()) {
-                        fileSynchronizer.syncFile(virtualFile.path, uploadLocation)
-                        fileSynchronizer.disconnect()
+        val mainConfiguration = syncConfigurationsService.mainConnection()
+        if (mainConfiguration == null) {
+            Notifier.notifyError(
+                e.project!!,
+                SourcesyncBundle.message("no.remote.sync.connection.configured.title"),
+                SourcesyncBundle.message("no.remote.sync.connection.configured.message")
+            )
+            return
+        }
+
+        val fileSynchronizer: Synchronizer = when (mainConfiguration.protocol) {
+            SyncConfigurationType.SCP -> {
+                SCPFileSynchronizer(mainConfiguration as ScpSyncConfiguration, project)
+            }
+
+            SyncConfigurationType.SFTP -> {
+                SFTPFileSynchronizer(mainConfiguration as SshSyncConfiguration, project)
+            }
+        }
+
+        try {
+            if (Utils.canBeUploaded(virtualFile.name, mainConfiguration.excludedFiles)) {
+                val uploadLocation = Utils.relativeLocalUploadDirs(virtualFile, project.stateStore)
+                ProgressManager.getInstance().run(object : Task.Backgroundable(e.project, "Uploading", false) {
+                    override fun run(indicator: ProgressIndicator) {
+                        if (fileSynchronizer.connect()) {
+                            fileSynchronizer.syncFile(virtualFile.path, uploadLocation, indicator)
+                        }
+
                     }
-                }
-            })
-        } else {
-            logger.info("Skipping upload of ${virtualFile.name} because it matches the exclusion file pattern")
+                })
+            } else {
+                logger.info("Skipping upload of ${virtualFile.name} because it matches the exclusion file pattern")
+            }
+        } finally {
+            fileSynchronizer.disconnect()
         }
     }
 
@@ -87,11 +86,10 @@ class ActionLocalFileToRemote : AnAction() {
             e.presentation.icon = SourceSyncIcons.ExpUI.SOURCESYNC
         }
 
-        val project = e.project ?: return
-        val associationName = ConnectionConfig.getInstance().getAssociationFor(project.name)
-        if (associationName != null) {
+        val mainConnectionName = syncConfigurationsService.mainConnectionName()
+        if (mainConnectionName != null) {
             e.presentation.apply {
-                text = "Sync this file to $associationName"
+                text = "Sync this file to $mainConnectionName"
                 isEnabled = true
             }
         } else {
@@ -103,7 +101,7 @@ class ActionLocalFileToRemote : AnAction() {
     }
 
     companion object {
-        val logger = Logger.getInstance(ActionSelectedFilesToRemote.javaClass.simpleName)
+        val logger = logger<ActionSelectedFilesToRemote>()
     }
 
 }

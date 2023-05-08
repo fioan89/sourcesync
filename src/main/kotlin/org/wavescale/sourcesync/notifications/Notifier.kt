@@ -10,7 +10,6 @@ import org.wavescale.sourcesync.SourcesyncBundle
 
 private val notificationGroup = NotificationGroupManager.getInstance().getNotificationGroup("Sourcesync")
 
-private const val PROPERTY_IGNORE_SOURCESYNC_FTP_DEPRECATION = "ignore.sourcesync.ftp.deprecation"
 private const val PROPERTY_IGNORE_SOURCESYNC_DONATION = "ignore.sourcesync.donation"
 
 class Notifier {
@@ -20,32 +19,6 @@ class Notifier {
             notificationGroup
                 .createNotification(simpleMessage, detailedMessage, NotificationType.ERROR)
                 .notify(project)
-        }
-
-        @JvmStatic
-        fun notifyDeprecation(project: Project, message: String, url: String) {
-
-            val ignored = PropertiesComponent.getInstance().isValueSet(PROPERTY_IGNORE_SOURCESYNC_FTP_DEPRECATION)
-            if (ignored) return
-
-            val notification = notificationGroup.createNotification(
-                SourcesyncBundle.message("ftp.deprecate.title"),
-                message,
-                NotificationType.WARNING
-            )
-
-            notification.apply {
-                addAction(NotificationAction.createSimpleExpiring(SourcesyncBundle.message("dont.show.again.action")) {
-                    PropertiesComponent.getInstance().setValue(PROPERTY_IGNORE_SOURCESYNC_FTP_DEPRECATION, "true")
-                })
-                addAction(NotificationAction.createSimple(SourcesyncBundle.message("go.to.github.issues")) {
-                    BrowserUtil.browse(url)
-                })
-
-                setDisplayId(SourcesyncBundle.message("notification.group.sourcesync.ftp.deprecation"))
-                isImportant = true
-                isSuggestionType = true
-            }.notify(project)
         }
 
         @JvmStatic

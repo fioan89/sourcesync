@@ -19,9 +19,9 @@ import com.jcraft.jsch.JSch
 import com.jcraft.jsch.JSchException
 import com.jcraft.jsch.Session
 import org.wavescale.sourcesync.SourcesyncBundle
-import org.wavescale.sourcesync.api.FileSynchronizer
 import org.wavescale.sourcesync.api.Utils
-import org.wavescale.sourcesync.config.SCPConfiguration
+import org.wavescale.sourcesync.configurations.AuthenticationType
+import org.wavescale.sourcesync.configurations.ScpSyncConfiguration
 import org.wavescale.sourcesync.notifications.Notifier
 import org.wavescale.sourcesync.services.StatsService
 import org.wavescale.sourcesync.services.SyncStatusService
@@ -32,30 +32,27 @@ import java.io.InputStream
 import java.nio.file.Path
 import java.nio.file.Paths
 
-class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, indicator: ProgressIndicator) :
-    FileSynchronizer(connectionInfo, project, indicator) {
+class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val project: Project) : Synchronizer {
     private val syncStatusService = service<SyncStatusService>()
     private val statsService = service<StatsService>()
     private val jsch: JSch = JSch()
-    private lateinit var session: Session
+    private var session: Session? = null
 
-    init {
-        this.indicator.isIndeterminate = true
-    }
+    private var isConnected: Boolean = false
 
     override fun connect(): Boolean {
         return if (!isConnected) {
             try {
                 initSession()
-                session.connect()
+                session!!.connect()
                 isConnected = true
                 true
             } catch (e: JSchException) {
-                syncStatusService.removeRunningSync(connectionInfo.connectionName)
+                syncStatusService.removeRunningSync(configuration.name)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("scp.upload.fail.text"),
-                    "Can't open SCP connection to ${connectionInfo.host}. Reason: ${e.message}",
+                    "Can't open SCP connection to ${configuration.hostname}. Reason: ${e.message}",
                 )
                 false
             }
@@ -64,19 +61,18 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
 
     @Throws(JSchException::class)
     private fun initSession() {
-        val configuration = connectionInfo as SCPConfiguration
-        syncStatusService.addRunningSync(configuration.connectionName)
+        syncStatusService.addRunningSync(configuration.name)
         session = jsch.getSession(
-            connectionInfo.userName, connectionInfo.host,
-            connectionInfo.port
+            configuration.username, configuration.hostname,
+            configuration.port.toInt()
         )
-        session.setConfig("StrictHostKeyChecking", "no")
-        if (configuration.isPasswordlessSSHSelected) {
-            session.setConfig("PreferredAuthentications", "publickey")
+        session!!.setConfig("StrictHostKeyChecking", "no")
+        if (configuration.authenticationType == AuthenticationType.KEY_PAIR) {
+            session!!.setConfig("PreferredAuthentications", "publickey")
             try {
                 Utils.createFile(SSH_KNOWN_HOSTS)
             } catch (e: IOException) {
-                syncStatusService.removeRunningSync(connectionInfo.connectionName)
+                syncStatusService.removeRunningSync(configuration.name)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("scp.upload.fail.text"),
@@ -86,20 +82,23 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
             }
             jsch.setKnownHosts(SSH_KNOWN_HOSTS)
             // add private key and passphrase if exists
-            if (configuration.isPasswordlessWithPassphrase) {
-                jsch.addIdentity(configuration.certificatePath, configuration.userPassword)
+            if (configuration.passphrase.isNullOrEmpty().not()) {
+                jsch.addIdentity(configuration.privateKey, configuration.passphrase)
             } else {
-                jsch.addIdentity(configuration.certificatePath)
+                jsch.addIdentity(configuration.privateKey)
             }
         } else {
-            session.setPassword(connectionInfo.userPassword)
+            session!!.setPassword(configuration.password)
         }
     }
 
     override fun disconnect() {
-        session.disconnect()
-        isConnected = false
-        syncStatusService.removeRunningSync(connectionInfo.connectionName)
+        try {
+            session?.disconnect()
+        } finally {
+            isConnected = false
+            syncStatusService.removeRunningSync(configuration.name)
+        }
     }
 
     /**
@@ -110,13 +109,13 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
      * @param uploadLocation a `String` representing a location path on the remote target
      * where the source will be uploaded.
      */
-    override fun syncFile(sourcePath: String, uploadLocation: Path) {
-        val preserveTimestamp = connectionInfo.isPreserveTime
-        val remotePath = Paths.get(connectionInfo.workspaceBasePath).resolve(uploadLocation)
-            .pathStringLike(connectionInfo.workspaceBasePath)
+    override fun syncFile(sourcePath: String, uploadLocation: Path, indicator: ProgressIndicator) {
+        val preserveTimestamp = configuration.preserveTimestamps
+        val remotePath = Paths.get(configuration.workspaceBasePath).resolve(uploadLocation)
+            .pathStringLike(configuration.workspaceBasePath)
         try {
             var command = "scp " + (if (preserveTimestamp) "-p" else "") + " -t -C " + remotePath
-            val channel = session.openChannel("exec")
+            val channel = session!!.openChannel("exec")
             (channel as ChannelExec).setCommand(command)
 
             // get I/O streams for remote scp
@@ -177,11 +176,11 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
                 Notifier.notifyDonation(project)
             }
         } catch (e: Exception) {
-            syncStatusService.removeRunningSync(connectionInfo.connectionName)
+            syncStatusService.removeRunningSync(configuration.name)
             Notifier.notifyError(
                 project,
                 SourcesyncBundle.message("scp.upload.fail.text"),
-                "Upload to ${connectionInfo.host} failed. Reason: ${e.message}",
+                "Upload to ${configuration.hostname} failed. Reason: ${e.message}",
             )
         }
     }
@@ -204,20 +203,20 @@ class SCPFileSynchronizer(connectionInfo: SCPConfiguration, project: Project, in
             } while (c != '\n'.code)
             if (b == 1) {
                 // error
-                syncStatusService.removeRunningSync(connectionInfo.connectionName)
+                syncStatusService.removeRunningSync(configuration.name)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("scp.upload.fail.text"),
-                    "Could not initiate SCP connection to ${connectionInfo.host} because of an error."
+                    "Could not initiate SCP connection to ${configuration.hostname} because of an error."
                 )
             }
             if (b == 2) {
                 // fatal error
-                syncStatusService.removeRunningSync(connectionInfo.connectionName)
+                syncStatusService.removeRunningSync(configuration.name)
                 Notifier.notifyError(
                     project,
                     SourcesyncBundle.message("scp.upload.fail.text"),
-                    "Could not initiate SCP connection to ${connectionInfo.host} because of a fatal error."
+                    "Could not initiate SCP connection to ${configuration.hostname} because of a fatal error."
                 )
             }
         }

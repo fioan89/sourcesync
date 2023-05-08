@@ -56,18 +56,6 @@ public class ConfigConnectionFactory
         return CONFIG_CONNECTION_FACTORY;
     }
 
-    /**
-     * Searches for the connection configuration that is assigned to the given name. If not found
-     * null is returned.
-     *
-     * @param connectionName a <code>String</code> representing the connection name.
-     * @return an implementation of the <code>ConnectionConfiguration</code>
-     */
-    public ConnectionConfiguration getConnectionConfiguration(String connectionName)
-    {
-        return connectionConfigurationMap.get(connectionName);
-    }
-
     @SuppressWarnings("unchecked")
     private void initComponent()
     {
