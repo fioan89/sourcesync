@@ -14,13 +14,10 @@ package org.wavescale.sourcesync.factory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 import org.wavescale.sourcesync.api.ConnectionConstants;
@@ -69,26 +66,6 @@ public class ConfigConnectionFactory
     public ConnectionConfiguration getConnectionConfiguration(String connectionName)
     {
         return connectionConfigurationMap.get(connectionName);
-    }
-
-    /**
-     * Gets a set of all living connection names from the factory.
-     *
-     * @return a set of strings representing connection names that live inside the factory.
-     */
-    public Set<String> getConnectionNames()
-    {
-        return connectionConfigurationMap.keySet();
-    }
-
-    public void addConnectionConfiguration(String connectionName, ConnectionConfiguration connectionConfiguration)
-    {
-        connectionConfigurationMap.put(connectionName, connectionConfiguration);
-    }
-
-    public void removeConnectionConfiguration(String connectionName)
-    {
-        connectionConfigurationMap.remove(connectionName);
     }
 
     @SuppressWarnings("unchecked")
@@ -173,18 +150,5 @@ public class ConfigConnectionFactory
         c.setExcludedFiles(configuration.getExcludedFiles());
         c.setPreserveTimestamps(configuration.isPreserveTime());
         return c;
-    }
-
-    public void saveConnections()
-    {
-        // try to write the persistence data
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE))))
-        {
-            out.writeObject(connectionConfigurationMap);
-        }
-        catch (IOException e)
-        {
-            logger.warn("Could not save connections because", e);
-        }
     }
 }

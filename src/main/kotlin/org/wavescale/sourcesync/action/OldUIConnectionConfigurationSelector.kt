@@ -1,14 +1,23 @@
 package org.wavescale.sourcesync.action
 
 import com.intellij.ide.DataManager
-import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionUpdateThread
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.actionSystem.Presentation
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.project.ProjectManager
 import org.wavescale.sourcesync.SourceSyncIcons
 import org.wavescale.sourcesync.SourcesyncBundle
-import org.wavescale.sourcesync.factory.ConfigConnectionFactory
 import org.wavescale.sourcesync.factory.ConnectionConfig
+import org.wavescale.sourcesync.services.SyncRemoteConfigurationsService
 import org.wavescale.sourcesync.services.SyncStatusService
 import org.wavescale.sourcesync.ui.ConnectionConfigurationDialog
 import java.awt.Graphics
@@ -19,13 +28,16 @@ import javax.swing.SwingUtilities
 
 class OldUIConnectionConfigurationSelector : ComboBoxAction() {
     private val syncStatusService = service<SyncStatusService>()
+    private val syncConfigurationsService = ProjectManager.getInstance().openProjects[0].getService(SyncRemoteConfigurationsService::class.java)
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun createPopupActionGroup(button: JComponent, dataContext: DataContext): DefaultActionGroup {
         val allActionsGroup = DefaultActionGroup()
         allActionsGroup.add(getEditConnectionConfigurationsAction())
         allActionsGroup.addSeparator(SourcesyncBundle.message("sourcesyncConfigurations"))
 
-        ConfigConnectionFactory.getInstance().connectionNames.forEach { allActionsGroup.add(SourceSyncConfigAction(it)) }
+        syncConfigurationsService.allConnectionNames().forEach { allActionsGroup.add(SourceSyncConfigAction(syncConfigurationsService, it)) }
 
         return allActionsGroup
     }
@@ -40,13 +52,10 @@ class OldUIConnectionConfigurationSelector : ComboBoxAction() {
 
     override fun update(e: AnActionEvent) {
         val projectName = e.getData(CommonDataKeys.PROJECT)?.name
-        val associationFor = ConnectionConfig.getInstance().getAssociationFor(projectName)
-        if (!associationFor.isNullOrBlank() && ConfigConnectionFactory.getInstance()
-                .getConnectionConfiguration(associationFor) == null
-        ) {
+        val associationFor = syncConfigurationsService.mainConnection()
+        if (!associationFor.isNullOrBlank() && syncConfigurationsService.findFirstWithName(associationFor) == null) {
             ConnectionConfig.getInstance().apply {
-                removeAssociationFor(projectName)
-                saveModuleAssociatedConn()
+                syncConfigurationsService.resetMainConnection()
                 e.presentation.apply {
                     isEnabled = true
                     text = SourcesyncBundle.message("sourcesyncAddConfigurations")
@@ -63,7 +72,7 @@ class OldUIConnectionConfigurationSelector : ComboBoxAction() {
         } else {
             e.presentation.apply {
                 isEnabled = true
-                text = ConnectionConfig.getInstance().getAssociationFor(projectName)
+                text = syncConfigurationsService.mainConnection()
                 icon = SourceSyncIcons.SOURCESYNC
             }
         }
@@ -104,7 +113,7 @@ class OldUIConnectionConfigurationSelector : ComboBoxAction() {
         }
     }
 
-    internal class SourceSyncConfigAction(private val configuration: String) : DumbAwareAction() {
+    internal class SourceSyncConfigAction(private val syncConfigurationsService: SyncRemoteConfigurationsService, private val configuration: String) : DumbAwareAction() {
 
         init {
             val presentation = templatePresentation
@@ -116,12 +125,7 @@ class OldUIConnectionConfigurationSelector : ComboBoxAction() {
             val presentation = templatePresentation
             val projectName = PlatformDataKeys.PROJECT.getData(e.dataContext)!!.name
             presentation.setText(configuration, false)
-            associateProjectWithConnection(projectName)
-        }
-
-        private fun associateProjectWithConnection(projectName: String) {
-            ConnectionConfig.getInstance().associateProjectWithConnection(projectName, configuration)
-            ConnectionConfig.getInstance().saveModuleAssociatedConn()
+            syncConfigurationsService.setMainConnection(configuration)
         }
     }
 }

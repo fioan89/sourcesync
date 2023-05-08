@@ -38,12 +38,23 @@ class SyncRemoteConfigurationsServiceImpl(val project: Project) : SerializablePe
         }
     }
 
+    override fun allConnectionNames() = state.connections.map { it.name }.toSet()
+    override fun findFirstWithName(name: String) = state.connections.firstOrNull { it.name == name }
+    override fun mainConnection() = state.mainConnection
+
     override fun hasNoMainConnectionConfigured(): Boolean = state.mainConnection.isNullOrEmpty()
 
     override fun setMainConnection(connectionName: String) {
         updateState { oldState ->
             logger.info("Marked $connectionName as main remote sync connection for project ${project.name}")
             SyncConfigurations(oldState.connections, connectionName)
+        }
+    }
+
+    override fun resetMainConnection() {
+        updateState { oldState ->
+            logger.info("Removed ${oldState.mainConnection} as main remote sync connection for project ${project.name}")
+            SyncConfigurations(oldState.connections, null)
         }
     }
 

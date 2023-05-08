@@ -1,8 +1,19 @@
 package org.wavescale.sourcesync.action
 
 import com.intellij.ide.ui.laf.darcula.ui.ToolbarComboWidgetUI
-import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.actionSystem.ActionGroup
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionUpdateThread
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.actionSystem.Presentation
+import com.intellij.openapi.actionSystem.Separator
+import com.intellij.openapi.actionSystem.Toggleable
 import com.intellij.openapi.components.service
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.wm.impl.ExpandableComboAction
 import com.intellij.openapi.wm.impl.ToolbarComboWidget
@@ -10,13 +21,14 @@ import com.intellij.ui.components.JBList
 import com.intellij.ui.popup.PopupFactoryImpl
 import org.wavescale.sourcesync.SourceSyncIcons
 import org.wavescale.sourcesync.SourcesyncBundle
-import org.wavescale.sourcesync.factory.ConfigConnectionFactory
 import org.wavescale.sourcesync.factory.ConnectionConfig
+import org.wavescale.sourcesync.services.SyncRemoteConfigurationsService
 import org.wavescale.sourcesync.services.SyncStatusService
 import javax.swing.JComponent
 
 class NewUIConnectionConfigurationSelector : ExpandableComboAction() {
     private val syncStatusService = service<SyncStatusService>()
+    private val syncConfigurationsService = ProjectManager.getInstance().openProjects[0].getService(SyncRemoteConfigurationsService::class.java)
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
     override fun displayTextInToolbar() = true
 
@@ -45,13 +57,10 @@ class NewUIConnectionConfigurationSelector : ExpandableComboAction() {
 
     override fun update(e: AnActionEvent) {
         val projectName = e.project?.name
-        val associationFor = ConnectionConfig.getInstance().getAssociationFor(projectName)
-        if (!associationFor.isNullOrBlank() && ConfigConnectionFactory.getInstance()
-                .getConnectionConfiguration(associationFor) == null
-        ) {
+        val associationFor = syncConfigurationsService.mainConnection()
+        if (!associationFor.isNullOrBlank() && syncConfigurationsService.findFirstWithName(associationFor) == null) {
             ConnectionConfig.getInstance().apply {
-                removeAssociationFor(projectName)
-                saveModuleAssociatedConn()
+                syncConfigurationsService.resetMainConnection()
                 e.presentation.apply {
                     isEnabled = true
                     text = SourcesyncBundle.message("sourcesyncAddConfigurations")
@@ -68,29 +77,24 @@ class NewUIConnectionConfigurationSelector : ExpandableComboAction() {
         } else {
             e.presentation.apply {
                 isEnabled = true
-                text = ConnectionConfig.getInstance().getAssociationFor(projectName)
+                text = syncConfigurationsService.mainConnection()
                 icon = SourceSyncIcons.ExpUI.SOURCESYNC
             }
         }
     }
-}
 
+    private fun createActionGroup(): ActionGroup {
+        val allActionsGroup = DefaultActionGroup()
+        allActionsGroup.add(Separator.create(SourcesyncBundle.message("sourcesyncConfigurations")))
+        syncConfigurationsService.allConnectionNames().forEach {
+            allActionsGroup.add(SourceSyncConfigAction(syncConfigurationsService, it))
+        }
 
-private fun createActionGroup(): ActionGroup {
-    val allActionsGroup = DefaultActionGroup()
-    allActionsGroup.add(Separator.create(SourcesyncBundle.message("sourcesyncConfigurations")))
-    ConfigConnectionFactory.getInstance().connectionNames.forEach {
-        allActionsGroup.add(
-            SourceSyncConfigAction(
-                it
-            )
-        )
+        allActionsGroup.add(Separator.create())
+        allActionsGroup.add(ActionManager.getInstance().getAction("actionSourceSyncMenu"))
+
+        return allActionsGroup
     }
-
-    allActionsGroup.add(Separator.create())
-    allActionsGroup.add(ActionManager.getInstance().getAction("actionSourceSyncMenu"))
-
-    return allActionsGroup
 }
 
 class SourceSyncConfigurationActionGroupPopup(
@@ -118,7 +122,7 @@ class SourceSyncConfigurationActionGroupPopup(
     override fun shouldBeShowing(value: Any?) = true
 }
 
-class SourceSyncConfigAction(private val configuration: String) : AnAction() {
+class SourceSyncConfigAction(private val syncConfigurationsService: SyncRemoteConfigurationsService, private val configuration: String) : AnAction() {
     init {
         val presentation = templatePresentation
         presentation.setText(configuration, false)
@@ -129,11 +133,7 @@ class SourceSyncConfigAction(private val configuration: String) : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         val projectName = PlatformDataKeys.PROJECT.getData(e.dataContext)!!.name
-        associateProjectWithConnection(projectName)
+        syncConfigurationsService.setMainConnection(configuration)
     }
 
-    private fun associateProjectWithConnection(projectName: String) {
-        ConnectionConfig.getInstance().associateProjectWithConnection(projectName, configuration)
-        ConnectionConfig.getInstance().saveModuleAssociatedConn()
-    }
 }

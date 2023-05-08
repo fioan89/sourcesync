@@ -2,10 +2,8 @@ package org.wavescale.sourcesync.factory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import org.wavescale.sourcesync.services.SyncRemoteConfigurationsService;
@@ -76,11 +74,6 @@ public class ConnectionConfig
         projectToConnection.remove(projectName);
     }
 
-    public void removeAssociations()
-    {
-        projectToConnection.clear();
-    }
-
     @SuppressWarnings("unchecked")
     private void tryLoadModulesAssociatedConn()
     {
@@ -110,23 +103,6 @@ public class ConnectionConfig
             {
                 c.printStackTrace();
             }
-        }
-    }
-
-    public void saveModuleAssociatedConn()
-    {
-        // try to write the persistence file
-        try
-        {
-            FileOutputStream outputStream = new FileOutputStream(userHome.concat(fileSeparator).concat(CONFIG_FILE));
-            ObjectOutputStream out = new ObjectOutputStream(outputStream);
-            out.writeObject(projectToConnection);
-            out.close();
-            outputStream.close();
-        }
-        catch (IOException i)
-        {
-            i.printStackTrace();
         }
     }
 }
