@@ -18,7 +18,7 @@ class SshSyncConfiguration : BaseSyncConfiguration() {
         workspaceBasePath = this@SshSyncConfiguration.workspaceBasePath
         excludedFiles = this@SshSyncConfiguration.excludedFiles
         preserveTimestamps = this@SshSyncConfiguration.preserveTimestamps
-        certificatePath = this@SshSyncConfiguration.certificatePath
+        privateKey = this@SshSyncConfiguration.privateKey
         passphrase = this@SshSyncConfiguration.passphrase
     }
 }
@@ -38,7 +38,7 @@ class ScpSyncConfiguration : BaseSyncConfiguration() {
         workspaceBasePath = this@ScpSyncConfiguration.workspaceBasePath
         excludedFiles = this@ScpSyncConfiguration.excludedFiles
         preserveTimestamps = this@ScpSyncConfiguration.preserveTimestamps
-        certificatePath = this@ScpSyncConfiguration.certificatePath
+        privateKey = this@ScpSyncConfiguration.privateKey
         passphrase = this@ScpSyncConfiguration.passphrase
     }
 }

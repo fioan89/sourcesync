@@ -11,6 +11,8 @@ import com.intellij.ui.SideBorder
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBViewport
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.tree.TreeUtil
 import org.wavescale.sourcesync.SourcesyncBundle
@@ -33,12 +35,14 @@ import javax.swing.KeyStroke
 import javax.swing.ScrollPaneConstants
 import javax.swing.border.Border
 import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.TreeNode
 import javax.swing.tree.TreeSelectionModel
+import kotlin.math.max
 
 class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(project, true) {
     private var syncRemoteConfigurationsService = project.service<SyncRemoteConfigurationsService>()
 
-    private val rightPanel = JBScrollPane()
+    private val splitter = JBSplitter(false, "SourcesyncConnectionConfiguration.dividerProportion", 0.3f, 0.5f)
 
     private val rootNode = DefaultMutableTreeNode("Root")
     private val treeModel = SyncConnectionsTreeModel(rootNode)
@@ -47,7 +51,7 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
         selectionModel.addTreeSelectionListener { event ->
             val node = event.path.lastPathComponent as DefaultMutableTreeNode
             when (node.userObject) {
-                is ConnectionConfigurationComponent -> rightPanel.viewport.view = (node.userObject as ConnectionConfigurationComponent).component
+                is ConnectionConfigurationComponent -> splitter.secondComponent = (node.userObject as ConnectionConfigurationComponent).component
             }
         }
     }
@@ -61,36 +65,6 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
     override fun init() {
         super.init()
         title = SourcesyncBundle.message("connectionConfigurationDialogTitle")
-        initTree()
-    }
-
-    private fun initTree() {
-        tree.apply {
-            isRootVisible = false
-            showsRootHandles = true
-        }
-        tree.cellRenderer = SyncConfigurationTreeRenderer()
-
-        addRemoteSynConfigurations(rootNode)
-        TreeUtil.installActions(tree)
-        tree.registerKeyboardAction({ clickDefaultButton() }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_FOCUSED)
-        tree.emptyText.appendText(SourcesyncBundle.message("status.text.no.sync.configurations.added"))
-        tree.expandAll()
-    }
-
-    private fun addRemoteSynConfigurations(root: DefaultMutableTreeNode) {
-        SyncConfigurationType.values().forEach { type ->
-            val connections = syncRemoteConfigurationsService.findAllOfType(type)
-            if (connections.isNotEmpty()) {
-                val typeNode = DefaultMutableTreeNode(type.prettyName)
-                root.add(typeNode)
-                connections.forEach { connection ->
-                    typeNode.add(DefaultMutableTreeNode(ConnectionConfigurationComponent(connection, this::onConfigModifications)))
-                }
-            }
-        }
-
-        treeModel.reload()
     }
 
     private fun onConfigModifications() {
@@ -104,15 +78,61 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
 
     @Suppress("UnstableApiUsage")
     override fun createCenterPanel(): JComponent {
-        val splitter = JBSplitter()
         val leftPanel = leftSidePanel()
         leftPanel.border = IdeBorderFactory.createBorder(SideBorder.RIGHT)
 
         splitter.firstComponent = leftPanel
-        splitter.secondComponent = rightPanel
+        splitter.secondComponent = JPanel()
         splitter.setHonorComponentsMinimumSize(true)
         splitter.putClientProperty(IS_VISUAL_PADDING_COMPENSATED_ON_COMPONENT_LEVEL_KEY, true)
+
+        val d = splitter.preferredSize
+        d.width = max(d.width, 860)
+        d.height = max(d.height, 450)
+        splitter.preferredSize = d
+
+        initTree()
         return splitter
+    }
+
+    private fun initTree() {
+        tree.apply {
+            isRootVisible = false
+            showsRootHandles = true
+        }
+        tree.cellRenderer = SyncConfigurationTreeRenderer()
+
+        val firstNode = addRemoteSynConfigurations(rootNode)
+        TreeUtil.installActions(tree)
+        tree.registerKeyboardAction({ clickDefaultButton() }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_FOCUSED)
+        tree.emptyText.appendText(SourcesyncBundle.message("status.text.no.sync.configurations.added"))
+        tree.expandAll()
+
+        if (firstNode != null) {
+            tree.selectNode(firstNode)
+        }
+    }
+
+    private fun addRemoteSynConfigurations(root: DefaultMutableTreeNode): TreeNode? {
+        var firstNodeToSelectLater: TreeNode? = null
+        SyncConfigurationType.values().forEach { type ->
+            val connections = syncRemoteConfigurationsService.findAllOfType(type)
+            if (connections.isNotEmpty()) {
+                val typeNode = DefaultMutableTreeNode(type.prettyName)
+                root.add(typeNode)
+                connections.forEach { connection ->
+                    val connectionComponentNode = DefaultMutableTreeNode(ConnectionConfigurationComponent(project, connection, this::onConfigModifications))
+                    typeNode.add(connectionComponentNode)
+
+                    if (firstNodeToSelectLater == null) {
+                        firstNodeToSelectLater = connectionComponentNode
+                    }
+                }
+            }
+        }
+        treeModel.reload()
+
+        return firstNodeToSelectLater
     }
 
     override fun createContentPaneBorder(): Border = JBUI.Borders.empty()
@@ -120,34 +140,42 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
     private fun leftSidePanel(): JComponent {
 
         val toolbarDecorator = ToolbarDecorator.createDecorator(tree)
+        return panel {
+            row {
+                cell(JPanel(BorderLayout()))
+                    .resizableColumn()
+                    .align(Align.FILL)
+                    .applyToComponent {
+                        add(JBScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED).apply {
+                            add(JBViewport().apply {
+                                add(tree)
+                            })
+                            border = JBUI.Borders.empty()
+                        })
+                        add(
+                            toolbarDecorator.disableUpDownActions()
+                                .setAddAction { button ->
+                                    AddSyncRemoteConfigurationPopUp.create(
+                                        SyncConfigurationType.values().toList(),
+                                        this@ConnectionConfigurationDialog::addRemoteSyncConfiguration
+                                    ).show(button.preferredPopupPoint)
+                                }
+                                .setAddIcon(AllIcons.General.Add)
+                                .setRemoveAction {
+                                    val targetNode = tree.selectionPath?.lastPathComponent as DefaultMutableTreeNode
+                                    val parentNode = targetNode.parent as DefaultMutableTreeNode
 
-        return JPanel(BorderLayout()).apply {
-            add(JBScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED).apply {
-                add(JBViewport().apply {
-                    add(tree)
-                })
-                border = JBUI.Borders.empty()
-            })
-            add(
-                toolbarDecorator.disableUpDownActions()
-                    .setAddAction { button ->
-                        AddSyncRemoteConfigurationPopUp.create(
-                            SyncConfigurationType.values().toList(),
-                            this@ConnectionConfigurationDialog::addRemoteSyncConfiguration
-                        ).show(button.preferredPopupPoint)
+                                    treeModel.removeNodeFromParent(targetNode)
+                                    if (parentNode.childCount == 0) {
+                                        treeModel.removeNodeFromParent(parentNode)
+                                    }
+                                    splitter.secondComponent = JPanel()
+                                    splitter.updateUI()
+                                }.createPanel()
+                        )
+                        border = JBUI.Borders.empty()
                     }
-                    .setAddIcon(AllIcons.General.Add)
-                    .setRemoveAction {
-                        val targetNode = tree.selectionPath?.lastPathComponent as DefaultMutableTreeNode
-                        val parentNode = targetNode.parent as DefaultMutableTreeNode
-
-                        treeModel.removeNodeFromParent(targetNode)
-                        if (parentNode.childCount == 0) {
-                            treeModel.removeNodeFromParent(parentNode)
-                        }
-                        rightPanel.updateUI()
-                    }.createPanel()
-            )
+            }.resizableRow()
         }
     }
 
@@ -157,12 +185,12 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
         when (syncConfigurationType) {
             SFTP -> {
                 connectionTypeNode = treeModel.getOrCreateNodeFor(SFTP)
-                connectionNodeToAdd = DefaultMutableTreeNode(ConnectionConfigurationComponent(SshSyncConfiguration(), this::onConfigModifications))
+                connectionNodeToAdd = DefaultMutableTreeNode(ConnectionConfigurationComponent(project, SshSyncConfiguration(), this::onConfigModifications))
             }
 
             SCP -> {
                 connectionTypeNode = treeModel.getOrCreateNodeFor(SCP)
-                connectionNodeToAdd = DefaultMutableTreeNode(ConnectionConfigurationComponent(ScpSyncConfiguration(), this::onConfigModifications))
+                connectionNodeToAdd = DefaultMutableTreeNode(ConnectionConfigurationComponent(project, ScpSyncConfiguration(), this::onConfigModifications))
             }
         }
         connectionTypeNode.add(connectionNodeToAdd)

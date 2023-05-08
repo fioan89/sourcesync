@@ -10,11 +10,13 @@
 
 ### Changed
 
-- redesigned Sync Connection Configurations editor that provides a look and feel similar to Run Configurations editor
+- redesigned Sync Connection Configurations editor with an improved look and feel similar to Run Configurations editor
+- simplified the user experience when it comes to configuring remote connections, especially the authentication form
 
 ### Removed
 
 - support for FTP&FTPS protocols
+- the ability to configure concurrent sync jobs
 
 ## 2.0.4 - 2023-04-30
 

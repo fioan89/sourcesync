@@ -132,7 +132,7 @@ public class ConfigConnectionFactory
         c.setUsername(configuration.getUserName());
         if (((PasswordlessSSH) configuration).isPasswordlessSSHSelected())
         {
-            c.setCertificatePath(((PasswordlessSSH) configuration).getCertificatePath());
+            c.setPrivateKey(((PasswordlessSSH) configuration).getCertificatePath());
             if (((PasswordlessSSH) configuration).isPasswordlessWithPassphrase())
             {
                 c.setPassphrase(configuration.getUserPassword());
@@ -159,7 +159,7 @@ public class ConfigConnectionFactory
         c.setUsername(configuration.getUserName());
         if (((PasswordlessSSH) configuration).isPasswordlessSSHSelected())
         {
-            c.setCertificatePath(((PasswordlessSSH) configuration).getCertificatePath());
+            c.setPrivateKey(((PasswordlessSSH) configuration).getCertificatePath());
             if (((PasswordlessSSH) configuration).isPasswordlessWithPassphrase())
             {
                 c.setPassphrase(configuration.getUserPassword());
