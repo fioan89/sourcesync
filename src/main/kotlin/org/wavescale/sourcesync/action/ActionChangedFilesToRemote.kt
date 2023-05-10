@@ -72,30 +72,26 @@ class ActionChangedFilesToRemote : AnAction() {
             }
         }
 
-        try {
-            for (virtualFile in changedFiles) {
-                if (virtualFile != null && File(virtualFile.path).isFile) {
-                    if (Utils.canBeUploaded(virtualFile.name, mainConfiguration.excludedFiles)) {
-                        val uploadLocation = Utils.relativeLocalUploadDirs(virtualFile, project.stateStore)
-                        ProgressManager.getInstance().run(object : Task.Backgroundable(e.project, "Uploading", false) {
-                            override fun run(indicator: ProgressIndicator) {
-                                if (fileSynchronizer.connect()) {
-                                    fileSynchronizer.syncFile(virtualFile.path, uploadLocation, indicator)
-                                }
-                            }
-                        })
-                    } else {
-                        logger.info("Skipping upload of ${virtualFile.name} because it matches the exclusion file pattern")
+        val (files, rest) = changedFiles.filterNotNull().partition { File(it.path).isFile }
+        rest.forEach {
+            ActionSelectedFilesToRemote.logger.info("Skipping upload of ${it.name} because it's a directory")
+        }
+
+        val (acceptedFiles, excludedFiles) = files.partition { Utils.canBeUploaded(it.name, mainConfiguration.excludedFiles) }
+        excludedFiles.forEach {
+            ActionSelectedFilesToRemote.logger.info("Skipping upload of ${it.name} because it matches the exclusion file pattern")
+        }
+        ProgressManager.getInstance().run(object : Task.Backgroundable(e.project, "Uploading", false) {
+            override fun run(indicator: ProgressIndicator) {
+                try {
+                    if (fileSynchronizer.connect()) {
+                        fileSynchronizer.syncFiles(acceptedFiles.map { Pair(it.path, Utils.relativeLocalUploadDirs(it, project.stateStore)) }.toSet(), indicator)
                     }
-                } else {
-                    if (virtualFile != null) {
-                        logger.info("Skipping upload of ${virtualFile.name} because it's a directory")
-                    }
+                } finally {
+                    fileSynchronizer.disconnect()
                 }
             }
-        } finally {
-            fileSynchronizer.disconnect()
-        }
+        })
 
     }
 

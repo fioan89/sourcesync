@@ -61,22 +61,23 @@ class ActionLocalFileToRemote : AnAction() {
             }
         }
 
-        try {
-            if (Utils.canBeUploaded(virtualFile.name, mainConfiguration.excludedFiles)) {
-                val uploadLocation = Utils.relativeLocalUploadDirs(virtualFile, project.stateStore)
-                ProgressManager.getInstance().run(object : Task.Backgroundable(e.project, "Uploading", false) {
-                    override fun run(indicator: ProgressIndicator) {
+        if (Utils.canBeUploaded(virtualFile.name, mainConfiguration.excludedFiles)) {
+            val uploadLocation = Utils.relativeLocalUploadDirs(virtualFile, project.stateStore)
+            ProgressManager.getInstance().run(object : Task.Backgroundable(e.project, "Uploading", false) {
+                override fun run(indicator: ProgressIndicator) {
+                    try {
                         if (fileSynchronizer.connect()) {
                             fileSynchronizer.syncFile(virtualFile.path, uploadLocation, indicator)
                         }
-
+                    } finally {
+                        fileSynchronizer.disconnect()
                     }
-                })
-            } else {
-                logger.info("Skipping upload of ${virtualFile.name} because it matches the exclusion file pattern")
-            }
-        } finally {
-            fileSynchronizer.disconnect()
+
+
+                }
+            })
+        } else {
+            logger.info("Skipping upload of ${virtualFile.name} because it matches the exclusion file pattern")
         }
     }
 
