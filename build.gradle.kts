@@ -30,9 +30,6 @@ dependencies {
 
     // should be increased only when minimum supported IntelliJ is increased
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.0")
-
-    testImplementation("org.mockito:mockito-core:5.3.1")
-    testImplementation("com.tngtech.java:junit-dataprovider:1.13.1")
 }
 
 
