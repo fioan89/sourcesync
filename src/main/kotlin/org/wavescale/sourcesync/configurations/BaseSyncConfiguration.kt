@@ -12,7 +12,7 @@ sealed class BaseSyncConfiguration : Cloneable {
     var name = "Unnamed"
     abstract val protocol: SyncConfigurationType
     var hostname = "localhost"
-    var port = "11"
+    var port = "22"
 
     var username = "username"
 
