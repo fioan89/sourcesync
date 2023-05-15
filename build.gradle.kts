@@ -27,6 +27,8 @@ repositories {
 dependencies {
     implementation("com.github.mwiede:jsch:0.2.8")
     implementation("commons-net:commons-net:3.9.0")
+
+    // should be increased only when minimum supported IntelliJ is increased
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.0")
 
     testImplementation("org.mockito:mockito-core:5.3.1")
