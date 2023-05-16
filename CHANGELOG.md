@@ -7,6 +7,7 @@
 ### Added
 
 - passwords and passphrases are now stored in the much safer IntelliJ Credential Store.
+- improved SCP upload fail messages
 
 ### Changed
 

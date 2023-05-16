@@ -51,7 +51,7 @@ class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val p
                 syncStatusService.removeRunningSync(configuration.name)
                 Notifier.notifyError(
                     project,
-                    SourcesyncBundle.message("scp.upload.fail.text"),
+                    SourcesyncBundle.message("scp.upload.fail.title"),
                     "Can't open SCP connection to ${configuration.hostname}. Reason: ${e.message}",
                 )
                 false
@@ -75,7 +75,7 @@ class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val p
                 syncStatusService.removeRunningSync(configuration.name)
                 Notifier.notifyError(
                     project,
-                    SourcesyncBundle.message("scp.upload.fail.text"),
+                    SourcesyncBundle.message("scp.upload.fail.title"),
                     "Could not identify nor create the SSH known hosts file at $SSH_KNOWN_HOSTS. Reason: ${e.message}",
                 )
                 return
@@ -122,7 +122,7 @@ class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val p
             val out = channel.getOutputStream()
             val inputStream = channel.getInputStream()
             channel.connect()
-            if (checkAck(inputStream) != 0) {
+            if (checkAck(inputStream, this::onChannelConnectError) != 0) {
                 return
             }
             val _lfile = File(sourcePath)
@@ -135,7 +135,7 @@ class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val p
                 command += " " + (_lfile.lastModified() / 1000) + " 0\n"
                 out.write(command.toByteArray())
                 out.flush()
-                if (checkAck(inputStream) != 0) {
+                if (checkAck(inputStream, this::onPreservingTimestampsError) != 0) {
                     return
                 }
             }
@@ -146,7 +146,7 @@ class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val p
             command += "\n"
             out.write(command.toByteArray())
             out.flush()
-            if (checkAck(inputStream) != 0) {
+            if (checkAck(inputStream, this::onSendingFileModesError) != 0) {
                 return
             }
 
@@ -166,7 +166,7 @@ class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val p
             buf[0] = 0
             out.write(buf, 0, 1)
             out.flush()
-            if (checkAck(inputStream) != 0) {
+            if (checkAck(inputStream, this::onSendFileContentError) != 0) {
                 return
             }
             out.close()
@@ -179,14 +179,89 @@ class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val p
             syncStatusService.removeRunningSync(configuration.name)
             Notifier.notifyError(
                 project,
-                SourcesyncBundle.message("scp.upload.fail.text"),
+                SourcesyncBundle.message("scp.upload.fail.title"),
                 "Upload to ${configuration.hostname} failed. Reason: ${e.message}",
             )
         }
     }
 
+    private fun onChannelConnectError(errorCode: AckError, reason: String) {
+        when (errorCode) {
+            AckError.ERROR -> Notifier.notifyError(
+                project,
+                SourcesyncBundle.message("scp.upload.fail.title"),
+                SourcesyncBundle.message("scp.upload.fail.channel.connect.error.message", configuration.hostname, reason)
+            )
+
+            AckError.FATAL_ERROR -> Notifier.notifyError(
+                project,
+                SourcesyncBundle.message("scp.upload.fail.title"),
+                SourcesyncBundle.message("scp.upload.fail.channel.connect.fatal.error.message", configuration.hostname, reason)
+            )
+
+            AckError.UNKNOWN -> Unit
+        }
+    }
+
+    private fun onPreservingTimestampsError(errorCode: AckError, reason: String) {
+        when (errorCode) {
+            AckError.ERROR -> Notifier.notifyError(
+                project,
+                SourcesyncBundle.message("scp.upload.fail.title"),
+                SourcesyncBundle.message("scp.upload.fail.preserve.timestamps.error.message", reason)
+            )
+
+            AckError.FATAL_ERROR -> Notifier.notifyError(
+                project,
+                SourcesyncBundle.message("scp.upload.fail.title"),
+                SourcesyncBundle.message("scp.upload.fail.preserve.timestamps.fatal.error.message", reason)
+            )
+
+            AckError.UNKNOWN -> Unit
+        }
+    }
+
+    private fun onSendingFileModesError(errorCode: AckError, reason: String) {
+        when (errorCode) {
+            AckError.ERROR -> Notifier.notifyError(
+                project,
+                SourcesyncBundle.message("scp.upload.fail.title"),
+                SourcesyncBundle.message("scp.upload.fail.file.mode.error.message", configuration.hostname, reason)
+            )
+
+            AckError.FATAL_ERROR -> Notifier.notifyError(
+                project,
+                SourcesyncBundle.message("scp.upload.fail.title"),
+                SourcesyncBundle.message("scp.upload.fail.file.mode.fatal.error.message", configuration.hostname, reason)
+            )
+
+            AckError.UNKNOWN -> Unit
+        }
+    }
+
+    private fun onSendFileContentError(errorCode: AckError, reason: String) {
+        when (errorCode) {
+            AckError.ERROR -> Notifier.notifyError(
+                project,
+                SourcesyncBundle.message("scp.upload.fail.title"),
+                SourcesyncBundle.message("scp.upload.fail.file.content.error.message", configuration.hostname, reason)
+            )
+
+            AckError.FATAL_ERROR -> Notifier.notifyError(
+                project,
+                SourcesyncBundle.message("scp.upload.fail.title"),
+                SourcesyncBundle.message("scp.upload.fail.file.content.fatal.error.message", configuration.hostname, reason)
+            )
+
+            AckError.UNKNOWN -> Unit
+        }
+    }
+
     @Throws(IOException::class)
-    private fun checkAck(inStream: InputStream): Int {
+    /**
+     * Reads the server response (ack) for a client command
+     */
+    private fun checkAck(inStream: InputStream, onError: (errorCode: AckError, reason: String) -> Unit): Int {
         val b = inStream.read()
         // b may be 0 for success,
         // 1 for error,
@@ -194,33 +269,24 @@ class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val p
         // -1
         if (b == 0) return b
         if (b == -1) return b
-        if (b == 1 || b == 2) {
-            val sb = StringBuilder()
-            var c: Int
-            do {
-                c = inStream.read()
-                sb.append(c.toChar())
-            } while (c != '\n'.code)
-            if (b == 1) {
-                // error
-                syncStatusService.removeRunningSync(configuration.name)
-                Notifier.notifyError(
-                    project,
-                    SourcesyncBundle.message("scp.upload.fail.text"),
-                    "Could not initiate SCP connection to ${configuration.hostname} because of an error."
-                )
-            }
-            if (b == 2) {
-                // fatal error
-                syncStatusService.removeRunningSync(configuration.name)
-                Notifier.notifyError(
-                    project,
-                    SourcesyncBundle.message("scp.upload.fail.text"),
-                    "Could not initiate SCP connection to ${configuration.hostname} because of a fatal error."
-                )
-            }
-        }
+
+        val sb = StringBuilder()
+        var c: Int
+        do {
+            c = inStream.read()
+            sb.append(c.toChar())
+        } while (c != '\n'.code)
+        syncStatusService.removeRunningSync(configuration.name)
+        onError(AckError.from(b), sb.toString())
         return b
+    }
+
+    private enum class AckError(private val code: Int) {
+        ERROR(1), FATAL_ERROR(2), UNKNOWN(3);
+
+        companion object {
+            infix fun from(value: Int) = AckError.values().firstOrNull { it.code == value } ?: UNKNOWN
+        }
     }
 
     companion object {
