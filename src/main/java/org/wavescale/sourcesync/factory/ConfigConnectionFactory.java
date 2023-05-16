@@ -48,7 +48,6 @@ public class ConfigConnectionFactory
         connectionConfigurationMap = new HashMap<>();
         userHome = System.getProperty("user.home");
         fileSeparator = System.getProperty("file.separator");
-        initComponent();
     }
 
     public static ConfigConnectionFactory getInstance()
@@ -57,7 +56,7 @@ public class ConfigConnectionFactory
     }
 
     @SuppressWarnings("unchecked")
-    private void initComponent()
+    public void migrate()
     {
         // try to load the persistence data.
         if (new File(userHome.concat(fileSeparator).concat(CONNECTIONS_FILE)).exists())

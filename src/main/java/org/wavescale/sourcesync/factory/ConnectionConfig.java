@@ -38,7 +38,6 @@ public class ConnectionConfig
         projectToConnection = new HashMap<>();
         userHome = System.getProperty("user.home");
         fileSeparator = System.getProperty("file.separator");
-        tryLoadModulesAssociatedConn();
     }
 
     public static ConnectionConfig getInstance()
@@ -59,7 +58,7 @@ public class ConnectionConfig
     }
 
     @SuppressWarnings("unchecked")
-    private void tryLoadModulesAssociatedConn()
+    public void migrate()
     {
         // try to load the persistence file.
         if (new File(userHome.concat(fileSeparator).concat(CONFIG_FILE)).exists())
