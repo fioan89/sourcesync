@@ -13,6 +13,8 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBViewport
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.util.minimumWidth
+import com.intellij.ui.util.preferredWidth
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.tree.TreeUtil
 import org.wavescale.sourcesync.SourcesyncBundle
@@ -150,7 +152,6 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
                             add(JBViewport().apply {
                                 add(tree)
                             })
-                            border = JBUI.Borders.empty()
                         })
                         add(
                             toolbarDecorator.disableUpDownActions()
@@ -176,6 +177,9 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
                         border = JBUI.Borders.empty()
                     }
             }.resizableRow()
+        }.apply {
+            minimumWidth = 320
+            preferredWidth = 350
         }
     }
 
