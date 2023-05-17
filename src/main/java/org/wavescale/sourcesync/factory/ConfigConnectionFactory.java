@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.wavescale.sourcesync.api.ConnectionConfiguration;
 import org.wavescale.sourcesync.api.ConnectionConstants;
 import org.wavescale.sourcesync.api.PasswordlessSSH;
+import org.wavescale.sourcesync.configurations.AuthenticationType;
 import org.wavescale.sourcesync.configurations.ScpSyncConfiguration;
 import org.wavescale.sourcesync.configurations.SshSyncConfiguration;
 import org.wavescale.sourcesync.services.SyncRemoteConfigurationsService;
@@ -96,6 +97,7 @@ public class ConfigConnectionFactory
         c.setUsername(configuration.getUserName());
         if (((PasswordlessSSH) configuration).isPasswordlessSSHSelected())
         {
+            c.setAuthenticationType(AuthenticationType.KEY_PAIR);
             c.setPrivateKey(((PasswordlessSSH) configuration).getCertificatePath());
             if (((PasswordlessSSH) configuration).isPasswordlessWithPassphrase())
             {
@@ -104,6 +106,7 @@ public class ConfigConnectionFactory
         }
         else
         {
+            c.setAuthenticationType(AuthenticationType.PASSWORD);
             c.setPassword(configuration.getUserPassword());
         }
 
@@ -123,6 +126,7 @@ public class ConfigConnectionFactory
         c.setUsername(configuration.getUserName());
         if (((PasswordlessSSH) configuration).isPasswordlessSSHSelected())
         {
+            c.setAuthenticationType(AuthenticationType.KEY_PAIR);
             c.setPrivateKey(((PasswordlessSSH) configuration).getCertificatePath());
             if (((PasswordlessSSH) configuration).isPasswordlessWithPassphrase())
             {
@@ -131,6 +135,7 @@ public class ConfigConnectionFactory
         }
         else
         {
+            c.setAuthenticationType(AuthenticationType.PASSWORD);
             c.setPassword(configuration.getUserPassword());
         }
 
