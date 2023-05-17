@@ -1,20 +1,25 @@
 # Sourcesync Plugin
 
 <!-- Plugin description -->
-**Sourcesync** provides fast, one-way file synchronization for your projects. 
+A fast, one-way file synchronization tool for your projects.
 
-The plugin replicates local changes on the remote infrastructure with support for a broad range of transport protocols:
-- SCP
-- SFTP
-- FTP
-- FTPS
+Local changes can be transferred on the remote infrastructure using the **SCP** or **SSH** protocols.
+Other notable features include:
+
+* **password** and **key pair** authentication
+* support for **key pairs** with or without *passphrases*
+* timestamp preserving
+* file filtering
+* user-friendly UI with support for IntelliJ's **New UI** feature
+* synchronization of single or multi-selection files as well as VCS changes
+
 <!-- Plugin description end -->
 
 ## How to install
 
 Sourcesync plugin can be found at http://plugins.jetbrains.com/plugin/7374?pr=idea_ce
 
-Details about how to install a plugin from JetBrains plugin repository can be found at: 
+Details about how to install a plugin from JetBrains plugin repository can be found at:
 http://www.jetbrains.com/idea/webhelp/installing-updating-and-uninstalling-repository-plugins.html
 
 ## How to use it
