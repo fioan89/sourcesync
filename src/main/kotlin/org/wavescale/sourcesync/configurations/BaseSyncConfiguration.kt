@@ -19,14 +19,14 @@ sealed class BaseSyncConfiguration : Cloneable {
     @SerialName("authentication_type")
     var authenticationType = AuthenticationType.PASSWORD
     var password: String?
-        get() = PasswordSafe.instance.getPassword(credentialsAttributesForPassword(username, hostname, port))
-        set(pass) = PasswordSafe.instance.set(credentialsAttributesForPassword(username, hostname, port), Credentials(username, pass))
+        get() = PasswordSafe.instance.getPassword(credentialsAttributesForPassword(protocol, name, username, hostname, port))
+        set(pass) = PasswordSafe.instance.set(credentialsAttributesForPassword(protocol, name, username, hostname, port), Credentials(username, pass))
 
     @SerialName("private_key")
     var privateKey: String? = null
     var passphrase: String?
-        get() = PasswordSafe.instance.getPassword(credentialsAttributesForPassphrase(username, hostname, port))
-        set(passPhrase) = PasswordSafe.instance.set(credentialsAttributesForPassphrase(username, hostname, port), Credentials(username, passPhrase))
+        get() = PasswordSafe.instance.getPassword(credentialsAttributesForPassphrase(protocol, name, username, hostname, port))
+        set(passPhrase) = PasswordSafe.instance.set(credentialsAttributesForPassphrase(protocol, name, username, hostname, port), Credentials(username, passPhrase))
 
 
     @SerialName("remote_workspace_path")
@@ -38,13 +38,13 @@ sealed class BaseSyncConfiguration : Cloneable {
     @SerialName("preserve_timestamps")
     var preserveTimestamps = false
 
-    private fun credentialsAttributesForPassword(username: String, hostname: String, port: String) = CredentialAttributes(
-        generateServiceName("SourceSync - Password", "${hostname}:${port}"),
+    private fun credentialsAttributesForPassword(protocol: SyncConfigurationType, name: String, username: String, hostname: String, port: String) = CredentialAttributes(
+        generateServiceName("SourceSync - Password", "${protocol}://${name} - ${username}@${hostname}:${port}"),
         username
     )
 
-    private fun credentialsAttributesForPassphrase(username: String, hostname: String, port: String) = CredentialAttributes(
-        generateServiceName("SourceSync - Passphrase", "${hostname}:${port}"),
+    private fun credentialsAttributesForPassphrase(protocol: SyncConfigurationType, name: String, username: String, hostname: String, port: String) = CredentialAttributes(
+        generateServiceName("SourceSync - Passphrase", "${protocol}://${name} - ${username}@${hostname}:${port}"),
         username
     )
 
