@@ -52,8 +52,8 @@ intellij {
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
     groups.empty()
+    unreleasedTerm = "Unreleased"
     repositoryUrl = properties("pluginRepositoryUrl")
-
 }
 
 // Configure Gradle Qodana Plugin - read more: https://github.com/JetBrains/gradle-qodana-plugin
@@ -98,6 +98,8 @@ tasks {
                 renderItem(
                     (getOrNull(pluginVersion) ?: getUnreleased())
                         .withHeader(false)
+                        .withLinkedHeader(false)
+                        .withLinks(false)
                         .withEmptySections(false),
                     Changelog.OutputType.HTML,
                 )
