@@ -31,6 +31,8 @@ class ConnectionConfigurationComponent(private val project: Project, private val
     private lateinit var cb: ComboBox<AuthenticationType>
 
     var displayName = model.name
+    private var _password = model.password
+    private var _passPhrase = model.passphrase
 
 
     val component = panel {
@@ -97,7 +99,7 @@ class ConnectionConfigurationComponent(private val project: Project, private val
             row {
                 label(SourcesyncBundle.message("sync.editor.password.label"))
                 passwordField()
-                    .bindText(model::password.toNonNullableProperty(""))
+                    .bindText(this@ConnectionConfigurationComponent::_password.toNonNullableProperty(""))
                     .columns(COLUMNS_MEDIUM)
                     .resizableColumn()
                     .applyToComponent {
@@ -140,7 +142,7 @@ class ConnectionConfigurationComponent(private val project: Project, private val
             row {
                 label(SourcesyncBundle.message("sync.editor.passphrase.label"))
                 passwordField()
-                    .bindText(model::passphrase.toNonNullableProperty(""))
+                    .bindText(this@ConnectionConfigurationComponent::_passPhrase.toNonNullableProperty(""))
                     .columns(COLUMNS_MEDIUM)
                     .resizableColumn()
                     .applyToComponent {
@@ -197,13 +199,16 @@ class ConnectionConfigurationComponent(private val project: Project, private val
     val isModified: Boolean
         get() {
             component.apply()
-            return original != model
+            return original != model || original.password != _password || original.passphrase != _passPhrase
         }
 
     val snapshot: BaseSyncConfiguration
         get() {
             component.apply()
-            return model.clone()
+            return model.clone().apply {
+                this.password = _password
+                this.passphrase = _passPhrase
+            }
         }
 }
 
