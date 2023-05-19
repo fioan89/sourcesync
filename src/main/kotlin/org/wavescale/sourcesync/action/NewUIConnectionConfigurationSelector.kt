@@ -8,12 +8,10 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.Presentation
 import com.intellij.openapi.actionSystem.Separator
 import com.intellij.openapi.actionSystem.Toggleable
 import com.intellij.openapi.components.service
-import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.wm.impl.ExpandableComboAction
 import com.intellij.openapi.wm.impl.ToolbarComboWidget
@@ -28,12 +26,11 @@ import javax.swing.JComponent
 
 class NewUIConnectionConfigurationSelector : ExpandableComboAction() {
     private val syncStatusService = service<SyncStatusService>()
-    private val syncConfigurationsService = ProjectManager.getInstance().openProjects[0].getService(SyncRemoteConfigurationsService::class.java)
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
     override fun displayTextInToolbar() = true
 
     override fun createPopup(event: AnActionEvent): JBPopup {
-        return SourceSyncConfigurationActionGroupPopup(createActionGroup(), event.dataContext) { Toggleable.setSelected(event.presentation, false) }
+        return SourceSyncConfigurationActionGroupPopup(createActionGroup(event), event.dataContext) { Toggleable.setSelected(event.presentation, false) }
     }
 
     override fun createCustomComponent(presentation: Presentation, place: String): JComponent {
@@ -56,8 +53,8 @@ class NewUIConnectionConfigurationSelector : ExpandableComboAction() {
     }
 
     override fun update(e: AnActionEvent) {
-        val projectName = e.project?.name
-        val associationFor = syncConfigurationsService.mainConnectionName()
+        val syncConfigurationsService = e.project?.service<SyncRemoteConfigurationsService>()
+        val associationFor = syncConfigurationsService?.mainConnectionName()
         if (!associationFor.isNullOrBlank() && syncConfigurationsService.findFirstWithName(associationFor) == null) {
             ConnectionConfig.getInstance().apply {
                 syncConfigurationsService.resetMainConnection()
@@ -83,10 +80,11 @@ class NewUIConnectionConfigurationSelector : ExpandableComboAction() {
         }
     }
 
-    private fun createActionGroup(): ActionGroup {
+    private fun createActionGroup(e: AnActionEvent): ActionGroup {
+        val syncConfigurationsService = e.project?.service<SyncRemoteConfigurationsService>()
         val allActionsGroup = DefaultActionGroup()
         allActionsGroup.add(Separator.create(SourcesyncBundle.message("sourcesyncConfigurations")))
-        syncConfigurationsService.allConnectionNames().forEach {
+        syncConfigurationsService?.allConnectionNames()?.forEach {
             allActionsGroup.add(SourceSyncConfigAction(syncConfigurationsService, it))
         }
 
@@ -132,7 +130,6 @@ class SourceSyncConfigAction(private val syncConfigurationsService: SyncRemoteCo
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun actionPerformed(e: AnActionEvent) {
-        val projectName = PlatformDataKeys.PROJECT.getData(e.dataContext)!!.name
         syncConfigurationsService.setMainConnection(configuration)
     }
 
