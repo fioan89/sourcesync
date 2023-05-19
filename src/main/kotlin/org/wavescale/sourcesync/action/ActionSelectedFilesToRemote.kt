@@ -1,32 +1,37 @@
 package org.wavescale.sourcesync.action
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.project.stateStore
 import com.intellij.ui.ExperimentalUI
 import org.wavescale.sourcesync.SourceSyncIcons
 import org.wavescale.sourcesync.SourcesyncBundle
-import org.wavescale.sourcesync.api.FileSynchronizer
-import org.wavescale.sourcesync.api.SynchronizationQueue
 import org.wavescale.sourcesync.api.Utils
-import org.wavescale.sourcesync.factory.ConfigConnectionFactory
-import org.wavescale.sourcesync.factory.ConnectionConfig
+import org.wavescale.sourcesync.configurations.ScpSyncConfiguration
+import org.wavescale.sourcesync.configurations.SshSyncConfiguration
+import org.wavescale.sourcesync.configurations.SyncConfigurationType
 import org.wavescale.sourcesync.notifications.Notifier
+import org.wavescale.sourcesync.services.SyncRemoteConfigurationsService
+import org.wavescale.sourcesync.synchronizer.SCPFileSynchronizer
+import org.wavescale.sourcesync.synchronizer.SFTPFileSynchronizer
+import org.wavescale.sourcesync.synchronizer.Synchronizer
 import java.io.File
-import java.util.concurrent.Semaphore
 
 class ActionSelectedFilesToRemote : AnAction() {
+    private val syncConfigurationsService = ProjectManager.getInstance().openProjects[0].getService(SyncRemoteConfigurationsService::class.java)
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
     override fun actionPerformed(e: AnActionEvent) {
         // first check if there's a connection type associated to this module.
         // If not alert the user and get out
         val project = e.project ?: return
-        val projectName = project.name
-        val associationName = ConnectionConfig.getInstance().getAssociationFor(projectName)
 
         // get a list of selected virtual files
         val virtualFiles = PlatformDataKeys.VIRTUAL_FILE_ARRAY.getData(e.dataContext)!!
@@ -38,50 +43,45 @@ class ActionSelectedFilesToRemote : AnAction() {
             return
         }
 
-        // start sync
-        val connectionConfiguration = ConfigConnectionFactory.getInstance().getConnectionConfiguration(associationName)
-        val semaphores = Semaphore(connectionConfiguration.simultaneousJobs)
-        val allowedSessions =
-            if (virtualFiles.size <= connectionConfiguration.simultaneousJobs) virtualFiles.size else connectionConfiguration.simultaneousJobs
-        val synchronizationQueue = SynchronizationQueue(e.project, connectionConfiguration, allowedSessions)
-        synchronizationQueue.startCountingTo(virtualFiles.size)
-        val queue = synchronizationQueue.syncQueue
-        for (virtualFile in virtualFiles) {
-            if (virtualFile != null && File(virtualFile.path).isFile) {
-                if (Utils.canBeUploaded(virtualFile.name, connectionConfiguration.getExcludedFiles())) {
-                    val uploadLocation = Utils.relativeLocalUploadDirs(virtualFile, project.stateStore)
-                    ProgressManager.getInstance().run(object : Task.Backgroundable(e.project, "Uploading", false) {
-                        override fun run(indicator: ProgressIndicator) {
-                            var fileSynchronizer: FileSynchronizer?
-                            try {
-                                semaphores.acquire()
-                                fileSynchronizer = queue.take()
-                                fileSynchronizer!!.indicator = indicator
-                                if (fileSynchronizer != null && fileSynchronizer.connect()) {
-                                    fileSynchronizer.syncFile(virtualFile.path, uploadLocation)
-                                }
-                                queue.put(fileSynchronizer)
-                                synchronizationQueue.count()
-                            } catch (e1: InterruptedException) {
-                                e1.printStackTrace()
-                            } finally {
-                                semaphores.release()
-                            }
-                        }
-                    })
-                } else {
-                    if (virtualFile != null) {
-                        logger.info("Skipping upload of ${virtualFile.name} because it matches the exclusion file pattern")
-                        synchronizationQueue.count()
-                    }
-                }
-            } else {
-                if (virtualFile != null) {
-                    logger.info("Skipping upload of ${virtualFile.name} because it's a directory")
-                    synchronizationQueue.count()
-                }
+        val mainConfiguration = syncConfigurationsService.mainConnection()
+        if (mainConfiguration == null) {
+            Notifier.notifyError(
+                e.project!!,
+                SourcesyncBundle.message("no.remote.sync.connection.configured.title"),
+                SourcesyncBundle.message("no.remote.sync.connection.configured.message")
+            )
+            return
+        }
+
+        val fileSynchronizer: Synchronizer = when (mainConfiguration.protocol) {
+            SyncConfigurationType.SCP -> {
+                SCPFileSynchronizer(mainConfiguration as ScpSyncConfiguration, project)
+            }
+
+            SyncConfigurationType.SFTP -> {
+                SFTPFileSynchronizer(mainConfiguration as SshSyncConfiguration, project)
             }
         }
+        val (files, rest) = virtualFiles.filterNotNull().partition { File(it.path).isFile }
+        rest.forEach {
+            logger.info("Skipping upload of ${it.name} because it's a directory")
+        }
+
+        val (acceptedFiles, excludedFiles) = files.partition { Utils.canBeUploaded(it.name, mainConfiguration.excludedFiles) }
+        excludedFiles.forEach {
+            logger.info("Skipping upload of ${it.name} because it matches the exclusion file pattern")
+        }
+        ProgressManager.getInstance().run(object : Task.Backgroundable(e.project, "Uploading", false) {
+            override fun run(indicator: ProgressIndicator) {
+                try {
+                    if (fileSynchronizer.connect()) {
+                        fileSynchronizer.syncFiles(acceptedFiles.map { Pair(it.path, Utils.relativeLocalUploadDirs(it, project.stateStore)) }.toSet(), indicator)
+                    }
+                } finally {
+                    fileSynchronizer.disconnect()
+                }
+            }
+        })
     }
 
     override fun update(e: AnActionEvent) {
@@ -90,11 +90,10 @@ class ActionSelectedFilesToRemote : AnAction() {
             e.presentation.icon = SourceSyncIcons.ExpUI.SOURCESYNC
         }
 
-        val project = e.project ?: return
-        val associationName = ConnectionConfig.getInstance().getAssociationFor(project.name)
-        if (associationName != null) {
+        val mainConnectionName = syncConfigurationsService.mainConnectionName()
+        if (mainConnectionName != null) {
             e.presentation.apply {
-                text = "Sync selected files to $associationName"
+                text = "Sync selected files to $mainConnectionName"
                 isEnabled = true
             }
         } else {
@@ -106,6 +105,6 @@ class ActionSelectedFilesToRemote : AnAction() {
     }
 
     companion object {
-        val logger = Logger.getInstance(ActionSelectedFilesToRemote.javaClass.simpleName)
+        val logger = logger<ActionSelectedFilesToRemote>()
     }
 }

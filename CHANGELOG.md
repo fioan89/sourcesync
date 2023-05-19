@@ -4,12 +4,29 @@
 
 ## Unreleased
 
+### Added
+
+- passwords and passphrases are now stored in the much safer IntelliJ Credential Store.
+- improved SCP upload fail messages
+
+### Changed
+
+- redesigned Sync Connection Configurations editor with an improved look and feel similar to Run Configurations editor
+- simplified the user experience when it comes to configuring remote connections, especially the authentication form
+
+### Removed
+
+- support for FTP&FTPS protocols
+- the ability to configure concurrent sync jobs
+
 ## 2.0.4 - 2023-04-30
 
 ### Fixed
+
 - context menu takes a long time to open when using the New UI
 
 ### Changed
+
 - removed deprecated API usages
 
 ## 2.0.3 - 2023-03-01

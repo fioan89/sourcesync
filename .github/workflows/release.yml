@@ -29,6 +29,7 @@ jobs:
         with:
           distribution: zulu
           java-version: 17
+          cache: gradle
 
       # Set environment variables
       - name: Export Properties

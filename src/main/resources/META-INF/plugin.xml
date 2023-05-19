@@ -48,9 +48,9 @@
         <action id="actionLocalFileToRemote" class="org.wavescale.sourcesync.action.ActionLocalFileToRemote"
                 text="Sync this file to Remote target" description="Upload current local file to remote location"
                 icon="/sourcesync.svg">
-            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="Github.Create.Gist"/>
-            <add-to-group group-id="EditorTabPopupMenu" anchor="after" relative-to-action="Github.Create.Gist"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F1"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="Github.Create.Gist" />
+            <add-to-group group-id="EditorTabPopupMenu" anchor="after" relative-to-action="Github.Create.Gist" />
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F1" />
 
         </action>
 
@@ -58,23 +58,23 @@
                 text="Sync changed files to Remote target" description="Sync local changed files to remote target."
                 icon="/sourcesync.svg">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after"
-                          relative-to-action="org.wavescale.sourcesync.action.ActionProjectConnectionConfig"/>
+                          relative-to-action="org.wavescale.sourcesync.action.ActionProjectConnectionConfig" />
             <add-to-group group-id="EditorPopupMenu" anchor="after"
-                          relative-to-action="org.wavescale.sourcesync.action.ActionLocalFileToRemote"/>
+                          relative-to-action="org.wavescale.sourcesync.action.ActionLocalFileToRemote" />
             <add-to-group group-id="EditorTabPopupMenu" anchor="after"
-                          relative-to-action="org.wavescale.sourcesync.action.ActionLocalFileToRemote"/>
-            <add-to-group group-id="ChangesViewPopupMenu" anchor="after" relative-to-action="ChangesView.Diff"/>
+                          relative-to-action="org.wavescale.sourcesync.action.ActionLocalFileToRemote" />
+            <add-to-group group-id="ChangesViewPopupMenu" anchor="after" relative-to-action="ChangesView.Diff" />
 
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F2"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F2" />
         </action>
 
         <action id="actionSelectedFilesToRemote" class="org.wavescale.sourcesync.action.ActionSelectedFilesToRemote"
                 text="Sync selected files to Remote target" description="Sync locally selected files to remote target"
                 icon="/sourcesync.svg">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after"
-                          relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote"/>
-            <add-to-group group-id="ChangesViewPopupMenu" anchor="after" relative-to-action="ChangesView.Diff"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F3"/>
+                          relative-to-action="org.wavescale.sourcesync.action.ActionChangedFilesToRemote" />
+            <add-to-group group-id="ChangesViewPopupMenu" anchor="after" relative-to-action="ChangesView.Diff" />
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift F3" />
         </action>
     </actions>
 
@@ -82,6 +82,11 @@
         <notificationGroup id="Sourcesync"
                            displayType="BALLOON"
                            bundle="messages.SourcesyncBundle"
-                           key="notification.group.sourcesync"/>
+                           key="notification.group.sourcesync" />
+
+        <projectService serviceInterface="org.wavescale.sourcesync.services.SyncRemoteConfigurationsService" serviceImplementation="org.wavescale.sourcesync.services.SyncRemoteConfigurationsServiceImpl" />
+
+        <postStartupActivity implementation="org.wavescale.sourcesync.activities.RemoteConfigMigrationActivity" />
     </extensions>
+
 </idea-plugin>
