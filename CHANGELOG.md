@@ -2,34 +2,31 @@
 
 # Source Synchronizer Changelog
 
-## Unreleased
+## [Unreleased]
+
+## [3.0.0] - 2023-05-19
 
 ### Added
-
 - passwords and passphrases are now stored in the much safer IntelliJ Credential Store.
 - improved SCP upload fail messages
 
 ### Changed
-
 - redesigned Sync Connection Configurations editor with an improved look and feel similar to Run Configurations editor
 - simplified the user experience when it comes to configuring remote connections, especially the authentication form
 
 ### Removed
-
 - support for FTP&FTPS protocols
 - the ability to configure concurrent sync jobs
 
-## 2.0.4 - 2023-04-30
+## [2.0.4] - 2023-04-30
 
 ### Fixed
-
 - context menu takes a long time to open when using the New UI
 
 ### Changed
-
 - removed deprecated API usages
 
-## 2.0.3 - 2023-03-01
+## [2.0.3] - 2023-03-01
 
 ### Added
 - support for experimental new UI
@@ -41,13 +38,13 @@
 - path location issues when uploading files with scp from Windows to Unix
 - sync menus are now disabled when no remote target is selected
 
-## 2.0.2 - 2022-12-07
+## [2.0.2] - 2022-12-07
 
 ### Added
 - support for latest OpenSSH private key format
 - support for latest IntelliJ 2022.3
 
-## 2.0.1
+## [2.0.1]
 
 ### Fixed
 - upload issues when using SFTP from local Windows to remote Linux
@@ -58,7 +55,7 @@
 - project's base location label from "Root path" to "Workspace base path". This is a breaking change, users
   will have to reconfigure the connections again.
 
-## 2.0.0
+## [2.0.0]
 
 ### Added
 - support for semver
@@ -82,7 +79,7 @@
 - fixed issues with resource location due to trailing "/"
 - remove all project associations when there is no Sourcesync connection available
 
-## 1.9.0
+## [1.9.0]
 
 ### Added
 - support for OS X 10.11
@@ -100,7 +97,7 @@
 - issue with private key file chooser forcing you to select the public key instead of the private one
 - issues with configuration and target window not getting on top of the IDE
 
-## 1.8.0
+## [1.8.0]
 
 ### Added
 - support for IntelliJ IDEA 15.x
@@ -112,7 +109,7 @@
 ### Fixed
 - upload of files over FTPS connections using explicit TLS security
 
-## 1.5.0
+## [1.5.0]
 
 ### Added
 - support for shortcuts
@@ -121,7 +118,7 @@
 - NPE when no default file was selected.
 - exception due to context switching when using shortcuts.
 
-## 1.4.0
+## [1.4.0]
 
 ### Added
 - a file sync manager, which forces `Sourcesync` to reuse existing opened connections during the command.
@@ -132,7 +129,7 @@
 ### Fixed
 - Sync selected jobs no longer has problems with "Allow simultaneous sync jobs" option.
 
-## 1.3.0
+## [1.3.0]
 
 ### Added
 - sync selected and changed files into the Changes View Popup-Menu
@@ -141,10 +138,24 @@
 - force OK button to save connection preferences
 - a few visual bugs (the `Allow ... number of connections` was not visible until resize)
 
-## 1.2.0
+## [1.2.0]
 
 ### Added
 - option to limit the number of upload threads
 
 ### Fixed
 - support for `PyCharm`
+
+[Unreleased]: https://github.com/fioan89/sourcesync/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/fioan89/sourcesync/compare/v2.0.4...v3.0.0
+[2.0.4]: https://github.com/fioan89/sourcesync/compare/v2.0.3...v2.0.4
+[2.0.3]: https://github.com/fioan89/sourcesync/compare/v2.0.2...v2.0.3
+[2.0.2]: https://github.com/fioan89/sourcesync/compare/v2.0.1...v2.0.2
+[2.0.1]: https://github.com/fioan89/sourcesync/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/fioan89/sourcesync/compare/v1.9.0...v2.0.0
+[1.9.0]: https://github.com/fioan89/sourcesync/compare/v1.8.0...v1.9.0
+[1.8.0]: https://github.com/fioan89/sourcesync/compare/v1.5.0...v1.8.0
+[1.5.0]: https://github.com/fioan89/sourcesync/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/fioan89/sourcesync/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/fioan89/sourcesync/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/fioan89/sourcesync/commits/v1.2.0
