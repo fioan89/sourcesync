@@ -31,7 +31,7 @@ dependencies {
     implementation("commons-net:commons-net:3.9.0")
 
     // should be increased only when minimum supported IntelliJ is increased
-    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.0")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
 }
 
 // Set the JVM language level used to build the project - Java 17 for 2022.2+.
