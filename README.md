@@ -30,7 +30,7 @@ http://www.jetbrains.com/idea/webhelp/installing-updating-and-uninstalling-repos
 
 1. Launch the IDE and install the plugin.
 2. Restart the IDE.
-3. Configure one or more remote sync configurations to target the remote environment where.
+3. Configure one or more remote sync configurations to target the remote environment where
    you would like to transfer your changes. To create or edit your sync configurations you would have to:
    1. locate the **Sourcesync Configurations** combo box in the IntelliJ's main toolbar panel.
    2. Click the combo box drop down icon and then hit the **Edit Sourcesync Configurations** button.
@@ -44,7 +44,7 @@ http://www.jetbrains.com/idea/webhelp/installing-updating-and-uninstalling-repos
 5. Select one or more files, right click, and in the context menu select **Sync selected files to target name**. Alternatively, press `Ctrl + Shift + F2`
 6. Alternatively only the file under edit (focused editor) could be transferred by right click in the editor, and in the context
    menu select **Sync this file to target name** or just press `Ctrl + Shift + F1`
-7. A third option is to sync all **Git* changed files by right click in the editor or **Project** toolbar, and then select **Sync changed files to target name**. Alternatively, press `Ctrl + Shift + F3`
+7. A third option is to sync all **Git** changed files by right click in the editor or **Project** toolbar, and then select **Sync changed files to target name**. Alternatively, press `Ctrl + Shift + F3`
 
 ## FAQ
 
