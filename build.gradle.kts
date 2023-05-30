@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.mwiede:jsch:0.2.8")
+    implementation("com.github.mwiede:jsch:0.2.9")
     implementation("commons-net:commons-net:3.9.0")
 
     // should be increased only when minimum supported IntelliJ is increased
