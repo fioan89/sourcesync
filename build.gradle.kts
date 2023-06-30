@@ -52,7 +52,7 @@ intellij {
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
     groups.empty()
-    unreleasedTerm = "Unreleased"
+    unreleasedTerm = "[Unreleased]"
     repositoryUrl = properties("pluginRepositoryUrl")
 }
 
