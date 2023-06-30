@@ -4,7 +4,7 @@
 
 ## [Unreleased]
 
-## Fixed
+### Fixed
 
 - migration on New UI disables the sync menu if it fails to migrate the main connection
 
