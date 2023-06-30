@@ -73,7 +73,10 @@ public class ConnectionConfig
                 SyncRemoteConfigurationsService remoteSyncConfigurationsService = project.getService(SyncRemoteConfigurationsService.class);
                 if (remoteSyncConfigurationsService.hasNoMainConnectionConfigured())
                 {
-                    remoteSyncConfigurationsService.setMainConnection(getAssociationFor(project.getName()));
+                    if (getAssociationFor(project.getName()) != null)
+                    {
+                        remoteSyncConfigurationsService.setMainConnection(getAssociationFor(project.getName()));
+                    }
                 }
                 in.close();
                 inputStream.close();
