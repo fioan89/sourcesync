@@ -9,9 +9,9 @@ plugins {
     id("java")
     // Kotlin support
     kotlin("jvm") version "1.8.22"
-    kotlin("plugin.serialization") version "1.8.21"
+    kotlin("plugin.serialization") version "1.8.22"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.14.1"
+    id("org.jetbrains.intellij") version "1.14.2"
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.1.0"
     // Gradle Qodana Plugin
