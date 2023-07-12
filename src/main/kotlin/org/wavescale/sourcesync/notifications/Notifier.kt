@@ -10,7 +10,7 @@ import org.wavescale.sourcesync.SourcesyncBundle
 
 private val notificationGroup = NotificationGroupManager.getInstance().getNotificationGroup("Sourcesync")
 
-private const val PROPERTY_IGNORE_SOURCESYNC_DONATION = "ignore.sourcesync.donation"
+private const val PROPERTY_IGNORE_SOURCESYNC_DONATION = "ignore.sourcesync.donation.v302"
 
 class Notifier {
     companion object {
@@ -34,11 +34,14 @@ class Notifier {
             )
 
             notification.apply {
-                addAction(NotificationAction.createSimpleExpiring(SourcesyncBundle.message("dont.show.again.action")) {
-                    PropertiesComponent.getInstance().setValue(PROPERTY_IGNORE_SOURCESYNC_DONATION, "true")
+                addAction(NotificationAction.createSimple(SourcesyncBundle.message("upgrade.to.pro.version")) {
+                    BrowserUtil.browse("https://plugins.jetbrains.com/plugin/sourcesync-pro")
                 })
                 addAction(NotificationAction.createSimple(SourcesyncBundle.message("buy.me.a.coffee")) {
                     BrowserUtil.browse("https://www.buymeacoffee.com/fioan89")
+                })
+                addAction(NotificationAction.createSimpleExpiring(SourcesyncBundle.message("dont.show.again.action")) {
+                    PropertiesComponent.getInstance().setValue(PROPERTY_IGNORE_SOURCESYNC_DONATION, "true")
                 })
 
                 setDisplayId(SourcesyncBundle.message("notification.group.sourcesync.donation"))
