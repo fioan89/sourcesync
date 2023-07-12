@@ -4,19 +4,18 @@
 
 ## [Unreleased]
 
-### Fixed
+## [3.0.1] - 2023-06-30
 
+### Fixed
 - migration on New UI disables the sync menu if it fails to migrate the main connection
 
 ## [3.0.0] - 2023-05-19
 
 ### Added
-
 - passwords and passphrases are now stored in the much safer IntelliJ Credential Store.
 - improved SCP upload fail messages
 
 ### Changed
-
 - redesigned Sync Connection Configurations editor with an improved look and feel similar to Run Configurations editor
 - simplified the user experience when it comes to configuring remote connections, especially the authentication form
 
@@ -152,7 +151,8 @@
 ### Fixed
 - support for `PyCharm`
 
-[Unreleased]: https://github.com/fioan89/sourcesync/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/fioan89/sourcesync/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/fioan89/sourcesync/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/fioan89/sourcesync/compare/v2.0.4...v3.0.0
 [2.0.4]: https://github.com/fioan89/sourcesync/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/fioan89/sourcesync/compare/v2.0.2...v2.0.3
