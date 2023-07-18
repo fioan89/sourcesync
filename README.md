@@ -36,7 +36,8 @@ Upgrade to **Sourcesync Pro** for more features and a more streamlined way of tr
 |                 Customizable keyboard shortcuts                 |            Yes            |                   Yes                    |
 |                       VCS Changes Upload                        |            Yes            |                   Yes                    |
 |                   Multi-selection File Upload                   |            Yes            |                   Yes                    |
-|                   Multi-selection File Upload                   |            Yes            |                   Yes                    |
+|                  Multi-selection Folder Upload                  |          **No**           |                   Yes                    |
+|                       Editor File Upload                        |            Yes            |                   Yes                    |
 
 <!-- Plugin description end -->
 
