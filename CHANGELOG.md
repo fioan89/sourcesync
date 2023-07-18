@@ -4,14 +4,24 @@
 
 ## [Unreleased]
 
+### Added
+
+- **Sourcesync Pro** announcement
+
+### Fixed
+
+- NPE when notification group is not available yet
+
 ## [3.0.1] - 2023-06-30
 
 ### Fixed
+
 - migration on New UI disables the sync menu if it fails to migrate the main connection
 
 ## [3.0.0] - 2023-05-19
 
 ### Added
+
 - passwords and passphrases are now stored in the much safer IntelliJ Credential Store.
 - improved SCP upload fail messages
 
