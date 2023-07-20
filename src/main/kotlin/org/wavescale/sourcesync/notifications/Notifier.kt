@@ -41,7 +41,7 @@ class Notifier {
 
             notification.apply {
                 addAction(NotificationAction.createSimple(SourcesyncBundle.message("upgrade.to.pro.version")) {
-                    BrowserUtil.browse("https://plugins.jetbrains.com/plugin/22288-source-synchronizer-pro")
+                    BrowserUtil.browse("https://plugins.jetbrains.com/plugin/22318-source-synchronizer-pro")
                 })
                 addAction(NotificationAction.createSimple(SourcesyncBundle.message("buy.me.a.coffee")) {
                     BrowserUtil.browse("https://www.buymeacoffee.com/fioan89")
