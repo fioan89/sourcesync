@@ -8,14 +8,18 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import org.wavescale.sourcesync.SourcesyncBundle
 
-private val notificationGroup = NotificationGroupManager.getInstance().getNotificationGroup("Sourcesync")
+private const val SOURCESYNC_GROUP_ID = "Sourcesync"
 
-private const val PROPERTY_IGNORE_SOURCESYNC_DONATION = "ignore.sourcesync.donation"
+private const val PROPERTY_IGNORE_SOURCESYNC_DONATION = "ignore.sourcesync.donation.v302"
 
 class Notifier {
     companion object {
         @JvmStatic
         fun notifyError(project: Project, simpleMessage: String, detailedMessage: String) {
+            if (NotificationGroupManager.getInstance().isGroupRegistered(SOURCESYNC_GROUP_ID).not()) {
+                return
+            }
+            val notificationGroup = NotificationGroupManager.getInstance().getNotificationGroup(SOURCESYNC_GROUP_ID)
             notificationGroup
                 .createNotification(simpleMessage, detailedMessage, NotificationType.ERROR)
                 .notify(project)
@@ -23,10 +27,12 @@ class Notifier {
 
         @JvmStatic
         fun notifyDonation(project: Project) {
-
             val ignored = PropertiesComponent.getInstance().isValueSet(PROPERTY_IGNORE_SOURCESYNC_DONATION)
             if (ignored) return
-
+            if (NotificationGroupManager.getInstance().isGroupRegistered(SOURCESYNC_GROUP_ID).not()) {
+                return
+            }
+            val notificationGroup = NotificationGroupManager.getInstance().getNotificationGroup(SOURCESYNC_GROUP_ID)
             val notification = notificationGroup.createNotification(
                 SourcesyncBundle.message("donation.title"),
                 SourcesyncBundle.message("donation.message"),
@@ -34,11 +40,14 @@ class Notifier {
             )
 
             notification.apply {
-                addAction(NotificationAction.createSimpleExpiring(SourcesyncBundle.message("dont.show.again.action")) {
-                    PropertiesComponent.getInstance().setValue(PROPERTY_IGNORE_SOURCESYNC_DONATION, "true")
+                addAction(NotificationAction.createSimple(SourcesyncBundle.message("upgrade.to.pro.version")) {
+                    BrowserUtil.browse("https://plugins.jetbrains.com/plugin/22318-source-synchronizer-pro")
                 })
                 addAction(NotificationAction.createSimple(SourcesyncBundle.message("buy.me.a.coffee")) {
                     BrowserUtil.browse("https://www.buymeacoffee.com/fioan89")
+                })
+                addAction(NotificationAction.createSimpleExpiring(SourcesyncBundle.message("dont.show.again.action")) {
+                    PropertiesComponent.getInstance().setValue(PROPERTY_IGNORE_SOURCESYNC_DONATION, "true")
                 })
 
                 setDisplayId(SourcesyncBundle.message("notification.group.sourcesync.donation"))
@@ -49,6 +58,10 @@ class Notifier {
 
         @JvmStatic
         fun notifyInfo(project: Project, simpleMessage: String) {
+            if (NotificationGroupManager.getInstance().isGroupRegistered(SOURCESYNC_GROUP_ID).not()) {
+                return
+            }
+            val notificationGroup = NotificationGroupManager.getInstance().getNotificationGroup(SOURCESYNC_GROUP_ID)
             notificationGroup.createNotification(simpleMessage, NotificationType.INFORMATION).notify(project)
         }
     }

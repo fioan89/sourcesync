@@ -10,7 +10,8 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.project.stateStore
-import com.intellij.ui.ExperimentalUI
+import com.intellij.ui.NewUI
+import java.io.File
 import org.wavescale.sourcesync.SourceSyncIcons
 import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.api.Utils
@@ -22,7 +23,6 @@ import org.wavescale.sourcesync.services.SyncRemoteConfigurationsService
 import org.wavescale.sourcesync.synchronizer.SCPFileSynchronizer
 import org.wavescale.sourcesync.synchronizer.SFTPFileSynchronizer
 import org.wavescale.sourcesync.synchronizer.Synchronizer
-import java.io.File
 
 class ActionSelectedFilesToRemote : AnAction() {
     private val syncConfigurationsService = ProjectManager.getInstance().openProjects[0].getService(SyncRemoteConfigurationsService::class.java)
@@ -86,7 +86,7 @@ class ActionSelectedFilesToRemote : AnAction() {
 
     override fun update(e: AnActionEvent) {
         super.update(e)
-        if (ExperimentalUI.isNewUI()) {
+        if (NewUI.isEnabled()) {
             e.presentation.icon = SourceSyncIcons.ExpUI.SOURCESYNC
         }
 

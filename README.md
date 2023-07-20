@@ -17,6 +17,28 @@ Other notable features include:
 * user-friendly UI with support for IntelliJ's **New UI** feature
 * synchronization of single or multi-selection files as well as VCS changes
 
+Upgrade to **Sourcesync Pro** for more features and a more streamlined way of transferring code.
+
+|                            Features                             |        Sourcesync         |              Sourcesync Pro              |
+|:---------------------------------------------------------------:|:-------------------------:|:----------------------------------------:|
+|                             License                             | **Free** & **opensource** |  Starts at **$5.99 USD per user/month**  |
+|                         SCP File Upload                         |            Yes            |                   Yes                    |
+|                        SCP Folder Upload                        |          **No**           |          Yes - Recursive Upload          |
+|                      SSH/SFTP File Upload                       |            Yes            |                   Yes                    |
+|                     SSH/SFTP Folder Upload                      |          **No**           |          Yes - Recursive Upload          |
+|                   Auto Transfer On File Save                    |          **No**           |                   Yes                    |
+|           Support For Comparing Local vs Remote Files           |          **No**           |                   Yes                    |
+|                 SCP/SSH Password Authentication                 |            Yes            |                   Yes                    |
+|    SCP/SSH Key-Pair Authentication With & Without Passphrase    |            Yes            |                   Yes                    |
+|                  SCP/SSH timestamp preserving                   |     Modification Time     | Permissions, Access & Modification times |
+|                         File Filtering                          |            Yes            |                   Yes                    |
+| User-friendly UI with support for IntelliJ's **New UI** feature |            Yes            |                   Yes                    |
+|                 Customizable keyboard shortcuts                 |            Yes            |                   Yes                    |
+|                       VCS Changes Upload                        |            Yes            |                   Yes                    |
+|                   Multi-selection File Upload                   |            Yes            |                   Yes                    |
+|                  Multi-selection Folder Upload                  |          **No**           |                   Yes                    |
+|                       Editor File Upload                        |            Yes            |                   Yes                    |
+
 <!-- Plugin description end -->
 
 ## How to install

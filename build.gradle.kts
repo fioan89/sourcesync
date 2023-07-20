@@ -1,5 +1,9 @@
+import com.jetbrains.plugin.structure.base.utils.simpleName
+import com.jetbrains.plugin.structure.intellij.utils.JDOMUtil
+import java.nio.file.Files
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.intellij.transformXml
 
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
@@ -104,6 +108,35 @@ tasks {
                     Changelog.OutputType.HTML,
                 )
             }
+        }
+
+        doLast {
+            pluginXmlFiles.get()
+                .map(File::toPath)
+                .forEach { xmlPath ->
+                    val xmlPathOnDestinationDir = destinationDir.get().asFile.toPath().resolve(xmlPath.simpleName)
+                    Files.newInputStream(xmlPathOnDestinationDir).use { inputStream ->
+                        val document = JDOMUtil.loadDocument(inputStream)
+                        val pluginXml = document.rootElement.takeIf { it.name == "idea-plugin" }
+                        pluginXml?.let {
+                            val descriptionTag = pluginXml.getChild("description")
+
+                            descriptionTag?.apply {
+                                setText(
+                                    "<style>\n" +
+                                            "table, tr, th, td {\n" +
+                                            "  border: 1px solid;\n" +
+                                            "  border-spacing: 0px;\n" +
+                                            "  border-collapse: collapse;\n" +
+                                            "}\n" +
+                                            "</style>\n\n$text"
+                                )
+                            }
+                        }
+
+                        transformXml(document, xmlPathOnDestinationDir)
+                    }
+                }
         }
     }
 
