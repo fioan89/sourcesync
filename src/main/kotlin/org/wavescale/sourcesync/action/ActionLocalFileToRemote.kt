@@ -10,7 +10,7 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.project.stateStore
-import com.intellij.ui.ExperimentalUI
+import com.intellij.ui.NewUI
 import org.wavescale.sourcesync.SourceSyncIcons
 import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.api.Utils
@@ -83,7 +83,7 @@ class ActionLocalFileToRemote : AnAction() {
 
     override fun update(e: AnActionEvent) {
         super.update(e)
-        if (ExperimentalUI.isNewUI()) {
+        if (NewUI.isEnabled()) {
             e.presentation.icon = SourceSyncIcons.ExpUI.SOURCESYNC
         }
 

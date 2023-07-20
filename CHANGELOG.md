@@ -6,11 +6,15 @@
 
 ### Added
 
-- **Sourcesync Pro** announcement
+- [**Sourcesync Pro**](https://plugins.jetbrains.com/plugin/22318-source-synchronizer-pro) announcement
+
+### Changed
+
+- the plugin no longer relies on private/Internal IntelliJ API's (ported from **Sourcesync Pro**)
 
 ### Fixed
 
-- NPE when notification group is not available yet
+- NPE when notification group is not yet available
 
 ## [3.0.1] - 2023-06-30
 
