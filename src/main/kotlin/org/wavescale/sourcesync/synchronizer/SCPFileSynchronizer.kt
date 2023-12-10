@@ -18,6 +18,12 @@ import com.jcraft.jsch.ChannelExec
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.JSchException
 import com.jcraft.jsch.Session
+import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
+import java.io.InputStream
+import java.nio.file.Path
+import java.nio.file.Paths
 import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.api.Utils
 import org.wavescale.sourcesync.configurations.AuthenticationType
@@ -25,12 +31,6 @@ import org.wavescale.sourcesync.configurations.ScpSyncConfiguration
 import org.wavescale.sourcesync.notifications.Notifier
 import org.wavescale.sourcesync.services.StatsService
 import org.wavescale.sourcesync.services.SyncStatusService
-import java.io.File
-import java.io.FileInputStream
-import java.io.IOException
-import java.io.InputStream
-import java.nio.file.Path
-import java.nio.file.Paths
 
 class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val project: Project) : Synchronizer {
     private val syncStatusService = service<SyncStatusService>()
@@ -104,17 +104,27 @@ class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val p
     /**
      * Uploads the given file to the remote target.
      *
-     * @param sourcePath     a `String` representing a file path to be uploaded. This is a relative path
+     * @param src     a `String` representing a file path to be uploaded. This is a relative path
      * to project base path.
      * @param uploadLocation a `String` representing a location path on the remote target
      * where the source will be uploaded.
      */
-    override fun syncFile(sourcePath: String, uploadLocation: Path, indicator: ProgressIndicator) {
-        val preserveTimestamp = configuration.preserveTimestamps
-        val remotePath = Paths.get(configuration.workspaceBasePath).resolve(uploadLocation)
+    override fun syncFile(src: String, uploadLocation: Path, indicator: ProgressIndicator) {
+        val srcAsFile = File(src)
+        var remotePath = Paths
+            .get(configuration.workspaceBasePath)
+            .resolve(uploadLocation)
             .pathStringLike(configuration.workspaceBasePath)
+
+        var command = "scp " + (if (configuration.preserveTimestamps) "-p" else "") + " -t -C "
+        if (srcAsFile.isFile) {
+            remotePath = Paths
+                .get(remotePath)
+                .resolve(srcAsFile.name)
+                .pathStringLike(configuration.workspaceBasePath)
+            command += remotePath
+        }
         try {
-            var command = "scp " + (if (preserveTimestamp) "-p" else "") + " -t -C " + remotePath
             val channel = session!!.openChannel("exec")
             (channel as ChannelExec).setCommand(command)
 
@@ -125,14 +135,13 @@ class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val p
             if (checkAck(inputStream, this::onChannelConnectError) != 0) {
                 return
             }
-            val _lfile = File(sourcePath)
             indicator.isIndeterminate = false
-            indicator.text = "Uploading...[" + _lfile.name + "]"
-            if (preserveTimestamp) {
-                command = "T " + _lfile.lastModified() / 1000 + " 0"
+            indicator.text = "Uploading...[" + srcAsFile.name + "]"
+            if (configuration.preserveTimestamps) {
+                command = "T " + srcAsFile.lastModified() / 1000 + " 0"
                 // The access time should be sent here,
                 // but it is not accessible with JavaAPI ;-<
-                command += " " + (_lfile.lastModified() / 1000) + " 0\n"
+                command += " " + (srcAsFile.lastModified() / 1000) + " 0\n"
                 out.write(command.toByteArray())
                 out.flush()
                 if (checkAck(inputStream, this::onPreservingTimestampsError) != 0) {
@@ -140,9 +149,9 @@ class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val p
                 }
             }
             // send "C0644 filesize filename", where filename should not include '/'
-            val filesize = _lfile.length()
+            val filesize = srcAsFile.length()
             command = "C0644 $filesize "
-            command += Paths.get(sourcePath).fileName.toString()
+            command += Paths.get(src).fileName.toString()
             command += "\n"
             out.write(command.toByteArray())
             out.flush()
@@ -151,7 +160,7 @@ class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val p
             }
 
             // send content of finalSourcePath
-            val fis = FileInputStream(sourcePath)
+            val fis = FileInputStream(src)
             var totalUploaded = 0.0
             val buf = ByteArray(1024)
             while (true) {
