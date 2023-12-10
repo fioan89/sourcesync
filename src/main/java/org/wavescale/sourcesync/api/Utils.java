@@ -53,7 +53,7 @@ public class Utils
      * <pre>
      * - project base bath is: C:\Users\ifaur\workspace\sourcesync\
      * - selected file/folder: C:\Users\ifaur\workspace\sourcesync\src\main\kotlin\Example.kt
-     * - result is: src\main\kotlin\Example.kt
+     * - result is: src\main\kotlin
      * </pre>
      */
     public static Path relativeToProjectPath(VirtualFile virtualFile, IProjectStore projectStore)
