@@ -9,6 +9,8 @@ class StatsService {
         successfulUploads++
     }
 
-    fun eligibleForDonations() =
-        successfulUploads == 10 || successfulUploads == 50 || successfulUploads == 120 || successfulUploads == 200 || successfulUploads == 500
+    fun eligibleForDonations(): Boolean = when (successfulUploads) {
+        10, 30, 60, 100 -> true
+        else -> successfulUploads % 100 == 0
+    }
 }
