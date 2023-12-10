@@ -62,7 +62,7 @@ class ActionLocalFileToRemote : AnAction() {
         }
 
         if (Utils.canBeUploaded(virtualFile.name, mainConfiguration.excludedFiles)) {
-            val uploadLocation = Utils.relativeLocalUploadDirs(virtualFile, project.stateStore)
+            val uploadLocation = Utils.relativeToProjectPath(virtualFile, project.stateStore)
             ProgressManager.getInstance().run(object : Task.Backgroundable(e.project, "Uploading", false) {
                 override fun run(indicator: ProgressIndicator) {
                     try {

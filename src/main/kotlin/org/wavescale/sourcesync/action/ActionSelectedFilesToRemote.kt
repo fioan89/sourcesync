@@ -75,7 +75,7 @@ class ActionSelectedFilesToRemote : AnAction() {
             override fun run(indicator: ProgressIndicator) {
                 try {
                     if (fileSynchronizer.connect()) {
-                        fileSynchronizer.syncFiles(acceptedFiles.map { Pair(it.path, Utils.relativeLocalUploadDirs(it, project.stateStore)) }.toSet(), indicator)
+                        fileSynchronizer.syncFiles(acceptedFiles.map { Pair(it.path, Utils.relativeToProjectPath(it, project.stateStore)) }.toSet(), indicator)
                     }
                 } finally {
                     fileSynchronizer.disconnect()
