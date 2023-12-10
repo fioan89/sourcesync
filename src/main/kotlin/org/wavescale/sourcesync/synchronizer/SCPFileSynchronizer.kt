@@ -182,7 +182,7 @@ class SCPFileSynchronizer(private val configuration: ScpSyncConfiguration, val p
             channel.disconnect()
             statsService.registerSuccessfulUpload()
             if (statsService.eligibleForDonations()) {
-                Notifier.notifyDonation(project)
+                Notifier.notifyToProDueToHighNumberOfUploads(project)
             }
         } catch (e: Exception) {
             syncStatusService.removeRunningSync(configuration.name)

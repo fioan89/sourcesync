@@ -20,6 +20,11 @@ import com.jcraft.jsch.JSch
 import com.jcraft.jsch.JSchException
 import com.jcraft.jsch.Session
 import com.jcraft.jsch.SftpProgressMonitor
+import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
+import java.nio.file.Path
+import java.nio.file.Paths
 import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.api.Utils
 import org.wavescale.sourcesync.configurations.AuthenticationType
@@ -27,11 +32,6 @@ import org.wavescale.sourcesync.configurations.SshSyncConfiguration
 import org.wavescale.sourcesync.notifications.Notifier
 import org.wavescale.sourcesync.services.StatsService
 import org.wavescale.sourcesync.services.SyncStatusService
-import java.io.File
-import java.io.FileInputStream
-import java.io.IOException
-import java.nio.file.Path
-import java.nio.file.Paths
 
 
 /**
@@ -206,7 +206,7 @@ class SFTPFileSynchronizer(private val configuration: SshSyncConfiguration, val 
             indicator.fraction = 1.0
             statsService.registerSuccessfulUpload()
             if (statsService.eligibleForDonations()) {
-                Notifier.notifyDonation(project)
+                Notifier.notifyToProDueToHighNumberOfUploads(project)
             }
         }
     }

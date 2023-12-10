@@ -33,18 +33,23 @@ class ActionLocalFileToRemote : AnAction() {
         val project = e.project ?: return
 
         val virtualFile = PlatformDataKeys.VIRTUAL_FILE.getData(e.dataContext)
-        if (virtualFile == null || virtualFile.isDirectory) {
+        if (virtualFile == null) {
             Notifier.notifyInfo(
-                e.project!!,
+                project,
                 SourcesyncBundle.message("no.file.selected.to.sync")
             )
+            return
+        }
+
+        if (virtualFile.isDirectory) {
+            Notifier.notifyUpgradeToProDueToFolderUpload(project)
             return
         }
 
         val mainConfiguration = syncConfigurationsService.mainConnection()
         if (mainConfiguration == null) {
             Notifier.notifyError(
-                e.project!!,
+                project,
                 SourcesyncBundle.message("no.remote.sync.connection.configured.title"),
                 SourcesyncBundle.message("no.remote.sync.connection.configured.message")
             )
