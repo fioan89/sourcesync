@@ -10,7 +10,7 @@ import org.wavescale.sourcesync.SourcesyncBundle
 
 private const val SOURCESYNC_GROUP_ID = "Sourcesync"
 
-private const val PROPERTY_IGNORE_SOURCESYNC_DONATION = "ignore.sourcesync.donation.v302"
+private const val PROPERTY_IGNORE_SOURCESYNC_DONATION = "ignore.sourcesync.donation.v303"
 
 class Notifier {
     companion object {
