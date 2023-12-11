@@ -17,12 +17,13 @@ import com.intellij.openapi.wm.impl.ExpandableComboAction
 import com.intellij.openapi.wm.impl.ToolbarComboWidget
 import com.intellij.ui.components.JBList
 import com.intellij.ui.popup.PopupFactoryImpl
+import com.intellij.ui.util.maximumWidth
+import javax.swing.JComponent
 import org.wavescale.sourcesync.SourceSyncIcons
 import org.wavescale.sourcesync.SourcesyncBundle
 import org.wavescale.sourcesync.factory.ConnectionConfig
 import org.wavescale.sourcesync.services.SyncRemoteConfigurationsService
 import org.wavescale.sourcesync.services.SyncStatusService
-import javax.swing.JComponent
 
 class NewUIConnectionConfigurationSelector : ExpandableComboAction() {
     private val syncStatusService = service<SyncStatusService>()
@@ -34,9 +35,7 @@ class NewUIConnectionConfigurationSelector : ExpandableComboAction() {
     }
 
     override fun createCustomComponent(presentation: Presentation, place: String): JComponent {
-        val comp = super.createCustomComponent(presentation, place)
-        (comp.ui as? ToolbarComboWidgetUI)?.setMaxWidth(Int.MAX_VALUE)
-        return comp
+        return super.createCustomComponent(presentation, place).apply { maximumWidth = Int.MAX_VALUE }
     }
 
     override fun updateCustomComponent(component: JComponent, presentation: Presentation) {
