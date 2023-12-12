@@ -11,6 +11,7 @@
 ### Fixed
 
 - SCP upload for files that don't have an existing remote directory will now fail with an error instead of silently uploading into a file with parent folder's name
+- support for New UI on IJ 2023.3
 
 ## [3.0.2] - 2023-07-20
 
