@@ -62,9 +62,15 @@ class ActionSelectedFilesToRemote : AnAction() {
                 SFTPFileSynchronizer(mainConfiguration as SshSyncConfiguration, project)
             }
         }
+        var directoriesFound = false
         val (files, rest) = virtualFiles.filterNotNull().partition { File(it.path).isFile }
         rest.forEach {
+            directoriesFound = true
             logger.info("Skipping upload of ${it.name} because it's a directory")
+        }
+
+        if (directoriesFound) {
+            Notifier.notifyUpgradeToProDueToFolderUpload(project)
         }
 
         val (acceptedFiles, excludedFiles) = files.partition { Utils.canBeUploaded(it.name, mainConfiguration.excludedFiles) }
@@ -75,7 +81,7 @@ class ActionSelectedFilesToRemote : AnAction() {
             override fun run(indicator: ProgressIndicator) {
                 try {
                     if (fileSynchronizer.connect()) {
-                        fileSynchronizer.syncFiles(acceptedFiles.map { Pair(it.path, Utils.relativeLocalUploadDirs(it, project.stateStore)) }.toSet(), indicator)
+                        fileSynchronizer.syncFiles(acceptedFiles.map { Pair(it.path, Utils.relativeToProjectPath(it, project.stateStore)) }.toSet(), indicator)
                     }
                 } finally {
                     fileSynchronizer.disconnect()

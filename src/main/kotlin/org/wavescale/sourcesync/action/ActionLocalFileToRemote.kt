@@ -33,18 +33,23 @@ class ActionLocalFileToRemote : AnAction() {
         val project = e.project ?: return
 
         val virtualFile = PlatformDataKeys.VIRTUAL_FILE.getData(e.dataContext)
-        if (virtualFile == null || virtualFile.isDirectory) {
+        if (virtualFile == null) {
             Notifier.notifyInfo(
-                e.project!!,
+                project,
                 SourcesyncBundle.message("no.file.selected.to.sync")
             )
+            return
+        }
+
+        if (virtualFile.isDirectory) {
+            Notifier.notifyUpgradeToProDueToFolderUpload(project)
             return
         }
 
         val mainConfiguration = syncConfigurationsService.mainConnection()
         if (mainConfiguration == null) {
             Notifier.notifyError(
-                e.project!!,
+                project,
                 SourcesyncBundle.message("no.remote.sync.connection.configured.title"),
                 SourcesyncBundle.message("no.remote.sync.connection.configured.message")
             )
@@ -62,7 +67,7 @@ class ActionLocalFileToRemote : AnAction() {
         }
 
         if (Utils.canBeUploaded(virtualFile.name, mainConfiguration.excludedFiles)) {
-            val uploadLocation = Utils.relativeLocalUploadDirs(virtualFile, project.stateStore)
+            val uploadLocation = Utils.relativeToProjectPath(virtualFile, project.stateStore)
             ProgressManager.getInstance().run(object : Task.Backgroundable(e.project, "Uploading", false) {
                 override fun run(indicator: ProgressIndicator) {
                     try {
