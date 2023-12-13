@@ -41,7 +41,6 @@
                 description="Sourcesync Configurationsss"
                 icon="/expui/sourcesync.svg">
             <add-to-group group-id="SourcesyncToolbarGroupNewUI" />
-            <override-text place="NewUiRunToolbar" />
         </action>
 
         <action id="actionLocalFileToRemote" class="org.wavescale.sourcesync.action.ActionLocalFileToRemote"
