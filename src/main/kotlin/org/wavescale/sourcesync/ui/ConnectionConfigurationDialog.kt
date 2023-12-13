@@ -2,6 +2,7 @@ package org.wavescale.sourcesync.ui
 
 import com.intellij.CommonBundle
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
@@ -17,16 +18,6 @@ import com.intellij.ui.util.minimumWidth
 import com.intellij.ui.util.preferredWidth
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.tree.TreeUtil
-import org.wavescale.sourcesync.SourcesyncBundle
-import org.wavescale.sourcesync.configurations.ScpSyncConfiguration
-import org.wavescale.sourcesync.configurations.SshSyncConfiguration
-import org.wavescale.sourcesync.configurations.SyncConfigurationType
-import org.wavescale.sourcesync.configurations.SyncConfigurationType.SCP
-import org.wavescale.sourcesync.configurations.SyncConfigurationType.SFTP
-import org.wavescale.sourcesync.services.SyncRemoteConfigurationsService
-import org.wavescale.sourcesync.ui.tree.SyncConfigurationTreeRenderer
-import org.wavescale.sourcesync.ui.tree.SyncConnectionsTree
-import org.wavescale.sourcesync.ui.tree.SyncConnectionsTreeModel
 import java.awt.BorderLayout
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -40,8 +31,23 @@ import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.TreeNode
 import javax.swing.tree.TreeSelectionModel
 import kotlin.math.max
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.wavescale.sourcesync.SourcesyncBundle
+import org.wavescale.sourcesync.configurations.ScpSyncConfiguration
+import org.wavescale.sourcesync.configurations.SshSyncConfiguration
+import org.wavescale.sourcesync.configurations.SyncConfigurationType
+import org.wavescale.sourcesync.configurations.SyncConfigurationType.SCP
+import org.wavescale.sourcesync.configurations.SyncConfigurationType.SFTP
+import org.wavescale.sourcesync.services.SyncRemoteConfigurationsService
+import org.wavescale.sourcesync.ui.tree.SyncConfigurationTreeRenderer
+import org.wavescale.sourcesync.ui.tree.SyncConnectionsTree
+import org.wavescale.sourcesync.ui.tree.SyncConnectionsTreeModel
 
 class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(project, true) {
+    private val cs = CoroutineScope(Dispatchers.IO)
     private var syncRemoteConfigurationsService = project.service<SyncRemoteConfigurationsService>()
 
     private val splitter = JBSplitter(false, "SourcesyncConnectionConfiguration.dividerProportion", 0.3f, 0.5f)
@@ -70,12 +76,12 @@ class ConnectionConfigurationDialog(val project: Project) : DialogWrapper(projec
     }
 
     private fun onConfigModifications() {
-        this.updateApplyButton()
-        tree.updateUI()
-    }
-
-    private fun updateApplyButton() {
-        applyAction.isEnabled = treeModel.getAllComponents().hasModifications()
+        cs.launch {
+            applyAction.isEnabled = treeModel.getAllComponents().hasModifications()
+            withContext(Dispatchers.EDT) {
+                tree.updateUI()
+            }
+        }
     }
 
     @Suppress("UnstableApiUsage")
