@@ -32,7 +32,7 @@ repositories {
 
 dependencies {
     implementation("com.github.mwiede:jsch:0.2.13")
-    implementation("commons-net:commons-net:3.10.0")
+    implementation("commons-net:commons-net:3.11.1")
 
     // should be increased only when minimum supported IntelliJ is increased
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.0")
